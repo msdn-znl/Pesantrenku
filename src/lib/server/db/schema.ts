@@ -60,6 +60,39 @@ export const admin = mysqlTable('admin', {
 		.references(() => user.id, { onDelete: 'cascade' })
 });
 
+export const kelas = mysqlTable('kelas', {
+	id: int('id').autoincrement().primaryKey(),
+	namaKelas: varchar('nama_kelas', { length: 50 }),
+	tahunAjaran: varchar('tahun_ajaran', { length: 20 }),
+	ketuaKelas: int('ketua_kelas').references(() => santri.id, { onDelete: 'set null' })
+});
+
+export const kelas_santri = mysqlTable(
+	'kelas_santri',
+	{
+		santriId: int('santri_id')
+			.references(() => santri.id, { onDelete: 'cascade' })
+			.notNull(),
+		kelasId: int('kelas_id')
+			.references(() => kelas.id, { onDelete: 'cascade' })
+			.notNull()
+	},
+	(table) => [primaryKey({ columns: [table.kelasId, table.santriId] })]
+);
+
+export const kelas_guru = mysqlTable(
+	'kelas_guru',
+	{
+		kelasId: int('kelas_id')
+			.references(() => kelas.id, { onDelete: 'cascade' })
+			.notNull(),
+		guruId: int('guru_id')
+			.references(() => guru.id, { onDelete: 'cascade' })
+			.notNull()
+	},
+	(table) => [primaryKey({ columns: [table.kelasId, table.guruId] })]
+);
+
 export type Session = typeof session.$inferSelect;
 
 export type User = typeof user.$inferSelect;
@@ -69,3 +102,9 @@ export type Santri = typeof santri.$inferSelect;
 export type Guru = typeof guru.$inferSelect;
 
 export type Admin = typeof admin.$inferSelect;
+
+export type Kelas = typeof kelas.$inferSelect;
+
+export type KelasSantri = typeof kelas_santri.$inferSelect;
+
+export type KelasGuru = typeof kelas_guru.$inferSelect;
