@@ -93,6 +93,13 @@ export const kelas_guru = mysqlTable(
 	(table) => [primaryKey({ columns: [table.kelasId, table.guruId] })]
 );
 
+export const kitab = mysqlTable('kitab', {
+	id: int('id').autoincrement().primaryKey(),
+	namaKitab: varchar('nama_kitab', { length: 100 }),
+	pengarang: varchar('pengarang', { length: 255 }),
+	kategori: varchar('kategori', { length: 20 })
+});
+
 export type Session = typeof session.$inferSelect;
 
 export type User = typeof user.$inferSelect;
@@ -108,3 +115,5 @@ export type Kelas = typeof kelas.$inferSelect;
 export type KelasSantri = typeof kelas_santri.$inferSelect;
 
 export type KelasGuru = typeof kelas_guru.$inferSelect;
+
+export type Kitab = typeof kitab.$inferSelect;
