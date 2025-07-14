@@ -1,4 +1,9 @@
 node_modules
+drizzle/
+package-lock.json
+.svelte-kit
+.vscode
+Dev-Note.md
 
 # Output
 .output
