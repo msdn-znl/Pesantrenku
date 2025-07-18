@@ -62,8 +62,8 @@
 						<td>
 							<!-- Todo: Buat modal untuk tombol edit -->
 							<div>
-								<button class="btn btn-accent"
-									><a href={'/user/edit-data/' + user.id}>Edit</a></button
+								<a href={'/user/edit-data/' + user.id}
+									><button class="btn btn-accent">Edit</button></a
 								>
 							</div>
 							<div>

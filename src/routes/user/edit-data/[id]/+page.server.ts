@@ -67,8 +67,10 @@ export const actions: Actions = {
 
 		try {
 			await db.update(table.user).set(updatedData).where(eq(table.user.id, id));
+			return { success: true, message: 'Berhasil di-edit' };
 		} catch (err) {
 			console.error(err);
+			error(500, 'An error occured');
 		}
 	}
 };
