@@ -1,12 +1,12 @@
 <script lang="ts">
+	import { enhance } from '$app/forms';
 	import type { PageServerData, ActionData } from './$types';
 
 	let { data, form }: { data: PageServerData; form: ActionData } = $props();
-	let { kelasList } = data;
 </script>
 
 <div>
-	<form method="post" action="?/add">
+	<form method="post" action="?/add" use:enhance>
 		<label for="namaKelas">Nama Kelas</label>
 		<input
 			type="text"
@@ -42,7 +42,7 @@
 				</tr>
 			</thead>
 			<tbody>
-				{#each kelasList as kelas, i (kelas.id)}
+				{#each data.kelasList as kelas, i (kelas.id)}
 					<tr class="hover:bg-base-300">
 						<th>{i + 1}</th>
 						<td>{kelas.namaKelas}</td>

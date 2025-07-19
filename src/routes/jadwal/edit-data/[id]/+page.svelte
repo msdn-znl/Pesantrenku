@@ -4,7 +4,6 @@
 
 	let { data, form }: { data: PageServerData; form: ActionData } = $props();
 	const hari = ['', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
-	const { jadwal } = data;
 </script>
 
 <div class="flex flex-row">
@@ -20,7 +19,7 @@
 				<select name="kitabId" id="kitabId" class="select" required>
 					<option value=""></option>
 					{#each kitabList as kitab (kitab.id)}
-						<option value={kitab.id} selected={kitab.id === jadwal.kitabId}
+						<option value={kitab.id} selected={kitab.id === data.jadwal?.kitabId}
 							>{kitab.namaKitab}</option
 						>
 					{/each}
@@ -37,7 +36,7 @@
 				<select name="kelasId" id="kelasId" class="select" required>
 					<option value=""></option>
 					{#each kelasList as kelas (kelas.id)}
-						<option value={kelas.id} selected={kelas.id === jadwal.kelasId}
+						<option value={kelas.id} selected={kelas.id === data.jadwal?.kelasId}
 							>{kelas.namaKelas}</option
 						>
 					{/each}
@@ -54,7 +53,7 @@
 				<select name="guruId" id="guruId" class="select" required>
 					<option value=""></option>
 					{#each guruList as guru (guru.id)}
-						<option value={guru.id} selected={guru.id === jadwal.guruId}>{guru.nama}</option>
+						<option value={guru.id} selected={guru.id === data.jadwal?.guruId}>{guru.nama}</option>
 					{/each}
 				</select>
 			{:catch error}
@@ -63,7 +62,7 @@
 			<label for="hari">Hari</label>
 			<select name="hari" id="hari" class="select" required>
 				{#each hari as h}
-					<option value={h} selected={h === jadwal.hari}>{h}</option>
+					<option value={h} selected={h === data.jadwal?.hari}>{h}</option>
 				{/each}
 			</select>
 			<label for="jamMulai">Jam Mulai</label>
@@ -73,7 +72,7 @@
 				id="jamMulai"
 				class="input"
 				required
-				value={jadwal.jamMulai}
+				value={data.jadwal?.jamMulai}
 			/>
 			<label for="jamSelesai">Jam Selesai</label>
 			<input
@@ -82,7 +81,7 @@
 				id="jamSelesai"
 				class="input"
 				required
-				value={jadwal.jamSelesai}
+				value={data.jadwal?.jamSelesai}
 			/>
 			<button type="submit" class="btn btn-success">Edit Data</button>
 		</form>
