@@ -10,15 +10,15 @@ export const load: PageServerLoad = async () => {
 		const streamedPromises = {
 			kelasList: db.select().from(table.kelas),
 			guruList: db
-				.select({ id: table.guru.id, nama: table.user.nama })
+				.select({ id: table.guru.id, nama: table.users.nama })
 				.from(table.guru)
-				.innerJoin(table.user, eq(table.guru.userId, table.user.id)), //harusnya tabel join antara guru dan user
+				.innerJoin(table.users, eq(table.guru.userId, table.users.id)), //harusnya tabel join antara guru dan user
 			kitabList: db.select().from(table.kitab)
 		};
 		const jadwalListPromise = db
 			.select({
 				id: table.jadwal.id,
-				nama: table.user.nama,
+				nama: table.users.nama,
 				kelas: table.kelas.namaKelas,
 				kitab: table.kitab.namaKitab,
 				hari: table.jadwal.hari,
@@ -27,7 +27,7 @@ export const load: PageServerLoad = async () => {
 			})
 			.from(table.jadwal)
 			.innerJoin(table.guru, eq(table.jadwal.guruId, table.guru.id))
-			.innerJoin(table.user, eq(table.guru.userId, table.user.id))
+			.innerJoin(table.users, eq(table.guru.userId, table.users.id))
 			.innerJoin(table.kelas, eq(table.jadwal.kelasId, table.kelas.id))
 			.innerJoin(table.kitab, eq(table.jadwal.kitabId, table.kitab.id));
 		return { streamed: streamedPromises, jadwalList: await jadwalListPromise };
@@ -62,14 +62,14 @@ export const actions: Actions = {
 	},
 	delete: async (event: RequestEvent) => {
 		const formData = await event.request.formData();
-		const paramsId = formData.get('id');
-		if (!paramsId) {
+		const entryId = formData.get('id');
+		if (!entryId) {
 			return fail(400, { message: 'userId  tidak ada' });
 		}
-		if (typeof paramsId !== 'string') {
+		if (typeof entryId !== 'string') {
 			return fail(400, { message: 'userId tidak valid' });
 		}
-		const id = parseInt(paramsId);
+		const id = parseInt(entryId);
 		try {
 			await db.delete(table.jadwal).where(eq(table.jadwal.id, id));
 			return { success: true, message: 'Berhasil Dihapus' };

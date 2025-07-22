@@ -13,12 +13,12 @@ export const load: PageServerLoad = async () => {
 	try {
 		const userList = await db
 			.select({
-				id: table.user.id,
-				nama: table.user.nama,
-				username: table.user.username,
-				role: table.user.role
+				id: table.users.id,
+				nama: table.users.nama,
+				username: table.users.username,
+				role: table.users.role
 			})
-			.from(table.user);
+			.from(table.users);
 		return { userList };
 	} catch (err) {
 		console.error(err);
@@ -33,7 +33,7 @@ export const actions: Actions = {
 		if (!newUsername || typeof newUsername !== 'string') {
 			return fail(400, { message: 'no Email provided/ email not valid' });
 		}
-		const result = await db.select().from(table.user).where(eq(table.user.username, newUsername));
+		const result = await db.select().from(table.users).where(eq(table.users.username, newUsername));
 
 		const existingUser = result.at(0);
 		if (existingUser) {
@@ -68,26 +68,18 @@ export const actions: Actions = {
 
 		try {
 			await db.transaction(async (tx) => {
-				await tx.insert(table.user).values({ id: userId, username, passwordHash, role, nama });
-				if (role === 'admin') {
-					await tx.insert(table.admin).values({ userId: userId });
-				} else if (role === 'guru') {
+				await tx.insert(table.users).values({ id: userId, username, passwordHash, role, nama });
+				if (role === 'guru') {
 					await tx.insert(table.guru).values({ userId: userId, status: 'aktif' });
 				} else if (role === 'santri') {
 					await tx.insert(table.santri).values({ userId: userId, status: 'aktif' });
 				}
 			});
 			return { success: true, message: 'Success' };
-			// await db.insert(table.user).values({ id: userId, username, passwordHash, role, nama });
-
-			// const sessionToken = auth.generateSessionToken();
-			// const session = await auth.createSession(sessionToken, userId);
-			// auth.setSessionTokenCookie(event, sessionToken, session.expiresAt);
 		} catch (error) {
 			console.error(error);
 			return fail(500, { message: 'An error has occurred' });
 		}
-		// return redirect(302, '/auth');
 	},
 
 	delete: async (event: RequestEvent) => {
@@ -100,7 +92,7 @@ export const actions: Actions = {
 			return fail(400, { message: 'userId tidak valid' });
 		}
 		try {
-			await db.delete(table.user).where(eq(table.user.id, id));
+			await db.delete(table.users).where(eq(table.users.id, id));
 			return { success: true, message: 'Berhasil Dihapus' };
 		} catch (err) {
 			console.error(err);

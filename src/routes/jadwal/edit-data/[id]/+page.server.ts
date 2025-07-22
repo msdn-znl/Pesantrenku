@@ -16,9 +16,9 @@ export const load: PageServerLoad = async ({ params }) => {
 		const streamedPromises = {
 			kelasList: db.select().from(table.kelas),
 			guruList: db
-				.select({ id: table.guru.id, nama: table.user.nama })
+				.select({ id: table.guru.id, nama: table.users.nama })
 				.from(table.guru)
-				.innerJoin(table.user, eq(table.guru.userId, table.user.id)), //harusnya tabel join antara guru dan user
+				.innerJoin(table.users, eq(table.guru.userId, table.users.id)), //harusnya tabel join antara guru dan user
 			kitabList: db.select().from(table.kitab)
 		};
 		const jadwal = db.query.jadwal.findFirst({
