@@ -11,9 +11,9 @@ export const load: PageServerLoad = async ({ params }) => {
 	try {
 		const id = params.id;
 		const userArray = await db
-			.select({ nama: table.user.nama, username: table.user.username, role: table.user.role })
-			.from(table.user)
-			.where(eq(table.user.id, id));
+			.select({ nama: table.users.nama, username: table.users.username, role: table.users.role })
+			.from(table.users)
+			.where(eq(table.users.id, id));
 		const user = userArray[0];
 		if (!user) {
 			error(404, { message: 'User tidak ditemukan' });
@@ -66,7 +66,7 @@ export const actions: Actions = {
 		}
 
 		try {
-			await db.update(table.user).set(updatedData).where(eq(table.user.id, id));
+			await db.update(table.users).set(updatedData).where(eq(table.users.id, id));
 			return { success: true, message: 'Berhasil di-edit' };
 		} catch (err) {
 			console.error(err);

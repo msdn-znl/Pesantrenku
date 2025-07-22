@@ -13,13 +13,13 @@ export const load: PageServerLoad = async () => {
 		const guruList = await db
 			.select({
 				id: table.guru.userId,
-				nama: table.user.nama,
+				nama: table.users.nama,
 				nomorIndukGuru: table.guru.nomorIndukGuru,
 				status: table.guru.status,
 				nomorTelepon: table.guru.nomorTelepon
 			})
 			.from(table.guru)
-			.innerJoin(table.user, eq(table.guru.userId, table.user.id));
+			.innerJoin(table.users, eq(table.guru.userId, table.users.id));
 		return { guruList };
 	} catch (err) {
 		console.error(err);

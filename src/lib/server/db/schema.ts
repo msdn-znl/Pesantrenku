@@ -12,7 +12,7 @@ import {
 } from 'drizzle-orm/mysql-core';
 import { relations } from 'drizzle-orm';
 
-export const user = mysqlTable('user', {
+export const users = mysqlTable('users', {
 	id: varchar('id', { length: 255 }).primaryKey(),
 	age: int('age'),
 	nama: varchar('nama', { length: 255 }),
@@ -25,8 +25,13 @@ export const session = mysqlTable('session', {
 	id: varchar('id', { length: 255 }).primaryKey(),
 	userId: varchar('user_id', { length: 255 })
 		.notNull()
-		.references(() => user.id),
+		.references(() => users.id),
 	expiresAt: datetime('expires_at').notNull()
+});
+
+export const tahun_ajaran = mysqlTable('tahun_ajaran', {
+	id: int('id').autoincrement().primaryKey(),
+	tahunAjaran: varchar('tahun_ajaran', { length: 25 })
 });
 
 export const santri = mysqlTable('santri', {
@@ -41,7 +46,7 @@ export const santri = mysqlTable('santri', {
 	kamar: varchar('kamar', { length: 255 }),
 	userId: varchar('user_id', { length: 255 })
 		.notNull()
-		.references(() => user.id, { onDelete: 'cascade' })
+		.references(() => users.id, { onDelete: 'cascade' })
 });
 
 export const guru = mysqlTable('guru', {
@@ -51,48 +56,51 @@ export const guru = mysqlTable('guru', {
 	status: mysqlEnum(['aktif', 'inaktif']),
 	userId: varchar('user_id', { length: 255 })
 		.notNull()
-		.references(() => user.id, { onDelete: 'cascade' })
+		.references(() => users.id, { onDelete: 'cascade' })
 });
 
-export const admin = mysqlTable('admin', {
-	id: int('id').autoincrement().primaryKey(),
-	userId: varchar('user_id', { length: 255 })
-		.notNull()
-		.references(() => user.id, { onDelete: 'cascade' })
-});
+// tabel admin ini bisa dihapus
+// export const admin = mysqlTable('admin', {
+// 	id: int('id').autoincrement().primaryKey(),
+// 	userId: varchar('user_id', { length: 255 })
+// 		.notNull()
+// 		.references(() => users.id, { onDelete: 'cascade' })
+// });
 
-export const userRelations = relations(user, ({ one }) => ({
+export const userRelations = relations(users, ({ one }) => ({
 	guru: one(guru),
 	santri: one(santri)
 }));
 
 export const guruRelations = relations(guru, ({ one, many }) => ({
-	user: one(user, {
+	user: one(users, {
 		fields: [guru.userId],
-		references: [user.id]
+		references: [users.id]
 	}),
 	jadwal: many(jadwal),
-	kelas: many(kelas_guru)
+	absensi_guru: many(absensi_guru)
+	// kelas_guru: many(kelas_guru)
 }));
 
 export const santriRelations = relations(santri, ({ one, many }) => ({
-	user: one(user, {
+	user: one(users, {
 		fields: [santri.userId],
-		references: [user.id]
+		references: [users.id]
 	}),
-	kelas_santri: many(kelas_santri)
+	kelas_santri: many(kelas_santri),
+	absensi_santri: many(absensi_santri)
 }));
 
 export const kelas = mysqlTable('kelas', {
 	id: int('id').autoincrement().primaryKey(),
 	namaKelas: varchar('nama_kelas', { length: 50 }),
-	tahunAjaran: varchar('tahun_ajaran', { length: 20 }),
+	tahunAjaran: int('tahun_ajaran').references(() => tahun_ajaran.id, { onDelete: 'set null' }),
 	ketuaKelas: int('ketua_kelas').references(() => santri.id, { onDelete: 'set null' })
 });
 
 export const kelasRelations = relations(kelas, ({ many }) => ({
-	kelas_santri: many(kelas_santri),
-	kelas_guru: many(kelas_guru)
+	kelas_santri: many(kelas_santri)
+	// kelas_guru: many(kelas_guru)
 }));
 
 export const kelas_santri = mysqlTable(
@@ -119,29 +127,29 @@ export const kelasSantriRelations = relations(kelas_santri, ({ one }) => ({
 	})
 }));
 
-export const kelas_guru = mysqlTable(
-	'kelas_guru',
-	{
-		kelasId: int('kelas_id')
-			.references(() => kelas.id, { onDelete: 'cascade' })
-			.notNull(),
-		guruId: int('guru_id')
-			.references(() => guru.id, { onDelete: 'cascade' })
-			.notNull()
-	},
-	(table) => [primaryKey({ columns: [table.kelasId, table.guruId] })]
-);
+// export const kelas_guru = mysqlTable(
+// 	'kelas_guru',
+// 	{
+// 		kelasId: int('kelas_id')
+// 			.references(() => kelas.id, { onDelete: 'cascade' })
+// 			.notNull(),
+// 		guruId: int('guru_id')
+// 			.references(() => guru.id, { onDelete: 'cascade' })
+// 			.notNull()
+// 	},
+// 	(table) => [primaryKey({ columns: [table.kelasId, table.guruId] })]
+// );
 
-export const kelasGuruRelations = relations(kelas_guru, ({ one }) => ({
-	kelas: one(kelas, {
-		fields: [kelas_guru.kelasId],
-		references: [kelas.id]
-	}),
-	guru: one(guru, {
-		fields: [kelas_guru.guruId],
-		references: [guru.id]
-	})
-}));
+// export const kelasGuruRelations = relations(kelas_guru, ({ one }) => ({
+// 	kelas: one(kelas, {
+// 		fields: [kelas_guru.kelasId],
+// 		references: [kelas.id]
+// 	}),
+// 	guru: one(guru, {
+// 		fields: [kelas_guru.guruId],
+// 		references: [guru.id]
+// 	})
+// }));
 
 export const kitab = mysqlTable('kitab', {
 	id: int('id').autoincrement().primaryKey(),
@@ -170,28 +178,83 @@ export const jadwal = mysqlTable('jadwal', {
 	jamSelesai: time('jam_selesai')
 });
 
-export const jadwalRelations = relations(jadwal, ({ one }) => ({
+export const jadwalRelations = relations(jadwal, ({ one, many }) => ({
 	kitab: one(kitab, { fields: [jadwal.kitabId], references: [kitab.id] }),
 	kelas: one(kelas, { fields: [jadwal.kelasId], references: [kelas.id] }),
-	guru: one(guru, { fields: [jadwal.guruId], references: [guru.id] })
+	guru: one(guru, { fields: [jadwal.guruId], references: [guru.id] }),
+	pertemuan: many(pertemuan)
+}));
+
+export const pertemuan = mysqlTable('pertemuan', {
+	id: int('id').autoincrement().primaryKey(),
+	jadwalId: int('jadwal_id')
+		.notNull()
+		.references(() => jadwal.id),
+	jurnalMengajar: text('jurnal_mengajar'),
+	tanggalPertemuan: date('tanggal_pertemuan'),
+	status: mysqlEnum(['selesai', 'batal', 'tugas mandiri'])
+});
+
+export const absensi_santri = mysqlTable('absensi_santri', {
+	id: int('id').autoincrement().primaryKey(),
+	pertemuanId: int('pertemuan_id')
+		.notNull()
+		.references(() => pertemuan.id, { onDelete: 'cascade' }),
+	santriId: int('santri_id')
+		.notNull()
+		.references(() => santri.id, { onDelete: 'cascade' }),
+	status_kehadiran: mysqlEnum(['hadir', 'alfa', 'izin', 'sakit'])
+});
+
+export const absensi_guru = mysqlTable('absensi_guru', {
+	id: int('id').autoincrement().primaryKey(),
+	pertemuanId: int('pertemuan_id')
+		.notNull()
+		.references(() => pertemuan.id, { onDelete: 'cascade' }),
+	guruId: int('guru_id')
+		.notNull()
+		.references(() => guru.id, { onDelete: 'cascade' }),
+	status_kehadiran: mysqlEnum(['hadir', 'tidak hadir'])
+});
+
+export const pertemuanRelations = relations(pertemuan, ({ one, many }) => ({
+	jadwal: one(jadwal, { fields: [pertemuan.jadwalId], references: [jadwal.id] }),
+	absensi_santri: many(absensi_santri),
+	absensi_guru: many(absensi_guru)
+}));
+
+export const absensiSantriRelations = relations(absensi_santri, ({ one }) => ({
+	pertemuan: one(pertemuan, { fields: [absensi_santri.pertemuanId], references: [pertemuan.id] }),
+	santri: one(santri, { fields: [absensi_santri.santriId], references: [santri.id] })
+}));
+
+export const absensiGuruRelations = relations(absensi_guru, ({ one }) => ({
+	pertemuan: one(pertemuan, { fields: [absensi_guru.pertemuanId], references: [pertemuan.id] }),
+	guru: one(guru, { fields: [absensi_guru.guruId], references: [guru.id] })
 }));
 
 export type Session = typeof session.$inferSelect;
 
-export type User = typeof user.$inferSelect;
+export type User = typeof users.$inferSelect;
 
 export type Santri = typeof santri.$inferSelect;
 
 export type Guru = typeof guru.$inferSelect;
 
-export type Admin = typeof admin.$inferSelect;
+// export type Admin = typeof admin.$inferSelect; // bisa dihilangkan
 
 export type Kelas = typeof kelas.$inferSelect;
 
 export type KelasSantri = typeof kelas_santri.$inferSelect;
 
-export type KelasGuru = typeof kelas_guru.$inferSelect;
+// export type KelasGuru = typeof kelas_guru.$inferSelect;
 
 export type Kitab = typeof kitab.$inferSelect;
 
 export type Jadwal = typeof jadwal.$inferSelect;
+
+export type Pertemuan = typeof pertemuan.$inferSelect;
+
+export type AbsensiGuru = typeof absensi_guru.$inferSelect;
+
+export type AbsensiSantri = typeof absensi_santri.$inferSelect;

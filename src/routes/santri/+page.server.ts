@@ -14,13 +14,13 @@ export const load: PageServerLoad = async () => {
 			.select({
 				id: table.santri.id,
 				userId: table.santri.userId,
-				nama: table.user.nama,
+				nama: table.users.nama,
 				tahun_masuk: table.santri.tahunMasuk,
 				status: table.santri.status,
 				kamar: table.santri.kamar
 			})
 			.from(table.santri)
-			.innerJoin(table.user, eq(table.santri.userId, table.user.id));
+			.innerJoin(table.users, eq(table.santri.userId, table.users.id));
 		return { santriList };
 	} catch (err) {
 		console.error(err);
