@@ -34,6 +34,10 @@ export const tahun_ajaran = mysqlTable('tahun_ajaran', {
 	tahunAjaran: varchar('tahun_ajaran', { length: 25 })
 });
 
+export const tahunAjaranRelations = relations(tahun_ajaran, ({ many }) => ({
+	kelas: many(kelas)
+}));
+
 export const santri = mysqlTable('santri', {
 	id: int('id').autoincrement().primaryKey(),
 	nomorIndukSantri: char('nomor_induk_santri', { length: 10 }),
@@ -98,8 +102,9 @@ export const kelas = mysqlTable('kelas', {
 	ketuaKelas: int('ketua_kelas').references(() => santri.id, { onDelete: 'set null' })
 });
 
-export const kelasRelations = relations(kelas, ({ many }) => ({
-	kelas_santri: many(kelas_santri)
+export const kelasRelations = relations(kelas, ({ many, one }) => ({
+	kelas_santri: many(kelas_santri),
+	tahun_ajaran: one(tahun_ajaran, { fields: [kelas.tahunAjaran], references: [tahun_ajaran.id] })
 	// kelas_guru: many(kelas_guru)
 }));
 

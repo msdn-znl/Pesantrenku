@@ -5,34 +5,45 @@
 	let { data, form }: { data: PageServerData; form: ActionData } = $props();
 </script>
 
-<div>
-	<form action="?/add" method="post" use:enhance autocomplete="off">
-		<label for="namaKitab">Nama Kitab</label>
-		<input
-			type="text"
-			name="namaKitab"
-			id="namaKitab"
-			class="input"
-			placeholder="Contoh: Muttamimmah"
-		/>
-		<label for="pengarang">Pengarang</label>
-		<input
-			type="text"
-			name="pengarang"
-			id="pengarang"
-			class="input"
-			placeholder="Contoh: Syekh Nawawi"
-		/>
-		<label for="kategori">Kategori</label>
-		<input type="text" name="kategori" id="kategori" class="input" placeholder="Contoh: Fiqih" />
-		<button type="submit" class="btn btn-success">Tambah Data</button>
-	</form>
-	<p>{form?.message ?? ''}</p>
+<div class="card max-w-md">
+	<h2 class="card-title">Tambah Kitab</h2>
+	<div class="card-body">
+		<form action="?/add" method="post" use:enhance autocomplete="off" class="flex flex-col">
+			<fieldset class="fieldset">
+				<label for="namaKitab">Nama Kitab</label>
+				<input
+					type="text"
+					name="namaKitab"
+					id="namaKitab"
+					class="input"
+					placeholder="Contoh: Muttamimmah"
+				/>
+				<label for="pengarang">Pengarang</label>
+				<input
+					type="text"
+					name="pengarang"
+					id="pengarang"
+					class="input"
+					placeholder="Contoh: Syekh Nawawi"
+				/>
+				<label for="kategori">Kategori</label>
+				<input
+					type="text"
+					name="kategori"
+					id="kategori"
+					class="input"
+					placeholder="Contoh: Fiqih"
+				/>
+				<button type="submit" class="btn btn-success mt-4">Tambah Data</button>
+			</fieldset>
+		</form>
+		<p>{form?.message ?? ''}</p>
+	</div>
 </div>
 
-<div>
-	<h1>List Kitab</h1>
-	<div>
+<div class="card overflow-auto">
+	<h1 class="card-title">List Kitab</h1>
+	<div class="card-body">
 		<table class="table">
 			<thead>
 				<tr>

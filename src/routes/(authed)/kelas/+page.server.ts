@@ -10,7 +10,8 @@ import * as z from 'zod/v4';
 export const load: PageServerLoad = async () => {
 	try {
 		const kelasList = await db.select().from(table.kelas);
-		return { kelasList };
+		const tahunAjaranList = await db.select().from(table.tahun_ajaran);
+		return { kelasList, tahunAjaranList };
 	} catch (err) {
 		console.error(err);
 		return error(500, { message: 'An error occured' });

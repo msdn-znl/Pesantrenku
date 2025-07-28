@@ -6,7 +6,7 @@
 	let { guruList } = data;
 </script>
 
-<div class=" w-3/4">
+<div class="overflow-auto">
 	<table class="table">
 		<thead>
 			<tr>
