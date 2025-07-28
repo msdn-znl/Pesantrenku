@@ -8,7 +8,7 @@
 <div class="card max-w-md">
 	<h2 class="card-title">Tambah Kelas</h2>
 	<div class="card-body">
-		<form method="post" action="?/add" use:enhance class="flex flex-col">
+		<form method="post" action="?/create" use:enhance class="flex flex-col">
 			<fieldset class="fieldset">
 				<label for="namaKelas">Nama Kelas</label>
 				<input

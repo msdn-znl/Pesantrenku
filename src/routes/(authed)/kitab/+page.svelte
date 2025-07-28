@@ -8,7 +8,7 @@
 <div class="card max-w-md">
 	<h2 class="card-title">Tambah Kitab</h2>
 	<div class="card-body">
-		<form action="?/add" method="post" use:enhance autocomplete="off" class="flex flex-col">
+		<form action="?/create" method="post" use:enhance autocomplete="off" class="flex flex-col">
 			<fieldset class="fieldset">
 				<label for="namaKitab">Nama Kitab</label>
 				<input

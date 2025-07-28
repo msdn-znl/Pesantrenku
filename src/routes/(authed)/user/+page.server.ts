@@ -27,7 +27,7 @@ export const load: PageServerLoad = async () => {
 };
 
 export const actions: Actions = {
-	add: async (event: RequestEvent) => {
+	create: async (event: RequestEvent) => {
 		const formData = await event.request.formData();
 		const newUsername = formData.get('username');
 		if (!newUsername || typeof newUsername !== 'string') {

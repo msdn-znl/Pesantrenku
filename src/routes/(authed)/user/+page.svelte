@@ -8,52 +8,56 @@
 	let userToDelete = $state<string | null>(null);
 </script>
 
-<div class="overflow-auto">
+<div class="">
 	<dialog class="modal" id="create_user_modal" bind:this={createUserModal}>
-		<div class="">
-			<div class="card max-w-lg bg-base-100 shadow">
-				<form method="dialog">
-					<button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+		<div class="card bg-base-100 shadow">
+			<form method="dialog">
+				<button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+			</form>
+			<div class="card-body flex-col shrink-0">
+				<h2 class="card-title">Tambah User</h2>
+				<form method="post" action="?/create" use:enhance>
+					<fieldset class="fieldset">
+						<label for="username" class="text-base label"> Email </label>
+						<input
+							name="username"
+							type="email"
+							id="username"
+							placeholder="Email"
+							class="input w-xs lg:w-lg"
+						/>
+						<label for="password" class="text-base label"> Password </label>
+						<input
+							type="password"
+							name="password"
+							id="password"
+							placeholder="Password"
+							class="input w-xs lg:w-lg"
+						/>
+						<label for="nama" class="text-base label"> Nama </label>
+						<input
+							type="text"
+							name="nama"
+							id="nama"
+							placeholder="Nama"
+							class="input w-xs lg:w-lg"
+						/>
+						<label for="role" class="text-base label"> Role </label>
+						<select name="role" id="role" class="select w-xs lg:w-lg">
+							<option value="">Role</option>
+							<option value="admin">Admin</option>
+							<option value="guru">Guru</option>
+							<option value="santri">Santri</option>
+						</select>
+						<button class="btn btn-success hover:btn-warning mt-5">Tambah Data</button>
+					</fieldset>
 				</form>
-				<div class="card-body flex-col shrink-0">
-					<h2 class="card-title">Tambah User</h2>
-					<form method="post" action="?/add" use:enhance>
-						<fieldset class="fieldset">
-							<label for="username" class="text-base label"> Email </label>
-							<input
-								name="username"
-								type="email"
-								id="username"
-								placeholder="Email"
-								class="input w-md"
-							/>
-							<label for="password" class="text-base label"> Password </label>
-							<input
-								type="password"
-								name="password"
-								id="password"
-								placeholder="Password"
-								class="input w-md"
-							/>
-							<label for="nama" class="text-base label"> Nama </label>
-							<input type="text" name="nama" id="nama" placeholder="Nama" class="input w-md" />
-							<label for="role" class="text-base label"> Role </label>
-							<select name="role" id="role" class="select w-md">
-								<option value="">Role</option>
-								<option value="admin">Admin</option>
-								<option value="guru">Guru</option>
-								<option value="santri">Santri</option>
-							</select>
-							<button class="btn btn-success hover:btn-warning mt-5">Tambah Data</button>
-						</fieldset>
-					</form>
-				</div>
 			</div>
 		</div>
 	</dialog>
 	<div class="flex flex-row-reverse p-2">
-		<button class="btn btn-success mt-4" onclick={() => createUserModal.showModal()}
-			>Tambah Santri</button
+		<button class="btn btn-success mr-2" onclick={() => createUserModal.showModal()}
+			>Tambah User</button
 		>
 	</div>
 	<dialog class="modal" id="delete_user_modal" bind:this={deleteUserModal}>
@@ -70,12 +74,12 @@
 			</div>
 		</div>
 	</dialog>
-	<div class="mt-4">
-		<div class="card">
+	<div class="p-2">
+		<div class="">
 			<div class="flex">
 				<h2 class="card-title">List User</h2>
 			</div>
-			<div class="card-bdy">
+			<div class="overflow-auto">
 				<table class="table">
 					<thead>
 						<tr>
@@ -96,21 +100,19 @@
 
 								<td>
 									<!-- Todo: Buat modal untuk tombol edit -->
-									<div>
-										<a href={'/user/edit-data/' + user.id}
-											><button class="btn btn-accent">Edit</button></a
-										>
-									</div>
-									<div>
-										<!-- Todo: Update list setelah tombol di delete tanpa reload halaman -->
-										<button
-											class="btn btn-error"
-											onclick={() => {
-												userToDelete = user.id;
-												deleteUserModal.showModal();
-											}}>Delete</button
-										>
-									</div>
+
+									<a href={'/user/edit-data/' + user.id} class="btn btn-accent"
+										><button>Edit</button></a
+									>
+
+									<!-- Todo: Update list setelah tombol di delete tanpa reload halaman -->
+									<button
+										class="btn btn-error"
+										onclick={() => {
+											userToDelete = user.id;
+											deleteUserModal.showModal();
+										}}>Delete</button
+									>
 								</td>
 							</tr>
 						{/each}

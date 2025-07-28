@@ -6,6 +6,7 @@
 	let { children, data } = $props();
 
 	let listMenu = [
+		{ href: '/dashboard', nama: 'Dashboard' },
 		{ href: '/user', nama: 'User' },
 		{ href: '/guru', nama: 'Guru' },
 		{ href: '/santri', nama: 'Santri' },
@@ -52,7 +53,7 @@
 		<div class="drawer-side">
 			<label for="app-drawer" class="drawer-overlay" aria-label="close sidebar"></label>
 			<aside class="bg-base-200 min-h-screen w-4/5 lg:w-80 sticky">
-				<div class="bg-base-100/90 navbar sticky top-0 hidden lg:flex">
+				<div class="bg-base-200 navbar sticky top-0 hidden lg:flex">
 					<p class="font-bold">
 						Selamat Datang <br />
 						{data.user.nama}

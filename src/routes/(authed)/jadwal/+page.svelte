@@ -10,7 +10,7 @@
 	<div class="card">
 		<h2 class="card-title">Tambah Jadwal</h2>
 		<div class="card-body max-w-lg">
-			<form action="?/add" method="post" class="flex flex-col" use:enhance>
+			<form action="?/create" method="post" class="flex flex-col" use:enhance>
 				<label for="kitabId">Kitab</label>
 				{#await data.streamed.kitabList}
 					<select class="select" disabled>
