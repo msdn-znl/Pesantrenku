@@ -1,10 +1,10 @@
-import type { PageServerLoad, Actions, RequestEvent } from './$types';
-import { fail, error } from '@sveltejs/kit';
+import type { PageServerLoad, RouteParams } from './$types';
+import { error } from '@sveltejs/kit';
 import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
 
-export const load: PageServerLoad = async ({ params }) => {
+export const load: PageServerLoad = async ({ params }: { params: RouteParams }) => {
 	const idPertemuan = Number(params.id);
 	if (isNaN(idPertemuan)) {
 		error(400, 'ID tidak valid');
@@ -19,7 +19,7 @@ export const load: PageServerLoad = async ({ params }) => {
 				}
 			}
 		});
-		return { absensiList };
+		return { absensiList, idPertemuan };
 	} catch (err) {
 		console.error('Error saat memuat data halaman absensi', err);
 		error(500, 'Terjadi kesalahan saat memuat data halaman absensi santri');
