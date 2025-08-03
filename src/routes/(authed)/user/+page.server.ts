@@ -75,7 +75,7 @@ export const actions: Actions = {
 					await tx.insert(table.santri).values({ userId: userId, status: 'aktif' });
 				}
 			});
-			return { success: true, message: 'Success' };
+			return { success: true, message: 'Berhasil Menambahkan Data' };
 		} catch (error) {
 			console.error(error);
 			return fail(500, { message: 'An error has occurred' });

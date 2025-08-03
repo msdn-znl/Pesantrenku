@@ -5,9 +5,9 @@
 	let { form, data }: { form: ActionData; data: PageServerData } = $props();
 </script>
 
-<div class="">
-	<h2 class="">Edit Data</h2>
+<div class="flex justify-center">
 	<div class="card">
+		<h2 class="card-title">Edit Data</h2>
 		<form action="?/edit" method="post" class="card-body flex flex-col" use:enhance>
 			<label for="username">Email</label>
 			<input type="email" name="username" id="username" class="input" value={data.user.username} />

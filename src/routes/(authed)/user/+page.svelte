@@ -1,6 +1,8 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
+	import { enhance, applyAction } from '$app/forms';
+	import { invalidateAll } from '$app/navigation';
 	import type { ActionData, PageServerData } from './$types';
+	import { toast } from 'svelte-sonner';
 
 	let { form, data }: { form: ActionData; data: PageServerData } = $props();
 	let createUserModal: HTMLDialogElement;
@@ -9,49 +11,61 @@
 </script>
 
 <div class="">
-	<dialog class="modal" id="create_user_modal" bind:this={createUserModal}>
-		<div class="card bg-base-100 shadow">
+	<dialog class="modal" id="create_user_modal2" bind:this={createUserModal}>
+		<div class="modal-box">
 			<form method="dialog">
 				<button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
 			</form>
-			<div class="card-body flex-col shrink-0">
+			<div class="">
 				<h2 class="card-title">Tambah User</h2>
-				<form method="post" action="?/create" use:enhance>
-					<fieldset class="fieldset">
-						<label for="username" class="text-base label"> Email </label>
-						<input
-							name="username"
-							type="email"
-							id="username"
-							placeholder="Email"
-							class="input w-xs lg:w-lg"
-						/>
-						<label for="password" class="text-base label"> Password </label>
-						<input
-							type="password"
-							name="password"
-							id="password"
-							placeholder="Password"
-							class="input w-xs lg:w-lg"
-						/>
-						<label for="nama" class="text-base label"> Nama </label>
-						<input
-							type="text"
-							name="nama"
-							id="nama"
-							placeholder="Nama"
-							class="input w-xs lg:w-lg"
-						/>
-						<label for="role" class="text-base label"> Role </label>
-						<select name="role" id="role" class="select w-xs lg:w-lg">
-							<option value="">Role</option>
-							<option value="admin">Admin</option>
-							<option value="guru">Guru</option>
-							<option value="santri">Santri</option>
-						</select>
-						<button class="btn btn-success hover:btn-warning mt-5">Tambah Data</button>
-					</fieldset>
+				<form
+					class="fieldset"
+					method="post"
+					action="?/create"
+					use:enhance={() => {
+						return async ({ result }) => {
+							if (result.type === 'success') {
+								invalidateAll();
+								createUserModal.close();
+								toast.success(result.data?.message);
+							} else if (result.type === 'failure') {
+								createUserModal.close();
+								toast.error(result.data?.message);
+							}
+							await applyAction(result);
+						};
+					}}
+				>
+					<label for="username" class="text-base label"> Email </label>
+					<input
+						name="username"
+						type="email"
+						id="username"
+						placeholder="Email"
+						class="input w-full"
+					/>
+					<label for="password" class="text-base label"> Password </label>
+					<input
+						type="password"
+						name="password"
+						id="password"
+						placeholder="Password"
+						class="input w-full"
+					/>
+					<label for="nama" class="text-base label"> Nama </label>
+					<input type="text" name="nama" id="nama" placeholder="Nama" class="input w-full" />
+					<label for="role" class="text-base label"> Role </label>
+					<select name="role" id="role" class="select w-full">
+						<option value="">Role</option>
+						<option value="admin">Admin</option>
+						<option value="guru">Guru</option>
+						<option value="santri">Santri</option>
+					</select>
+					<button class="btn btn-success mt-5">Tambah Data</button>
 				</form>
+				<!-- <button onclick={() => toast.success('toast test')} class="btn btn-success"
+					>Test Toast</button
+				> -->
 			</div>
 		</div>
 	</dialog>
@@ -67,7 +81,23 @@
 				<form method="dialog">
 					<button class="btn btn-success" onclick={() => (userToDelete = null)}>Batal</button>
 				</form>
-				<form action="?/delete" method="post" use:enhance>
+				<form
+					action="?/delete"
+					method="post"
+					use:enhance={() => {
+						return async ({ result }) => {
+							if (result.type === 'success') {
+								invalidateAll();
+								deleteUserModal.close();
+								toast.success(result.data?.message);
+							} else if (result.type === 'failure') {
+								deleteUserModal.close();
+								toast.error(result.data?.message);
+							}
+							await applyAction(result);
+						};
+					}}
+				>
 					<input type="hidden" name="id" value={userToDelete} />
 					<button type="submit" class="btn btn-error">Delete</button>
 				</form>
@@ -118,7 +148,6 @@
 						{/each}
 					</tbody>
 				</table>
-				<p>{form?.message ?? ''}</p>
 			</div>
 		</div>
 	</div>
