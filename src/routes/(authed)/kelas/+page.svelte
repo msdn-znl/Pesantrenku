@@ -23,7 +23,7 @@
 				<select name="tahunAjaran" id="tahunAjaran" class="select">
 					<option value=""></option>
 					{#each data.tahunAjaranList as item}
-						<option value={item.tahunAjaran}>{item.tahunAjaran}</option>
+						<option value={item.id}>{item.tahunAjaran}</option>
 					{/each}
 				</select>
 				<button type="submit" class="btn btn-success mt-4">Tambah Kelas</button>
@@ -49,9 +49,12 @@
 					<tr class="hover:bg-base-300">
 						<th>{i + 1}</th>
 						<td>{kelas.namaKelas}</td>
-						<td>{kelas.tahunAjaran}</td>
+						<td>{kelas.tahun_ajaran?.tahunAjaran}</td>
 						<td>{kelas.ketuaKelas}</td>
 						<td>
+							<a href={'/kelas/tambah-santri/' + kelas.id}
+								><button class="btn btn-accent">Tambah Santri</button></a
+							>
 							<div>
 								<button class="btn btn-accent"
 									><a href={'/kelas/edit-data/' + kelas.id}>Edit</a></button

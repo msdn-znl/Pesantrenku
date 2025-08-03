@@ -9,7 +9,11 @@ import * as z from 'zod/v4';
 
 export const load: PageServerLoad = async () => {
 	try {
-		const kelasList = await db.select().from(table.kelas);
+		const kelasList = await db.query.kelas.findMany({
+			with: {
+				tahun_ajaran: true
+			}
+		});
 		const tahunAjaranList = await db.select().from(table.tahun_ajaran);
 		return { kelasList, tahunAjaranList };
 	} catch (err) {

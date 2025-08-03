@@ -1,7 +1,7 @@
 import * as table from '$lib/server/db/schema';
 import { db } from '$lib/server/db';
 import { eq, notExists, and } from 'drizzle-orm';
-import type { PageServerLoad, Actions, RequestEvent } from '../$types';
+import type { PageServerLoad, Actions, RequestEvent } from './$types';
 import { error, fail } from '@sveltejs/kit';
 
 export const load: PageServerLoad = async ({ params }) => {
@@ -68,8 +68,7 @@ export const actions: Actions = {
 				formData.getAll(key).length > 1 ? formData.getAll(key) : formData.get(key)
 			])
 		);
-		console.log(inputData);
-		console.log(paramsId);
+
 		try {
 			await db.insert(table.kelas_santri).values({ santriId: inputData.id, kelasId: id });
 			return { success: true };
