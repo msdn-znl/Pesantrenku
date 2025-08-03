@@ -15,7 +15,7 @@
 			name="nomorIndukGuru"
 			id="nomorIndukGuru"
 			class="input"
-			value={data.nomorIndukGuru}
+			value={data.guruData.nomorIndukGuru}
 		/>
 		<label for="nomorTelepon"> Nomor Telepon </label>
 		<input
@@ -23,19 +23,19 @@
 			name="nomorTelepon"
 			id="nomorTelepon"
 			class="input"
-			value={data.nomorTelepon}
+			value={data.guruData.nomorTelepon}
 		/>
 		<label for="status"> Status </label>
 		<select name="status" id="status" class="select">
-			{#if data.status === null}
+			{#if data.guruData.status === null}
 				<option value="" selected></option>
 				<option value="aktif">Aktif</option>
 				<option value="inaktif">Non Aktif</option>
-			{:else if data.status === 'aktif'}
+			{:else if data.guruData.status === 'aktif'}
 				<option value=""></option>
 				<option value="aktif" selected>Aktif</option>
 				<option value="inaktif">Non Aktif</option>
-			{:else if data.status === 'inaktif'}
+			{:else if data.guruData.status === 'inaktif'}
 				<option value=""></option>
 				<option value="aktif">Aktif</option>
 				<option value="inaktif" selected>Non Aktif</option>
