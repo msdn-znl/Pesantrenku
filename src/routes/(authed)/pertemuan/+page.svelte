@@ -1,48 +1,111 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
+	import { enhance, applyAction } from '$app/forms';
+	import { invalidateAll } from '$app/navigation';
 	import type { PageServerData, ActionData } from './$types';
+	import { toast } from 'svelte-sonner';
 
 	let { data, form }: { data: PageServerData; form: ActionData } = $props();
+	let createPertemuanModal: HTMLDialogElement;
+	let deletePertemuanModal: HTMLDialogElement;
+	let pertemuanToDelete = $state<number | null>(null);
 </script>
 
-<div class="card max-w-md">
-	<h2 class="card-title">Tambah Pertemuan</h2>
-	<div class="card-body">
-		<form action="?/create" method="post" use:enhance class="flex flex-col">
-			<fieldset class="fieldset">
-				<label for="jadwalId" class="label">Jadwal</label>
-				<select name="jadwalId" id="jadwalId" class="select select-md">
-					<option value=""></option>
-					{#each data.jadwalList as jadwal (jadwal.id)}
-						<option value={jadwal.id}
-							>Guru: {jadwal.guru.user.nama}, Kelas: {jadwal.kelas.namaKelas}, Hari: {jadwal.hari},
-							Mulai: {jadwal.jamMulai}, Kitab: {jadwal.kitab.namaKitab}
-						</option>
-					{/each}
-				</select>
-				<label for="jurnalMengajar" class="label">Jurnal Mengajar</label>
-				<textarea
-					name="jurnalMengajar"
-					id="jurnalMengajar"
-					class="textarea textarea-md"
-					placeholder="Masukkan Jurnal Mengajar di sini"
-				></textarea>
-				<label for="tanggalPertemuan" class="label">Tanggal</label>
-				<input type="date" name="tanggalPertemuan" id="tanggalPertemuan" class="input input-md" />
-				<label for="status" class="label">Status Pertemuan</label>
-				<select name="status" id="status" class="select select-md">
-					<option value=""></option>
-					<option value="selesai">Selesai</option>
-					<option value="batal">Batal</option>
-					<option value="tugas mandiri">Tugas Mandiri</option>
-				</select>
+<div class="">
+	<dialog class="modal" id="create_pertemuan_modal" bind:this={createPertemuanModal}>
+		<div class="modal-box">
+			<form method="dialog">
+				<button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+			</form>
 
-				<button type="submit" class="btn btn-success mt-4">Tambah Pertemuan</button>
-			</fieldset>
-		</form>
-		{#if form?.success}
-			<p>{form?.message}</p>
-		{/if}
+			<form
+				action="?/create"
+				method="post"
+				use:enhance={() => {
+					return async ({ result }) => {
+						if (result.type === 'success') {
+							invalidateAll();
+							createPertemuanModal.close();
+							toast.success(result.data?.message);
+						} else if (result.type === 'failure') {
+							toast.error(result.data?.message);
+						}
+						await applyAction(result);
+					};
+				}}
+				class="flex flex-col"
+			>
+				<h2 class="card-title">Tambah Pertemuan</h2>
+				<fieldset class="fieldset">
+					<label for="jadwalId" class="label">Jadwal</label>
+					<select name="jadwalId" id="jadwalId" class="select select-md w-full">
+						<option value=""></option>
+						{#each data.jadwalList as jadwal (jadwal.id)}
+							<option value={jadwal.id}
+								>Guru: {jadwal.guru.user.nama}, Kelas: {jadwal.kelas.namaKelas}, Hari: {jadwal.hari},
+								Mulai: {jadwal.jamMulai}, Kitab: {jadwal.kitab.namaKitab}
+							</option>
+						{/each}
+					</select>
+					<label for="jurnalMengajar" class="label">Jurnal Mengajar</label>
+					<textarea
+						name="jurnalMengajar"
+						id="jurnalMengajar"
+						class="textarea textarea-md w-full"
+						placeholder="Masukkan Jurnal Mengajar di sini"
+					></textarea>
+					<label for="tanggalPertemuan" class="label">Tanggal</label>
+					<input
+						type="date"
+						name="tanggalPertemuan"
+						id="tanggalPertemuan"
+						class="input input-md w-full"
+					/>
+					<label for="status" class="label">Status Pertemuan</label>
+					<select name="status" id="status" class="select select-md w-full">
+						<option value=""></option>
+						<option value="selesai">Selesai</option>
+						<option value="batal">Batal</option>
+						<option value="tugas mandiri">Tugas Mandiri</option>
+					</select>
+
+					<button type="submit" class="btn btn-success mt-4">Tambah Pertemuan</button>
+				</fieldset>
+			</form>
+		</div>
+	</dialog>
+	<dialog class="modal" id="delete_pertemuan_modal" bind:this={deletePertemuanModal}>
+		<div class="modal-box">
+			<p>Apakah Anda yakin ingin menghapus data pertemuan ini?</p>
+			<div class="flex flex-row">
+				<form method="dialog">
+					<button class="btn btn-success" onclick={() => (pertemuanToDelete = null)}>Batal</button>
+				</form>
+				<form
+					action="?/delete"
+					method="post"
+					use:enhance={() => {
+						return async ({ result }) => {
+							if (result.type === 'success') {
+								deletePertemuanModal.close();
+								toast.success(result.data?.message);
+							} else if (result.type === 'failure') {
+								deletePertemuanModal.close();
+								toast.error(result.data?.message);
+							}
+							await applyAction(result);
+						};
+					}}
+				>
+					<input type="number" name="id" id="id" value={pertemuanToDelete} hidden />
+					<button type="submit" class="btn btn-error">Hapus Data Pertemuan</button>
+				</form>
+			</div>
+		</div>
+	</dialog>
+	<div class="flex flex-row-reverse p-2">
+		<button onclick={() => createPertemuanModal.showModal()} class="btn btn-success mt-2">
+			Tambah Pertemuan
+		</button>
 	</div>
 </div>
 
@@ -71,26 +134,23 @@
 						<td>{pertemuan.jadwal.hari}</td>
 						<td>{pertemuan.tanggalPertemuan?.toDateString()}</td>
 						<td>{pertemuan.status}</td>
-						<td>
+						<td class="flex flex-col">
 							<a href={'/pertemuan/' + pertemuan.id + '/absensi-santri'}
-								><button class="btn btn-success">Absensi Santri</button></a
+								><button class="btn btn-success w-full">Absensi Santri</button></a
 							>
-						</td>
-						<td>
 							<a href={'/pertemuan/' + pertemuan.id + '/data-absensi'}
-								><button class="btn btn-accent">Data Absensi</button></a
+								><button class="btn btn-accent w-full">Data Absensi</button></a
 							>
-						</td>
-						<td>
 							<a href={'/pertemuan/edit-data/' + pertemuan.id}
-								><btn class="btn btn-warning">Edit Data</btn></a
+								><btn class="btn btn-warning w-full">Edit Data</btn></a
 							>
-						</td>
-						<td>
-							<form action="?/delete" method="post" use:enhance>
-								<input type="number" name="id" id="id" value={pertemuan.id} hidden />
-								<button type="submit" class="btn btn-error">Hapus Data Pertemuan</button>
-							</form>
+							<button
+								class="btn btn-error w-full"
+								onclick={() => {
+									pertemuanToDelete = pertemuan.id;
+									deletePertemuanModal.showModal();
+								}}>Delete</button
+							>
 						</td>
 					</tr>
 				{/each}
