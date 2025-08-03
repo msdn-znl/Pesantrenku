@@ -2,6 +2,7 @@
 	import '../app.css';
 	import { enhance } from '$app/forms';
 	import { page } from '$app/state';
+	import { Toaster } from 'svelte-sonner';
 
 	let { children, data } = $props();
 
@@ -20,9 +21,10 @@
 
 {#if data.user}
 	<div class="drawer lg:drawer-open">
+		<Toaster position="top-right" richColors />
 		<input type="checkbox" id="app-drawer" class="drawer-toggle" />
 		<div class="drawer-content">
-			<nav class="navbar bg-base-100 shadow-sm sticky top-0">
+			<nav class="navbar bg-base-100 shadow-sm sticky top-0 z-30">
 				<label for="app-drawer" class="btn btn-square btn-ghost lg:hidden">
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
@@ -50,7 +52,7 @@
 
 			{@render children()}
 		</div>
-		<div class="drawer-side">
+		<div class="drawer-side z-40">
 			<label for="app-drawer" class="drawer-overlay" aria-label="close sidebar"></label>
 			<aside class="bg-base-200 min-h-screen w-4/5 lg:w-80 sticky">
 				<div class="bg-base-200 navbar sticky top-0 hidden lg:flex">
