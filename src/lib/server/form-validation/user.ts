@@ -13,6 +13,7 @@ export const LoginUserFormSchema = z.object({
 });
 
 export const EditUserFormSchema = z.object({
+	id: z.string(),
 	username: z.email().nonempty(),
 	nama: z.string(),
 	password: z.string().min(6).max(255).or(z.literal('')).optional(),
