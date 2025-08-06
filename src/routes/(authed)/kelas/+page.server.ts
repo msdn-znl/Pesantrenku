@@ -4,7 +4,7 @@ import { db } from '$lib/server/db';
 import { eq } from 'drizzle-orm';
 import type { RequestEvent } from './$types';
 import { fail, error } from '@sveltejs/kit';
-import { KelasFormSchema } from '$lib/server/form-validation/kelas';
+import { EditKelasFormSchema, KelasFormSchema } from '$lib/server/form-validation/kelas';
 import * as z from 'zod/v4';
 
 export const load: PageServerLoad = async () => {
@@ -46,6 +46,32 @@ export const actions: Actions = {
 		} catch (err) {
 			console.error(err);
 			error(500, { message: 'An error occured' });
+		}
+	},
+	edit: async (event: RequestEvent) => {
+		const formData = await event.request.formData();
+
+		const kelasData = Object.fromEntries(
+			Array.from(formData.keys()).map((key) => [
+				key,
+				formData.getAll(key).length > 1 ? formData.getAll(key) : formData.get(key)
+			])
+		);
+		const result = EditKelasFormSchema.safeParse(kelasData);
+		if (!result.success) {
+			return fail(422, {
+				message: 'Data yang anda masukkan salah',
+				error: z.prettifyError(result.error),
+				data: kelasData
+			});
+		}
+		const { namaKelas, tahunAjaran, id } = result.data;
+		try {
+			await db.update(table.kelas).set({ namaKelas, tahunAjaran }).where(eq(table.kelas.id, id));
+			return { success: true, message: 'Success' };
+		} catch (err) {
+			console.error(err);
+			error(500, 'An Error occured');
 		}
 	},
 	delete: async (event: RequestEvent) => {
