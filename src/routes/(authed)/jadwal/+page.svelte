@@ -97,12 +97,13 @@
 							<td>{jadwal.jamMulai}</td>
 							<td>{jadwal.jamSelesai}</td>
 							<td>
-								<!-- Todo: Buat modal untuk tombol edit -->
-								<div>
-									<a href={'/jadwal/edit-data/' + jadwal.id}
-										><button class="btn btn-accent">Edit</button></a
-									>
-								</div>
+								<a href={'/jadwal/' + jadwal.id + '/pertemuan'}
+									><button class="btn btn-success">Data Pertemuan</button></a
+								>
+								<a href={'/jadwal/edit-data/' + jadwal.id}
+									><button class="btn btn-accent">Edit</button></a
+								>
+
 								<div>
 									<!-- Todo: Update list setelah tombol di delete tanpa reload halaman -->
 									<form action="?/delete" method="post" use:enhance>
