@@ -3,6 +3,7 @@
 	import type { PageServerData, ActionData } from './$types';
 
 	let { data, form }: { data: PageServerData; form: ActionData } = $props();
+	console.log(data);
 </script>
 
 <div class="">
@@ -31,7 +32,7 @@
 			name="tanggalPertemuan"
 			id="tanggalPertemuan"
 			class="input"
-			value={data.pertemuanData?.tanggalPertemuan?.toISOString().split('T')[0]}
+			value={data.pertemuanData?.tanggalPertemuan}
 		/>
 		<label for="status">Status Pertemuan</label>
 		<select name="status" id="status" class="select">

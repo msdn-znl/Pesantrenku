@@ -132,7 +132,7 @@
 						<td>{pertemuan.jadwal.kelas.namaKelas}</td>
 						<td>{pertemuan.jurnalMengajar}</td>
 						<td>{pertemuan.jadwal.hari}</td>
-						<td>{pertemuan.tanggalPertemuan?.toDateString()}</td>
+						<td>{pertemuan.tanggalPertemuan}</td>
 						<td>{pertemuan.status}</td>
 						<td class="flex flex-col">
 							<a href={'/pertemuan/' + pertemuan.id + '/absensi-santri'}
