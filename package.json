@@ -48,7 +48,6 @@
 		"@oslojs/crypto": "^1.0.1",
 		"@oslojs/encoding": "^1.1.0",
 		"daisyui": "^5.0.43",
-		"dotenv": "^17.2.1",
 		"drizzle-orm": "^0.40.0",
 		"pg": "^8.16.3",
 		"svelte-sonner": "^1.0.5",
