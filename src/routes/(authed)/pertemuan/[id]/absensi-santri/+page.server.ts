@@ -17,7 +17,7 @@ export const load: PageServerLoad = async ({ params }) => {
 			columns: { pertemuanId: true }
 		});
 		if (isDataExist) {
-			return { dataPertemuanExist: true, santriKelasData: [], id: id };
+			return { dataKehadiranExist: true, santriKelasData: [], id: id };
 		}
 
 		const dataPertemuan = await db.query.pertemuan.findFirst({

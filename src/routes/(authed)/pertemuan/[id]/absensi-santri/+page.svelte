@@ -3,7 +3,7 @@
 	import type { PageServerData, ActionData } from './$types';
 
 	let { data, form }: { data: PageServerData; form: ActionData } = $props();
-	let tableBody: HTMLElement;
+	let tableBody = $state<HTMLElement>();
 	let selectedSantri: number[] = $state([]);
 
 	const toggleSelectAll = (event: Event) => {
@@ -16,6 +16,7 @@
 	};
 	const changeStatusSantri = (status: 'hadir' | 'alfa' | 'izin' | 'sakit') => {
 		selectedSantri.forEach((santriId) => {
+			if (!tableBody) return;
 			const radio = tableBody.querySelector<HTMLInputElement>(
 				`input[type="radio"][name="status_${santriId}"][value=${status}]`
 			);
@@ -26,8 +27,8 @@
 	};
 </script>
 
-{#if data.dataPertemuanExist}
-	<p>Data pertemuan Sudah Ada</p>
+{#if data.dataKehadiranExist}
+	<p>Data Kehadiran Sudah Ada</p>
 {:else}
 	<div class="p-2 card">
 		<form action="?/create" method="post">
@@ -50,7 +51,7 @@
 					</tr>
 				</thead>
 				<tbody id="table-body" bind:this={tableBody}>
-					{#each data.santriKelasData as santri, i (santri.santriId)}
+					{#each data.santriKelasData as santrikelas, i (santrikelas.santriId)}
 						<tr>
 							<th
 								><input
@@ -58,50 +59,49 @@
 									name=""
 									id=""
 									class="checkbox checkbox-md"
-									value={santri.santriId}
+									value={santrikelas.santriId}
 									bind:group={selectedSantri}
 								/></th
 							>
 							<th>{i + 1}</th>
-							<td>{santri.santri.user.nama}</td>
+							<td>{santrikelas.santri.user.nama}</td>
 							<td>
 								<div>
-									<!-- <input type="number" name="pertemuanId" id="" value={data?.id} hidden /> -->
-									<input type="number" name="santriId" id="" value={santri.santriId} hidden />
+									<input type="number" name="santriId" id="" value={santrikelas.santriId} hidden />
 								</div>
 								<div class="">
 									<input
 										type="radio"
-										name="status_{santri.santriId}"
-										id="hadir"
+										name="status_{santrikelas.santriId}"
+										id="hadir_{santrikelas.santriId}"
 										value="hadir"
 										class="radio"
 									/>
-									<label for="hadir">Hadir</label>
+									<label for="hadir_{santrikelas.santriId}">Hadir</label>
 									<input
 										type="radio"
-										name="status_{santri.santriId}"
-										id="alfa"
+										name="status_{santrikelas.santriId}"
+										id="alfa_{santrikelas.santriId}"
 										value="alfa"
 										class="radio"
 									/>
-									<label for="alfa">Alfa</label>
+									<label for="alfa_{santrikelas.santriId}">Alfa</label>
 									<input
 										type="radio"
-										name="status_{santri.santriId}"
-										id="sakit"
+										name="status_{santrikelas.santriId}"
+										id="sakit_{santrikelas.santriId}"
 										value="sakit"
 										class="radio"
 									/>
-									<label for="sakit">Sakit</label>
+									<label for="sakit_{santrikelas.santriId}">Sakit</label>
 									<input
 										type="radio"
-										name="status_{santri.santriId}"
-										id="izin"
+										name="status_{santrikelas.santriId}"
+										id="izin_{santrikelas.santriId}"
 										value="izin"
 										class="radio"
 									/>
-									<label for="izin">Izin</label>
+									<label for="izin_{santrikelas.santriId}">Izin</label>
 								</div>
 							</td>
 						</tr>
