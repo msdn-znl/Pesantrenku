@@ -1,6 +1,6 @@
 import * as table from '$lib/server/db/schema';
 import { db } from '$lib/server/db';
-import { eq, notExists, and } from 'drizzle-orm';
+import { eq, and, count, lt, sql } from 'drizzle-orm';
 import type { PageServerLoad, Actions, RequestEvent } from './$types';
 import { error, fail } from '@sveltejs/kit';
 
@@ -11,23 +11,19 @@ export const load: PageServerLoad = async ({ params }) => {
 	}
 	const id = parseInt(paramsId);
 	try {
-		const santriWithoutClass = await db.query.santri.findMany({
-			where: notExists(
-				db.select().from(table.kelas_santri).where(eq(table.kelas_santri.santriId, table.santri.id))
-			),
-			columns: {
-				id: true
-			},
-			with: {
-				user: {
-					columns: {
-						nama: true,
-						id: true,
-						username: true
-					}
-				}
-			}
-		});
+		const santriWithoutClass = await db
+			.select({
+				id: table.santri.id,
+				nama: table.users.nama,
+				jumlahKelas: count(table.kelas_santri.kelasId),
+				daftarKelas: sql<string[]>`array_agg(${table.kelas.namaKelas})`
+			})
+			.from(table.santri)
+			.leftJoin(table.users, eq(table.santri.userId, table.users.id))
+			.leftJoin(table.kelas_santri, eq(table.santri.id, table.kelas_santri.santriId))
+			.leftJoin(table.kelas, eq(table.kelas_santri.kelasId, table.kelas.id))
+			.groupBy(table.santri.id, table.users.id)
+			.having(lt(count(table.kelas_santri.kelasId), 2));
 		const santriWithClass = await db.query.kelas_santri.findMany({
 			where: eq(table.kelas_santri.kelasId, id),
 			with: {
@@ -68,15 +64,19 @@ export const actions: Actions = {
 				formData.getAll(key).length > 1 ? formData.getAll(key) : formData.get(key)
 			])
 		);
-
+		if (!inputData.id || typeof inputData.id !== 'string') {
+			return fail(400, { message: 'Id santri tidak ditemukan' });
+		}
+		const idSantri = parseInt(inputData.id);
 		try {
-			await db.insert(table.kelas_santri).values({ santriId: inputData.id, kelasId: id });
+			await db.insert(table.kelas_santri).values({ santriId: idSantri, kelasId: id });
 			return { success: true };
 		} catch (err) {
 			console.error(`Terjadi Error:`, err);
 			return fail(500, { message: ' terjadi kesalahan di Server saat input data' });
 		}
 	},
+
 	delete: async (event: RequestEvent) => {
 		const paramsId = event.params.id;
 		if (!paramsId || typeof paramsId !== 'string') {
@@ -90,14 +90,11 @@ export const actions: Actions = {
 				formData.getAll(key).length > 1 ? formData.getAll(key) : formData.get(key)
 			])
 		);
-		console.log(inputData);
-		console.log(paramsId);
+		const santriId = Number(inputData.id);
 		try {
 			await db
 				.delete(table.kelas_santri)
-				.where(
-					and(eq(table.kelas_santri.santriId, inputData.id), eq(table.kelas_santri.kelasId, id))
-				);
+				.where(and(eq(table.kelas_santri.santriId, santriId), eq(table.kelas_santri.kelasId, id)));
 			return { success: true, message: 'Berhasil Dihapus' };
 		} catch (err) {
 			console.error(`Terjadi Error:`, err);

@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import { success } from 'zod/v4';
 	import type { PageServerData, ActionData } from './$types';
 	let { data, form }: { data: PageServerData; form: ActionData } = $props();
 	let tambahData: HTMLDialogElement | undefined;
@@ -19,13 +20,16 @@
 						<tr>
 							<th></th>
 							<th>Nama</th>
+							<th>kelas Terdaftar</th>
+							<th>Action</th>
 						</tr>
 					</thead>
 					<tbody>
 						{#each data.santriWithoutClass as santri, i (santri.id)}
 							<tr>
 								<th>{i + 1}</th>
-								<td>{santri.user.nama}</td>
+								<td>{santri.nama}</td>
+								<td>{santri.daftarKelas}</td>
 								<td>
 									<form action="?/create" method="post" use:enhance>
 										<input type="number" name="id" id="id" value={santri.id} hidden />
