@@ -1,10 +1,10 @@
-import type { PageServerLoad, RouteParams } from './$types';
+import type { PageServerLoad } from './$types';
 import { error } from '@sveltejs/kit';
 import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
 
-export const load: PageServerLoad = async ({ params }: { params: RouteParams }) => {
+export const load: PageServerLoad = async ({ params }) => {
 	const idPertemuan = Number(params.id);
 	if (isNaN(idPertemuan)) {
 		error(400, 'ID tidak valid');

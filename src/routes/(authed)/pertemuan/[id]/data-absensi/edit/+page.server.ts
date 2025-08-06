@@ -1,4 +1,4 @@
-import type { PageServerLoad, Actions, RequestEvent, RouteParams } from './$types';
+import type { PageServerLoad, Actions, RequestEvent } from './$types';
 import { fail, error, redirect } from '@sveltejs/kit';
 import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
@@ -6,7 +6,7 @@ import { eq } from 'drizzle-orm';
 import { EditAbsensiSantriFormSchema } from '$lib/server/form-validation/absensi';
 import * as z from 'zod/v4';
 
-export const load: PageServerLoad = async ({ params }: { params: RouteParams }) => {
+export const load: PageServerLoad = async ({ params }) => {
 	const idPertemuan = Number(params.id);
 	if (isNaN(idPertemuan)) {
 		error(400, 'ID tidak valid');
