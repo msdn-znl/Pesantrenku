@@ -3,12 +3,14 @@ import { fail, error } from '@sveltejs/kit';
 import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
-import { PertemuanFormSchema } from '$lib/server/form-validation/pertemuan';
+import { SinglePertemuanFormSchema } from '$lib/server/form-validation/pertemuan';
 import * as z from 'zod/v4';
 
-export const load: PageServerLoad = async () => {
+export const load: PageServerLoad = async ({ params }) => {
+	const jadwalId = Number(params.jadwalId);
 	try {
 		const pertemuanList = await db.query.pertemuan.findMany({
+			where: eq(table.pertemuan.jadwalId, jadwalId),
 			with: {
 				jadwal: {
 					columns: {
@@ -29,36 +31,7 @@ export const load: PageServerLoad = async () => {
 				}
 			}
 		});
-		const jadwalList = await db.query.jadwal.findMany({
-			columns: {
-				id: true,
-				jamMulai: true,
-				jamSelesai: true,
-				hari: true
-			},
-			with: {
-				kelas: {
-					columns: {
-						namaKelas: true
-					}
-				},
-				guru: {
-					with: {
-						user: {
-							columns: {
-								nama: true
-							}
-						}
-					}
-				},
-				kitab: {
-					columns: {
-						namaKitab: true
-					}
-				}
-			}
-		});
-		return { pertemuanList, jadwalList };
+		return { pertemuanList };
 	} catch (err) {
 		console.error('Terjadi Kesalahan saat memuat halaman pertemuan', err);
 		error(500, 'Error Saat memuat data halaman pertemuan');
@@ -74,7 +47,7 @@ export const actions: Actions = {
 				formData.getAll(key).length > 1 ? formData.getAll(key) : formData.get(key)
 			])
 		);
-		const validationResult = PertemuanFormSchema.safeParse(pertemuanData);
+		const validationResult = SinglePertemuanFormSchema.safeParse(pertemuanData);
 		if (!validationResult.success) {
 			return fail(422, {
 				message: 'Data yang anda masukkan salah',
@@ -82,9 +55,16 @@ export const actions: Actions = {
 				data: validationResult.data
 			});
 		}
+		console.log(validationResult.data);
+		const dataPertemuan = {
+			jadwalId: Number(event.params.jadwalId),
+			tanggalPertemuan: new Date().toISOString(),
+			...validationResult.data
+		};
+		console.log(dataPertemuan);
 
 		try {
-			await db.insert(table.pertemuan).values(validationResult.data);
+			await db.insert(table.pertemuan).values(dataPertemuan);
 			return { success: true, message: 'berhasil menambahkan data pertemuan' };
 		} catch (err) {
 			console.error('Terjadi kesalahan saat menambahkan data pertemuan', err);

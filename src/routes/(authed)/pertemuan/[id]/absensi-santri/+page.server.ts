@@ -1,5 +1,5 @@
 import type { PageServerLoad, Actions, RequestEvent } from './$types';
-import { fail, error } from '@sveltejs/kit';
+import { fail, error, redirect } from '@sveltejs/kit';
 import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
@@ -12,6 +12,14 @@ export const load: PageServerLoad = async ({ params }) => {
 		error(400, 'ID tidak valid');
 	}
 	try {
+		const isDataExist = await db.query.absensi_santri.findFirst({
+			where: eq(table.absensi_santri.pertemuanId, id),
+			columns: { pertemuanId: true }
+		});
+		if (isDataExist) {
+			return { dataKehadiranExist: true, santriKelasData: [], id: id };
+		}
+
 		const dataPertemuan = await db.query.pertemuan.findFirst({
 			where: eq(table.pertemuan.id, id),
 			columns: { id: true },
@@ -75,10 +83,11 @@ export const actions: Actions = {
 
 		try {
 			await db.insert(table.absensi_santri).values(validationResult.data);
-			return { success: true, message: 'berhasil menambahkan data absensi santri' };
+			// return { success: true, message: 'berhasil menambahkan data absensi santri' };
 		} catch (err) {
 			console.error('Terjadi kesalahan saat menambahkan data absensi santri', err);
 			fail(500, { message: 'Error saat menambahkan data absensi santri' });
 		}
+		return redirect(303, '/pertemuan/' + id + `/data-absensi`);
 	}
 };

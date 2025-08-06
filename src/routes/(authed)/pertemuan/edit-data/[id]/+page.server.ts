@@ -91,7 +91,7 @@ export const actions: Actions = {
 			return { success: true, message: 'berhasil mengubah data pertemuan' };
 		} catch (err) {
 			console.error('Terjadi kesalahan saat mengubah data pertemuan', err);
-			fail(500, { message: 'Error saat mengubah data pertemuan' });
+			return fail(500, { message: 'Error saat mengubah data pertemuan' });
 		}
 	}
 };

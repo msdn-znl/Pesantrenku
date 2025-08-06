@@ -36,16 +36,6 @@
 			>
 				<h2 class="card-title">Tambah Pertemuan</h2>
 				<fieldset class="fieldset">
-					<label for="jadwalId" class="label">Jadwal</label>
-					<select name="jadwalId" id="jadwalId" class="select select-md w-full">
-						<option value=""></option>
-						{#each data.jadwalList as jadwal (jadwal.id)}
-							<option value={jadwal.id}
-								>Guru: {jadwal.guru.user.nama}, Kelas: {jadwal.kelas.namaKelas}, Hari: {jadwal.hari},
-								Mulai: {jadwal.jamMulai}, Kitab: {jadwal.kitab.namaKitab}
-							</option>
-						{/each}
-					</select>
 					<label for="jurnalMengajar" class="label">Jurnal Mengajar</label>
 					<textarea
 						name="jurnalMengajar"
@@ -53,13 +43,6 @@
 						class="textarea textarea-md w-full"
 						placeholder="Masukkan Jurnal Mengajar di sini"
 					></textarea>
-					<label for="tanggalPertemuan" class="label">Tanggal</label>
-					<input
-						type="date"
-						name="tanggalPertemuan"
-						id="tanggalPertemuan"
-						class="input input-md w-full"
-					/>
 					<label for="status" class="label">Status Pertemuan</label>
 					<select name="status" id="status" class="select select-md w-full">
 						<option value=""></option>

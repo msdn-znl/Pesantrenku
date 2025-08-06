@@ -4,6 +4,11 @@
 </script>
 
 <div>
+	<div class="flex flex-row-reverse">
+		<a href={'/pertemuan/' + data.idPertemuan + '/data-absensi/edit'}
+			><button class="btn btn-accent">Edit Absensi</button></a
+		>
+	</div>
 	<table class="table">
 		<thead
 			><tr>

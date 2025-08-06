@@ -13,8 +13,15 @@ export const LoginUserFormSchema = z.object({
 });
 
 export const EditUserFormSchema = z.object({
+	id: z.string(),
 	username: z.email().nonempty(),
 	nama: z.string(),
 	password: z.string().min(6).max(255).or(z.literal('')).optional(),
 	role: z.enum(['admin', 'guru', 'santri']).optional()
+});
+
+export const RegisterFormSchema = z.object({
+	username: z.email().nonempty(),
+	password: z.string().min(6).max(255),
+	nama: z.string()
 });

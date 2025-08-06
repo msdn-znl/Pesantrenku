@@ -1,58 +1,181 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
+	import { enhance, applyAction } from '$app/forms';
+	import { invalidateAll } from '$app/navigation';
 	import type { ActionData, PageServerData } from './$types';
+	import { toast } from 'svelte-sonner';
+	type User = PageServerData['userList'][number];
 
 	let { form, data }: { form: ActionData; data: PageServerData } = $props();
+
+	let createUserForm: HTMLFormElement;
 	let createUserModal: HTMLDialogElement;
 	let deleteUserModal: HTMLDialogElement;
+	let editUserForm: HTMLFormElement;
+	let editUserModal: HTMLDialogElement;
 	let userToDelete = $state<string | null>(null);
+	let userToEdit = $state<User | undefined>();
 </script>
 
 <div class="">
 	<dialog class="modal" id="create_user_modal" bind:this={createUserModal}>
-		<div class="card bg-base-100 shadow">
+		<div class="modal-box">
 			<form method="dialog">
 				<button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
 			</form>
-			<div class="card-body flex-col shrink-0">
+			<div class="">
 				<h2 class="card-title">Tambah User</h2>
-				<form method="post" action="?/create" use:enhance>
-					<fieldset class="fieldset">
-						<label for="username" class="text-base label"> Email </label>
-						<input
-							name="username"
-							type="email"
-							id="username"
-							placeholder="Email"
-							class="input w-xs lg:w-lg"
-						/>
-						<label for="password" class="text-base label"> Password </label>
-						<input
-							type="password"
-							name="password"
-							id="password"
-							placeholder="Password"
-							class="input w-xs lg:w-lg"
-						/>
-						<label for="nama" class="text-base label"> Nama </label>
-						<input
-							type="text"
-							name="nama"
-							id="nama"
-							placeholder="Nama"
-							class="input w-xs lg:w-lg"
-						/>
-						<label for="role" class="text-base label"> Role </label>
-						<select name="role" id="role" class="select w-xs lg:w-lg">
-							<option value="">Role</option>
-							<option value="admin">Admin</option>
-							<option value="guru">Guru</option>
-							<option value="santri">Santri</option>
-						</select>
-						<button class="btn btn-success hover:btn-warning mt-5">Tambah Data</button>
-					</fieldset>
+				<form
+					class="fieldset"
+					method="post"
+					action="?/create"
+					bind:this={createUserForm}
+					use:enhance={() => {
+						return async ({ result }) => {
+							if (result.type === 'success') {
+								createUserForm.reset();
+								invalidateAll();
+								createUserModal.close();
+								if (result.data?.message && typeof result.data?.message === 'string') {
+									toast.success(result.data?.message);
+								}
+							} else if (result.type === 'failure') {
+								createUserModal.close();
+								if (result.data?.message && typeof result.data.message === 'string') {
+									toast.error(result.data?.message);
+								}
+							}
+							await applyAction(result);
+						};
+					}}
+				>
+					<label for="username" class="text-base label"> Email </label>
+					<input
+						name="username"
+						type="email"
+						id="username"
+						placeholder="Email"
+						class="input w-full"
+					/>
+					<label for="password" class="text-base label"> Password </label>
+					<input
+						type="password"
+						name="password"
+						id="password"
+						placeholder="Password"
+						class="input w-full"
+					/>
+					<label for="nama" class="text-base label"> Nama </label>
+					<input type="text" name="nama" id="nama" placeholder="Nama" class="input w-full" />
+					<label for="role" class="text-base label"> Role </label>
+					<select name="role" id="role" class="select w-full">
+						<option value="">Role</option>
+						<option value="admin">Admin</option>
+						<option value="guru">Guru</option>
+						<option value="santri">Santri</option>
+					</select>
+					<button class="btn btn-success mt-5">Tambah Data</button>
+				</form>
+				<!-- <button onclick={() => toast.success('toast test')} class="btn btn-success"
+					>Test Toast</button
+				> -->
+			</div>
+		</div>
+	</dialog>
+	<dialog class="modal" id="delete_user_modal" bind:this={deleteUserModal}>
+		<div class="modal-box">
+			<p>Apakah Anda yakin ingin menghapus data user ini?</p>
+			<div class="modal-action">
+				<form method="dialog">
+					<button class="btn btn-success" onclick={() => (userToDelete = null)}>Batal</button>
+				</form>
+				<form
+					action="?/delete"
+					method="post"
+					use:enhance={() => {
+						return async ({ result }) => {
+							if (result.type === 'success') {
+								invalidateAll();
+								deleteUserModal.close();
+								if (result.data?.message && typeof result.data?.message === 'string') {
+									toast.success(result.data?.message);
+								}
+							} else if (result.type === 'failure') {
+								deleteUserModal.close();
+								if (result.data?.message && typeof result.data.message === 'string') {
+									toast.error(result.data?.message);
+								}
+							}
+							await applyAction(result);
+						};
+					}}
+				>
+					<input type="hidden" name="id" value={userToDelete} />
+					<button type="submit" class="btn btn-error">Delete</button>
 				</form>
 			</div>
+		</div>
+	</dialog>
+	<dialog class="modal" id="edit_user_modal" bind:this={editUserModal}>
+		<div class="modal-box">
+			<form method="dialog">
+				<button
+					class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+					onclick={() => (userToEdit = undefined)}>✕</button
+				>
+			</form>
+			<form
+				action="?/edit"
+				method="post"
+				bind:this={editUserForm}
+				use:enhance={() => {
+					return async ({ result }) => {
+						if (result.type === 'success') {
+							editUserForm.reset();
+							invalidateAll();
+							editUserModal.close();
+							if (result.data?.message && typeof result.data?.message === 'string') {
+								toast.success(result.data?.message);
+							}
+						} else if (result.type === 'failure') {
+							editUserModal.close();
+							if (result.data?.message && typeof result.data.message === 'string') {
+								toast.error(result.data?.message);
+							}
+						}
+						await applyAction(result);
+					};
+				}}
+			>
+				<fieldset class="fieldset">
+					<input type="text" name="id" id="id" value={userToEdit?.id} hidden />
+					<label for="edit_username" class="text-base label"> Username</label>
+					<input
+						type="text"
+						name="username"
+						id="edit_username"
+						class="input w-full"
+						value={userToEdit?.username}
+					/>
+					<label for="edit_nama" class="text-base label"> Nama </label>
+					<input
+						type="text"
+						name="nama"
+						id="edit_nama"
+						class="input w-full"
+						value={userToEdit?.nama}
+					/>
+					<label for="edit_password" class="text-base label">Password</label>
+					<input type="password" name="password" id="edit_password" class="input w-full" />
+					<label for="edit_role" class="text-base label"> Role</label>
+					<select name="role" id="edit_role" class="select w-full" disabled>
+						<option value="">Role</option>
+						<option value="admin" selected={userToEdit?.role == 'admin'}>Admin</option>
+						<option value="guru" selected={userToEdit?.role == 'guru'}>Guru</option>
+						<option value="santri" selected={userToEdit?.role == 'santri'}>Santri</option>
+					</select>
+					<button type="submit" class="btn btn-success mt-4">Edit Data</button>
+				</fieldset>
+			</form>
 		</div>
 	</dialog>
 	<div class="flex flex-row-reverse p-2">
@@ -60,20 +183,6 @@
 			>Tambah User</button
 		>
 	</div>
-	<dialog class="modal" id="delete_user_modal" bind:this={deleteUserModal}>
-		<div class="modal-box">
-			<p>Apakah Anda yakin ingin menghapus data user ini?</p>
-			<div class="flex flex-row">
-				<form method="dialog">
-					<button class="btn btn-success" onclick={() => (userToDelete = null)}>Batal</button>
-				</form>
-				<form action="?/delete" method="post" use:enhance>
-					<input type="hidden" name="id" value={userToDelete} />
-					<button type="submit" class="btn btn-error">Delete</button>
-				</form>
-			</div>
-		</div>
-	</dialog>
 	<div class="p-2">
 		<div class="">
 			<div class="flex">
@@ -101,8 +210,12 @@
 								<td>
 									<!-- Todo: Buat modal untuk tombol edit -->
 
-									<a href={'/user/edit-data/' + user.id} class="btn btn-accent"
-										><button>Edit</button></a
+									<button
+										class="btn btn-success mr-2"
+										onclick={() => {
+											userToEdit = { ...user };
+											editUserModal.showModal();
+										}}>Edit</button
 									>
 
 									<!-- Todo: Update list setelah tombol di delete tanpa reload halaman -->
@@ -118,7 +231,6 @@
 						{/each}
 					</tbody>
 				</table>
-				<p>{form?.message ?? ''}</p>
 			</div>
 		</div>
 	</div>

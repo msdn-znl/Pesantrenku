@@ -1,22 +1,23 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
-	import type { ActionData } from './$types';
-
-	let { form }: { form: ActionData } = $props();
 </script>
 
-<p style="color: red">{form?.message ?? ''}</p>
 <div class="hero bg-base-200 min-h-screen">
 	<div class="hero-content flex-col lg:flex-row-reverse">
 		<div class="text-center lg:text-left p-6">
-			<h1 class="text-5xl font-bold">Login</h1>
-			<p class="py-6">Selamat Datang di Pesantrenku, Silahkan Login</p>
+			<h1 class="text-5xl font-bold">Register</h1>
+			<p class="py-6">
+				Selamat Datang di Pesantrenku, Untuk Penggunaan pertama kali, mohon melakukan register Akun
+				Admin pada form
+			</p>
 		</div>
 		<div class="card w-full max-w-sm shrink-0 bg-base-100 shadow-2xl">
 			<div class="card-body">
-				<h2 class="card-title">Silahkan Login</h2>
-				<form method="post" action="?/login" use:enhance>
+				<h2 class="card-title">Silahkan Register</h2>
+				<form method="post" action="?/register" use:enhance>
 					<fieldset class="fieldset">
+						<label for="nama">Nama</label>
+						<input type="text" name="nama" id="nama" placeholder="Nama" class="input" required />
 						<label class="label" for="username"> Username(Email) </label>
 						<input
 							name="username"
@@ -24,6 +25,7 @@
 							placeholder="mail@mail.co"
 							type="email"
 							class="input"
+							required
 						/>
 						<label class="label" for="password"> Password </label>
 						<input
@@ -32,6 +34,7 @@
 							id="password"
 							placeholder="Password"
 							class="input"
+							required
 						/>
 						<button class="btn btn-success hover:btn-accent mt-4">Login</button>
 					</fieldset>

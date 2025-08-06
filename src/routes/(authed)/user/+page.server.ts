@@ -6,7 +6,7 @@ import { db } from '$lib/server/db';
 import { eq } from 'drizzle-orm';
 import type { Actions, PageServerLoad, RequestEvent } from './$types';
 import { fail, error } from '@sveltejs/kit';
-import { UserFormSchema } from '$lib/server/form-validation/user';
+import { UserFormSchema, EditUserFormSchema } from '$lib/server/form-validation/user';
 import * as z from 'zod/v4';
 
 export const load: PageServerLoad = async () => {
@@ -75,7 +75,7 @@ export const actions: Actions = {
 					await tx.insert(table.santri).values({ userId: userId, status: 'aktif' });
 				}
 			});
-			return { success: true, message: 'Success' };
+			return { success: true, message: 'Berhasil Menambahkan Data' };
 		} catch (error) {
 			console.error(error);
 			return fail(500, { message: 'An error has occurred' });
@@ -97,6 +97,50 @@ export const actions: Actions = {
 		} catch (err) {
 			console.error(err);
 			return fail(500, { message: 'An error occured ' });
+		}
+	},
+	edit: async (event: RequestEvent) => {
+		const formData = await event.request.formData();
+		const userData = Object.fromEntries(
+			Array.from(formData.keys()).map((key) => [
+				key,
+				formData.getAll(key).length > 1 ? formData.getAll(key) : formData.get(key)
+			])
+		);
+		const result = EditUserFormSchema.safeParse(userData);
+		if (!result.success) {
+			return fail(422, {
+				message: 'Data yang anda masukkan salah',
+				error: z.prettifyError(result.error),
+				data: userData
+			});
+		}
+
+		const { username, password, nama, role, id } = result.data;
+		const updatedData: {
+			username: string;
+			nama: string;
+			role?: 'admin' | 'guru' | 'santri' | undefined;
+			passwordHash?: string;
+		} = { username, nama, role };
+		if (password) {
+			const passwordHash = await hash(password, {
+				// recommended minimum parameters
+				memoryCost: 19456,
+				timeCost: 2,
+				outputLen: 32,
+				parallelism: 1
+			});
+			updatedData.passwordHash = passwordHash;
+		}
+		console.log(updatedData);
+
+		try {
+			await db.update(table.users).set(updatedData).where(eq(table.users.id, id));
+			return { success: true, message: 'Berhasil di-edit' };
+		} catch (err) {
+			console.error(err);
+			error(500, 'An error occured');
 		}
 	}
 };

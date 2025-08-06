@@ -39,7 +39,7 @@ export const actions: Actions = {
 		const deleteId = Number(id);
 		if (isNaN(deleteId)) fail(422, { message: 'ID tidak valid' });
 		try {
-			await db.delete(table.tahun_ajaran).where(eq(table.kelas.id, deleteId));
+			await db.delete(table.tahun_ajaran).where(eq(table.tahun_ajaran.id, deleteId));
 		} catch (err) {
 			console.error(err);
 			return fail(500, { message: 'An error occured' });
