@@ -75,7 +75,6 @@ export const actions: Actions = {
 			])
 		);
 		const validationResult = PertemuanFormSchema.safeParse(pertemuanData);
-		console.log(validationResult);
 		if (!validationResult.success) {
 			return fail(422, {
 				message: 'Data yang anda masukkan salah',
@@ -83,6 +82,7 @@ export const actions: Actions = {
 				data: validationResult.data
 			});
 		}
+
 		try {
 			await db.insert(table.pertemuan).values(validationResult.data);
 			return { success: true, message: 'berhasil menambahkan data pertemuan' };
