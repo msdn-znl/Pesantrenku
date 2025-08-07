@@ -3,79 +3,91 @@
 	import { enhance } from '$app/forms';
 
 	let { data, form }: { data: PageServerData; form: ActionData } = $props();
-	const tanggal = data.santriData.tanggalLahir
-		? data.santriData.tanggalLahir.toISOString().split('T')[0]
-		: '';
 </script>
 
-<!-- kurang tambahkan value awal dari form -->
-
-<div class="flex justify-center">
-	<form action="?/edit" method="POST" use:enhance class="fieldset flex flex-col">
-		<label for="nomorIndukSantri">Nomor Induk Santri</label>
-		<input
-			type="text"
-			id="nomorIndukSantri"
-			name="nomorIndukSantri"
-			class="input"
-			value={data.santriData.nomorIndukSantri}
-		/>
-		<label for="tahunMasuk">Tahun Masuk</label>
-		<input
-			type="number"
-			id="tahunMasuk"
-			name="tahunMasuk"
-			class="input"
-			value={data.santriData.tahunMasuk}
-		/>
-		<label for="tahunKeluar">Tahun Keluar</label>
-		<input
-			type="number"
-			id="tahunKeluar"
-			name="tahunKeluar"
-			class="input"
-			value={data.santriData.tahunKeluar}
-		/>
-		<label for="nomorTelepon">Nomor Telepon</label>
-		<input
-			type="tel"
-			name="nomorTelepon"
-			id="nomorTelepon"
-			class="input"
-			value={data.santriData.nomorTelepon}
-		/>
-		<label for="status">Status:</label>
-		<select name="status" id="status" class="select">
-			{#if data.santriData.status === 'aktif'}
-				<option value=""></option>
-				<option value="aktif" selected>Aktif</option>
-				<option value="inaktif">Non Aktif</option>
-			{:else if data.santriData.status === 'inaktif'}
-				<option value=""></option>
-				<option value="aktif">Aktif</option>
-				<option value="inaktif" selected>Non Aktif</option>
-			{/if}
-		</select>
-		<label for="tempatLahir">Tempat Lahir</label>
-		<input
-			type="text"
-			name="tempatLahir"
-			id="tempatLahir"
-			class="input"
-			value={data.santriData.tempatLahir}
-		/>
-		<label for="tanggalLahir">Tanggal Lahir</label>
-		<input type="date" name="tanggalLahir" id="tanggalLahir" class="input" value={tanggal || ''} />
-		<label for="kamar">Kamar</label>
-		<select name="kamar" id="kamar" class="select">
-			<option value="Ibrahim1" selected>Ibrahim1</option>
-			<option value="Ibrahim2">Ibrahim2</option>
-			<option value="Ibrahim3">Ibrahim3</option>
-			<option value="Ibrahim4">Ibrahim4</option>
-			<option value="Ibrahim5">Ibrahim5</option>
-		</select>
-		<button type="submit" class="btn btn-success">Edit Data Santri</button>
-	</form>
+<div class="">
+	<div class="card p-4 justify-center shadow">
+		<form action="?/edit" method="POST" use:enhance class="grid grid-cols-1 lg:grid-cols-2">
+			<fieldset class="fieldset p-4">
+				<legend class="fieldset-legend">Data Santri</legend>
+				<label for="nomorIndukSantri" class="label">Nomor Induk Santri</label>
+				<input
+					type="text"
+					id="nomorIndukSantri"
+					name="nomorIndukSantri"
+					class="input"
+					value={data.santriData.nomorIndukSantri}
+				/>
+				<label for="tahunMasuk" class="label">Tahun Masuk</label>
+				<input
+					type="number"
+					id="tahunMasuk"
+					name="tahunMasuk"
+					class="input"
+					value={data.santriData.tahunMasuk}
+				/>
+				<label for="tahunKeluar" class="label">Tahun Keluar</label>
+				<input
+					type="number"
+					id="tahunKeluar"
+					name="tahunKeluar"
+					class="input"
+					value={data.santriData.tahunKeluar}
+				/>
+				<label for="status" class="label">Status:</label>
+				<select name="status" id="status" class="select">
+					{#if data.santriData.status === 'aktif'}
+						<option value=""></option>
+						<option value="aktif" selected>Aktif</option>
+						<option value="inaktif">Non Aktif</option>
+					{:else if data.santriData.status === 'inaktif'}
+						<option value=""></option>
+						<option value="aktif">Aktif</option>
+						<option value="inaktif" selected>Non Aktif</option>
+					{/if}
+				</select>
+				<label for="kamar" class="label">Kamar</label>
+				<select name="kamar" id="kamar" class="select">
+					<option value="Ibrahim1" selected>Ibrahim1</option>
+					<option value="Ibrahim2">Ibrahim2</option>
+					<option value="Ibrahim3">Ibrahim3</option>
+					<option value="Ibrahim4">Ibrahim4</option>
+					<option value="Ibrahim5">Ibrahim5</option>
+				</select>
+			</fieldset>
+			<fieldset class="fieldset p-4">
+				<legend class="fieldset-legend">Data Pribadi</legend>
+				<label for="nomorTelepon" class="label">Nomor Telepon</label>
+				<input
+					type="tel"
+					name="nomorTelepon"
+					id="nomorTelepon"
+					class="input"
+					value={data.santriData.nomorTelepon}
+				/>
+				<label for="tempatLahir" class="label">Tempat Lahir</label>
+				<input
+					type="text"
+					name="tempatLahir"
+					id="tempatLahir"
+					class="input"
+					value={data.santriData.tempatLahir}
+				/>
+				<label for="tanggalLahir" class="label">Tanggal Lahir</label>
+				<input
+					type="date"
+					name="tanggalLahir"
+					id="tanggalLahir"
+					class="input"
+					value={data.santriData.tanggalLahir || ''}
+				/>
+			</fieldset>
+			<div></div>
+			<div class="card-actions flex flex-row-reverse pr-4">
+				<button type="submit" class="btn btn-success p-2">Edit Data Santri</button>
+			</div>
+		</form>
+	</div>
 </div>
 {#if form?.message}
 	<div role="alert" class="alert alert-error">
@@ -93,6 +105,5 @@
 			/>
 		</svg>
 		<p>{form.message}</p>
-		<p></p>
 	</div>
 {/if}
