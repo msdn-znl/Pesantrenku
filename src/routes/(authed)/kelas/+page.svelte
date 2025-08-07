@@ -46,7 +46,7 @@
 	<dialog class="modal" id="delete_kelas_modal" bind:this={deleteKelasModal}>
 		<div class="modal-box">
 			<p>Apakah Anda yakin untuk menghapus kelas ini?</p>
-			<div class="flex flex-row">
+			<div class="modal-actions">
 				<form method="dialog">
 					<button class="btn btn-success w-full" onclick={() => (kelasToDelete = null)}
 						>Batal</button
@@ -116,7 +116,7 @@
 						<td>{kelas.ketuaKelas}</td>
 						<td class="flex flex-col">
 							<a href={'/kelas/tambah-santri/' + kelas.id}
-								><button class="btn btn-accent w-full">Tambah Santri</button></a
+								><button class="btn btn-accent w-full">Edit Anggota Kelas</button></a
 							>
 
 							<button
@@ -124,14 +124,14 @@
 								onclick={() => {
 									kelasToEdit = { ...kelas };
 									editKelasModal.showModal();
-								}}>Edit</button
+								}}>Edit Nama Kelas</button
 							>
 							<button
 								class="btn btn-error w-full"
 								onclick={() => {
 									kelasToDelete = kelas.id;
 									deleteKelasModal.showModal();
-								}}>Delete</button
+								}}>Delete Kelas</button
 							>
 						</td>
 					</tr>
