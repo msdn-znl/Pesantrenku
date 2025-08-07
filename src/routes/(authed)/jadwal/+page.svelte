@@ -4,12 +4,14 @@
 
 	let { data, form }: { data: PageServerData; form: ActionData } = $props();
 	const hari = ['', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
+
+	let createJadwalModal: HTMLDialogElement;
 </script>
 
-<div class="p-2">
-	<div class="card">
-		<h2 class="card-title">Tambah Jadwal</h2>
-		<div class="card-body max-w-lg">
+<div class="">
+	<dialog class="modal" bind:this={createJadwalModal}>
+		<div class="modal-box">
+			<h2 class="card-title">Tambah Jadwal</h2>
 			<form action="?/create" method="post" class="flex flex-col" use:enhance>
 				<label for="kitabId">Kitab</label>
 				{#await data.streamed.kitabList}
@@ -69,8 +71,12 @@
 				<button type="submit" class="btn btn-success">Tambah Jadwal</button>
 			</form>
 		</div>
+	</dialog>
+	<div class="flex flex-row-reverse p-2">
+		<button class="btn btn-success" onclick={() => createJadwalModal.showModal()}
+			>Tambah Jadwal</button
+		>
 	</div>
-
 	<div class="card overflow-auto">
 		<h2 class="card-title">List Jadwal</h2>
 		<div class="card-body">
