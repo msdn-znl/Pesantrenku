@@ -75,9 +75,6 @@
 					</select>
 					<button class="btn btn-success mt-5">Tambah Data</button>
 				</form>
-				<!-- <button onclick={() => toast.success('toast test')} class="btn btn-success"
-					>Test Toast</button
-				> -->
 			</div>
 		</div>
 	</dialog>
