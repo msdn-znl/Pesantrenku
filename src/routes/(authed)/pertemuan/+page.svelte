@@ -3,10 +3,13 @@
 	import { invalidateAll } from '$app/navigation';
 	import type { PageServerData, ActionData } from './$types';
 	import { toast } from 'svelte-sonner';
+	type Pertemuan = PageServerData['pertemuanList'][number];
 
 	let { data, form }: { data: PageServerData; form: ActionData } = $props();
 	let createPertemuanModal: HTMLDialogElement;
 	let deletePertemuanModal: HTMLDialogElement;
+	let editPertemuanModal: HTMLDialogElement;
+	let pertemuanToEdit = $state<Pertemuan | null>(null);
 	let pertemuanToDelete = $state<number | null>(null);
 </script>
 
@@ -20,19 +23,23 @@
 			<form
 				action="?/create"
 				method="post"
+				class="flex flex-col"
 				use:enhance={() => {
 					return async ({ result }) => {
 						if (result.type === 'success') {
 							invalidateAll();
 							createPertemuanModal.close();
-							toast.success(result.data?.message);
+							if (result.data?.message && typeof result.data?.message === 'string') {
+								toast.success(result.data?.message);
+							}
 						} else if (result.type === 'failure') {
-							toast.error(result.data?.message);
+							if (result.data?.message && typeof result.data.message === 'string') {
+								toast.error(result.data?.message);
+							}
+							await applyAction(result);
 						}
-						await applyAction(result);
 					};
 				}}
-				class="flex flex-col"
 			>
 				<h2 class="card-title">Tambah Pertemuan</h2>
 				<fieldset class="fieldset">
@@ -87,10 +94,14 @@
 						return async ({ result }) => {
 							if (result.type === 'success') {
 								deletePertemuanModal.close();
-								toast.success(result.data?.message);
+								if (result.data?.message && typeof result.data?.message === 'string') {
+									toast.success(result.data?.message);
+								}
 							} else if (result.type === 'failure') {
 								deletePertemuanModal.close();
-								toast.error(result.data?.message);
+								if (result.data?.message && typeof result.data.message === 'string') {
+									toast.error(result.data?.message);
+								}
 							}
 							await applyAction(result);
 						};
@@ -100,6 +111,58 @@
 					<button type="submit" class="btn btn-error">Hapus Data Pertemuan</button>
 				</form>
 			</div>
+		</div>
+	</dialog>
+	<dialog class="modal" id="edit_pertemuan_modal" bind:this={editPertemuanModal}>
+		<div class="modal-box">
+			<form method="dialog">
+				<button
+					class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+					onclick={() => (pertemuanToEdit = null)}>✕</button
+				>
+			</form>
+			<form action="?/edit" method="post" use:enhance>
+				<fieldset class="fieldset">
+					<label for="jadwalId" class="label">Jadwal</label>
+					<select name="jadwalId" id="jadwalId" class="select w-full">
+						<option value=""></option>
+						{#each data.jadwalList as jadwal (jadwal.id)}
+							<option value={jadwal.id} selected={jadwal.id === pertemuanToEdit?.jadwalId}
+								>Guru: {jadwal.guru.user.nama}, Kelas: {jadwal.kelas.namaKelas}, Hari: {jadwal.hari},
+								Mulai: {jadwal.jamMulai}, Kitab: {jadwal.kitab.namaKitab}
+							</option>
+						{/each}
+					</select>
+					<label for="jurnalMengajar" class="label">Jurnal Mengajar</label>
+					<textarea
+						name="jurnalMengajar"
+						id="jurnalMengajar"
+						class="textarea w-full"
+						placeholder="Masukkan Jurnal Mengajar di sini"
+						value={pertemuanToEdit?.jurnalMengajar}
+					></textarea>
+					<label for="tanggalPertemuan" class="label">Tanggal</label>
+					<input
+						type="date"
+						name="tanggalPertemuan"
+						id="tanggalPertemuan"
+						class="input w-full"
+						value={pertemuanToEdit?.tanggalPertemuan}
+					/>
+					<label for="status" class="label">Status Pertemuan</label>
+					<select name="status" id="status" class="select w-full">
+						<option value=""></option>
+						<option value="selesai" selected={pertemuanToEdit?.status === 'selesai'}>Selesai</option
+						>
+						<option value="batal" selected={pertemuanToEdit?.status === 'batal'}>Batal</option>
+						<option value="tugas mandiri" selected={pertemuanToEdit?.status === 'tugas mandiri'}
+							>Tugas Mandiri</option
+						>
+					</select>
+
+					<button type="submit" class="btn btn-success">Edit Data Pertemuan</button>
+				</fieldset>
+			</form>
 		</div>
 	</dialog>
 	<div class="flex flex-row-reverse p-2">
@@ -141,8 +204,12 @@
 							<a href={'/pertemuan/' + pertemuan.id + '/data-absensi'}
 								><button class="btn btn-accent w-full">Data Absensi</button></a
 							>
-							<a href={'/pertemuan/edit-data/' + pertemuan.id}
-								><btn class="btn btn-warning w-full">Edit Data</btn></a
+							<button
+								class="btn btn-warning w-full"
+								onclick={() => {
+									pertemuanToEdit = { ...pertemuan };
+									editPertemuanModal.showModal();
+								}}>Edit Pertemuan</button
 							>
 							<button
 								class="btn btn-error w-full"
