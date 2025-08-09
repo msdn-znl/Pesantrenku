@@ -121,7 +121,26 @@
 					onclick={() => (pertemuanToEdit = null)}>✕</button
 				>
 			</form>
-			<form action="?/edit" method="post" use:enhance>
+			<form
+				action="?/edit"
+				method="post"
+				use:enhance={() => {
+					return async ({ result }) => {
+						if (result.type === 'success') {
+							invalidateAll();
+							editPertemuanModal.close();
+							if (result.data?.message && typeof result.data?.message === 'string') {
+								toast.success(result.data?.message);
+							}
+						} else if (result.type === 'failure') {
+							if (result.data?.message && typeof result.data.message === 'string') {
+								toast.error(result.data?.message);
+							}
+							await applyAction(result);
+						}
+					};
+				}}
+			>
 				<fieldset class="fieldset">
 					<label for="jadwalId" class="label">Jadwal</label>
 					<select name="jadwalId" id="jadwalId" class="select w-full">
