@@ -1,10 +1,14 @@
 <script lang="ts">
 	import '../app.css';
 	import { Toaster } from 'svelte-sonner';
+	import { page } from '$app/state';
 
 	let { children, data } = $props();
 </script>
 
+<svelte:head>
+	<title>{page.url.pathname}</title>
+</svelte:head>
 {#if data.user}
 	<div class="drawer lg:drawer-open">
 		<Toaster position="top-right" richColors />
