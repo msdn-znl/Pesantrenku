@@ -31,6 +31,7 @@
 	<p>Data Kehadiran Sudah Ada</p>
 {:else}
 	<div class="p-2 card">
+		<h2 class="card-title ml-2">Tambah Data Absensi</h2>
 		<form action="?/create" method="post">
 			<table class="table">
 				<thead>
@@ -69,7 +70,7 @@
 								<div>
 									<input type="number" name="santriId" id="" value={santrikelas.santriId} hidden />
 								</div>
-								<div class="">
+								<div class="flex justify-around">
 									<input
 										type="radio"
 										name="status_{santrikelas.santriId}"
@@ -108,15 +109,31 @@
 					{/each}
 				</tbody>
 			</table>
-			<div>
-				<button type="submit" class="btn btn-success">Submit data Absensi</button>
+			<div class="flex justify-between mt-5">
+				<button
+					type="button"
+					class="btn btn-accent btn-circle btn-outline flex-1"
+					onclick={() => changeStatusSantri('hadir')}>Hadir</button
+				>
+				<button
+					type="button"
+					class="btn btn-error btn-circle btn-outline flex-1"
+					onclick={() => changeStatusSantri('alfa')}>Alfa</button
+				>
+				<button
+					type="button"
+					class="btn btn-warning btn-circle btn-outline flex-1"
+					onclick={() => changeStatusSantri('sakit')}>Sakit</button
+				>
+				<button
+					type="button"
+					class="btn btn-info btn-circle btn-outline flex-1"
+					onclick={() => changeStatusSantri('izin')}>Izin</button
+				>
 			</div>
-			<div class="flex flex-row">
-				<button type="button" class="btn" onclick={() => changeStatusSantri('hadir')}>Hadir</button>
-				<button type="button" class="btn" onclick={() => changeStatusSantri('alfa')}>Alfa</button>
-				<button type="button" class="btn" onclick={() => changeStatusSantri('sakit')}>Sakit</button>
-				<button type="button" class="btn" onclick={() => changeStatusSantri('izin')}>Izin</button>
-			</div>
+			<fieldset class="fieldset">
+				<button type="submit" class="btn btn-success mt-4">Submit data Absensi</button>
+			</fieldset>
 		</form>
 	</div>
 {/if}
