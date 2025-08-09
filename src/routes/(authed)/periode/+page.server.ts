@@ -28,8 +28,9 @@ export const actions: Actions = {
 			return fail(422, { message: 'Data yang anda masukkan salah' });
 		try {
 			await db.insert(table.tahun_ajaran).values({ tahunAjaran: tahunAjaran });
+			return { success: true, message: 'Berhasil ditambahkan' };
 		} catch (err) {
-			console.error(err);
+			console.error('Error while add record to Periode:', err);
 			error(500, { message: 'An error occured' });
 		}
 	},
@@ -40,8 +41,9 @@ export const actions: Actions = {
 		if (isNaN(deleteId)) fail(422, { message: 'ID tidak valid' });
 		try {
 			await db.delete(table.tahun_ajaran).where(eq(table.tahun_ajaran.id, deleteId));
+			return { success: true, message: 'Berhasil dihapus' };
 		} catch (err) {
-			console.error(err);
+			console.error('Error while deleting Periode:', err);
 			return fail(500, { message: 'An error occured' });
 		}
 	}
