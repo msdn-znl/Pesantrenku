@@ -13,7 +13,7 @@
 	let editUserForm: HTMLFormElement;
 	let editUserModal: HTMLDialogElement;
 	let userToDelete = $state<string | null>(null);
-	let userToEdit = $state<User | undefined>();
+	let userToEdit = $state<User | null>(null);
 </script>
 
 <div class="">
@@ -117,7 +117,7 @@
 			<form method="dialog">
 				<button
 					class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
-					onclick={() => (userToEdit = undefined)}>✕</button
+					onclick={() => (userToEdit = null)}>✕</button
 				>
 			</form>
 			<form
