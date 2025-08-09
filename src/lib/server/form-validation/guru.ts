@@ -1,7 +1,7 @@
 import * as z from 'zod/v4';
 
 export const GuruFormSchema = z.object({
-	nama: z.string(),
+	id: z.string(),
 	nomorIndukGuru: z.string().optional(),
 	nomorTelepon: z.string().optional(),
 	status: z.enum(['aktif', 'inaktif']).optional()
