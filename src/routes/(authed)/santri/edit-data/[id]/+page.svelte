@@ -7,7 +7,12 @@
 
 <div class="">
 	<div class="card p-4 justify-center shadow">
-		<form action="?/edit" method="POST" use:enhance class="grid grid-cols-1 lg:grid-cols-2">
+		<form
+			action="?/edit"
+			method="POST"
+			use:enhance
+			class="grid grid-cols-1 place-content-around lg:grid-cols-2"
+		>
 			<fieldset class="fieldset p-4">
 				<legend class="fieldset-legend">Data Santri</legend>
 				<label for="nomorIndukSantri" class="label">Nomor Induk Santri</label>
