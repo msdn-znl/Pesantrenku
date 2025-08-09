@@ -10,7 +10,7 @@ import * as z from 'zod/v4';
 
 export const load: PageServerLoad = async (event) => {
 	if (event.locals.user) {
-		return redirect(302, '/auth');
+		return redirect(302, '/dashboard');
 	}
 	return {};
 };
