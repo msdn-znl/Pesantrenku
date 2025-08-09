@@ -53,7 +53,7 @@
 				{data.user.nama}
 			</p>
 		</div>
-		<ul class="menu w-4/5 lg:w-80">
+		<ul class="menu w-full lg:w-80">
 			{#each listMenu as menu}
 				<li class="font-medium">
 					<a href={menu.href} class={menu.href === page.url.pathname ? 'menu-active' : ''}
