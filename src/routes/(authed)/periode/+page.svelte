@@ -1,6 +1,8 @@
 <script lang="ts">
 	import type { PageServerData, ActionData } from './$types';
-	import { enhance } from '$app/forms';
+	import { enhance, applyAction } from '$app/forms';
+	import { invalidateAll } from '$app/navigation';
+	import { toast } from 'svelte-sonner';
 
 	let { data, form }: { data: PageServerData; form: ActionData } = $props();
 	let createPeriodeModal: HTMLDialogElement;
@@ -15,7 +17,28 @@
 				<button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
 			</form>
 			<div>
-				<form action="?/create" method="post" use:enhance autocomplete="off" class="flex flex-col">
+				<form
+					action="?/create"
+					method="post"
+					autocomplete="off"
+					use:enhance={() => {
+						return async ({ result }) => {
+							if (result.type === 'success') {
+								invalidateAll();
+								createPeriodeModal.close();
+								if (result.data?.message && typeof result.data?.message === 'string') {
+									toast.success(result.data?.message);
+								}
+							} else if (result.type === 'failure') {
+								createPeriodeModal.close();
+								if (result.data?.message && typeof result.data.message === 'string') {
+									toast.error(result.data?.message);
+								}
+							}
+							await applyAction(result);
+						};
+					}}
+				>
 					<fieldset class="fieldset">
 						<label for="tahunAjaran">Periode</label>
 						<input
@@ -30,7 +53,6 @@
 					</fieldset>
 				</form>
 			</div>
-			<p>{form?.message ?? ''}</p>
 		</div>
 	</dialog>
 	<div class="flex flex-row-reverse p-2">
@@ -45,7 +67,27 @@
 				<form method="dialog">
 					<button class="btn btn-success" onclick={() => (periodeToDelete = null)}>Batal</button>
 				</form>
-				<form action="?/delete" method="post" use:enhance>
+				<form
+					action="?/delete"
+					method="post"
+					use:enhance={() => {
+						return async ({ result }) => {
+							if (result.type === 'success') {
+								invalidateAll();
+								deletePeriodeModal.close();
+								if (result.data?.message && typeof result.data?.message === 'string') {
+									toast.success(result.data?.message);
+								}
+							} else if (result.type === 'failure') {
+								deletePeriodeModal.close();
+								if (result.data?.message && typeof result.data.message === 'string') {
+									toast.error(result.data?.message);
+								}
+							}
+							await applyAction(result);
+						};
+					}}
+				>
 					<input type="hidden" name="id" value={periodeToDelete} />
 					<button type="submit" class="btn btn-error">Delete</button>
 				</form>

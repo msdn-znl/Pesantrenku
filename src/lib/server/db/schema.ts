@@ -161,6 +161,11 @@ export const absensi_guru = pgTable('absensi_guru', {
 	status_kehadiran: kehadiranGuruEnum('status_kehadiran')
 });
 
+export const kamar = pgTable('kamar', {
+	id: serial('id').primaryKey(),
+	namaKamar: varchar('nama_kamar', { length: 255 })
+});
+
 // Relations Definitions
 export const userRelations = relations(users, ({ one }) => ({
 	guru: one(guru),
@@ -186,7 +191,11 @@ export const santriRelations = relations(santri, ({ one, many }) => ({
 		references: [users.id]
 	}),
 	kelas_santri: many(kelas_santri),
-	absensi_santri: many(absensi_santri)
+	absensi_santri: many(absensi_santri),
+	kamar: one(kamar, {
+		fields: [santri.kamar],
+		references: [kamar.id]
+	})
 }));
 
 export const kelasRelations = relations(kelas, ({ many, one }) => ({
@@ -250,6 +259,10 @@ export const absensiGuruRelations = relations(absensi_guru, ({ one }) => ({
 	})
 }));
 
+export const kamarRelations = relations(kamar, ({ many }) => ({
+	santri: many(santri)
+}));
+
 // Type Exports
 export type Session = typeof session.$inferSelect;
 export type User = typeof users.$inferSelect;
@@ -262,3 +275,5 @@ export type Jadwal = typeof jadwal.$inferSelect;
 export type Pertemuan = typeof pertemuan.$inferSelect;
 export type AbsensiGuru = typeof absensi_guru.$inferSelect;
 export type AbsensiSantri = typeof absensi_santri.$inferSelect;
+export type TahunAjaran = typeof tahun_ajaran.$inferSelect;
+export type Kamar = typeof kamar.$inferSelect;

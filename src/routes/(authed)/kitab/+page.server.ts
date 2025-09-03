@@ -3,7 +3,8 @@ import * as table from '$lib/server/db/schema';
 import { db } from '$lib/server/db';
 import { eq } from 'drizzle-orm';
 import { fail, error } from '@sveltejs/kit';
-import { KitabFormSchema } from '$lib/server/form-validation/kitab';
+import { KitabFormSchema, EditKitabFormSchema } from '$lib/server/form-validation/kitab';
+import * as z from 'zod/v4';
 
 export const load: PageServerLoad = async () => {
 	try {
@@ -34,6 +35,31 @@ export const actions: Actions = {
 		} catch (err) {
 			console.error(err);
 			return fail(500, { message: 'An error occured' });
+		}
+	},
+	edit: async (event: RequestEvent) => {
+		const formData = await event.request.formData();
+		const kitabData = Object.fromEntries(
+			Array.from(formData.keys()).map((key) => [
+				key,
+				formData.getAll(key).length > 1 ? formData.getAll(key) : formData.get(key)
+			])
+		);
+		const result = EditKitabFormSchema.safeParse(kitabData);
+		if (!result.success) {
+			return fail(422, {
+				message: 'Data yang anda masukkan salah',
+				error: z.prettifyError(result.error),
+				data: kitabData
+			});
+		}
+		const { id, ...kitab } = result.data;
+		try {
+			await db.update(table.kitab).set(kitab).where(eq(table.kitab.id, id));
+			return { success: true, message: 'Success' };
+		} catch (err) {
+			console.error(err);
+			error(500, 'An Error occured');
 		}
 	},
 	delete: async (event: RequestEvent) => {

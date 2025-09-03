@@ -1,6 +1,8 @@
 <script lang="ts">
-	import { enhance } from '$app/forms';
+	import { enhance, applyAction } from '$app/forms';
 	import type { PageServerData, ActionData } from './$types';
+	import { invalidateAll } from '$app/navigation';
+	import { toast } from 'svelte-sonner';
 
 	type Kelas = PageServerData['kelasList'][number];
 
@@ -10,7 +12,7 @@
 	let deleteKelasModal: HTMLDialogElement;
 	let editKelasModal: HTMLDialogElement;
 	let kelasToDelete = $state<number | null>(null);
-	let kelasToEdit = $state<Kelas | undefined>();
+	let kelasToEdit = $state<Kelas | null>(null);
 </script>
 
 <div>
@@ -19,7 +21,27 @@
 			<form method="dialog">
 				<button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
 			</form>
-			<form method="post" action="?/create" use:enhance class="flex flex-col">
+			<form
+				method="post"
+				action="?/create"
+				use:enhance={() => {
+					return async ({ result }) => {
+						if (result.type === 'success') {
+							invalidateAll();
+							createKelasModal.close();
+							if (result.data?.message && typeof result.data?.message === 'string') {
+								toast.success(result.data?.message);
+							}
+						} else if (result.type === 'failure') {
+							createKelasModal.close();
+							if (result.data?.message && typeof result.data.message === 'string') {
+								toast.error(result.data?.message);
+							}
+						}
+						await applyAction(result);
+					};
+				}}
+			>
 				<h2 class="card-title">Tambah Kelas</h2>
 				<fieldset class="fieldset">
 					<label for="namaKelas" class="label">Nama Kelas</label>
@@ -46,13 +68,33 @@
 	<dialog class="modal" id="delete_kelas_modal" bind:this={deleteKelasModal}>
 		<div class="modal-box">
 			<p>Apakah Anda yakin untuk menghapus kelas ini?</p>
-			<div class="flex flex-row">
+			<div class="modal-action">
 				<form method="dialog">
 					<button class="btn btn-success w-full" onclick={() => (kelasToDelete = null)}
 						>Batal</button
 					>
 				</form>
-				<form action="?/delete" method="post">
+				<form
+					action="?/delete"
+					method="post"
+					use:enhance={() => {
+						return async ({ result }) => {
+							if (result.type === 'success') {
+								invalidateAll();
+								deleteKelasModal.close();
+								if (result.data?.message && typeof result.data?.message === 'string') {
+									toast.success(result.data?.message);
+								}
+							} else if (result.type === 'failure') {
+								deleteKelasModal.close();
+								if (result.data?.message && typeof result.data.message === 'string') {
+									toast.error(result.data?.message);
+								}
+							}
+							await applyAction(result);
+						};
+					}}
+				>
 					<input type="hidden" name="id" value={kelasToDelete} />
 					<button type="submit" class="btn btn-error w-full">Delete</button>
 				</form>
@@ -62,9 +104,32 @@
 	<dialog class="modal" id="edit_kelas_modal" bind:this={editKelasModal}>
 		<div class="modal-box">
 			<form method="dialog">
-				<button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+				<button
+					class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+					onclick={() => (kelasToEdit = null)}>✕</button
+				>
 			</form>
-			<form action="?/edit" method="post">
+			<form
+				action="?/edit"
+				method="post"
+				use:enhance={() => {
+					return async ({ result }) => {
+						if (result.type === 'success') {
+							invalidateAll();
+							editKelasModal.close();
+							if (result.data?.message && typeof result.data?.message === 'string') {
+								toast.success(result.data?.message);
+							}
+						} else if (result.type === 'failure') {
+							editKelasModal.close();
+							if (result.data?.message && typeof result.data.message === 'string') {
+								toast.error(result.data?.message);
+							}
+						}
+						await applyAction(result);
+					};
+				}}
+			>
 				<fieldset class="fieldset">
 					<label for="namaKelas" class="label">Nama Kelas</label>
 					<input
@@ -96,7 +161,7 @@
 </div>
 
 <div class="card overflow-auto">
-	<h1 class="card-title">List Kelas</h1>
+	<h1 class="card-title ml-6">List Kelas</h1>
 	<div class="card-body">
 		<table class="table">
 			<thead>
@@ -116,7 +181,7 @@
 						<td>{kelas.ketuaKelas}</td>
 						<td class="flex flex-col">
 							<a href={'/kelas/tambah-santri/' + kelas.id}
-								><button class="btn btn-accent w-full">Tambah Santri</button></a
+								><button class="btn btn-accent w-full">Edit Anggota Kelas</button></a
 							>
 
 							<button
@@ -124,14 +189,14 @@
 								onclick={() => {
 									kelasToEdit = { ...kelas };
 									editKelasModal.showModal();
-								}}>Edit</button
+								}}>Edit Kelas</button
 							>
 							<button
 								class="btn btn-error w-full"
 								onclick={() => {
 									kelasToDelete = kelas.id;
 									deleteKelasModal.showModal();
-								}}>Delete</button
+								}}>Delete Kelas</button
 							>
 						</td>
 					</tr>
