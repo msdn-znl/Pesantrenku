@@ -1,5 +1,5 @@
 import { hash } from '@node-rs/argon2';
-import { encodeBase32LowerCase } from '@oslojs/encoding';
+// import { encodeBase32LowerCase } from '@oslojs/encoding';
 // import * as auth from '$lib/server/auth';
 import * as table from '$lib/server/db/schema';
 import { db } from '$lib/server/db';
@@ -8,6 +8,7 @@ import type { Actions, PageServerLoad, RequestEvent } from './$types';
 import { fail, error } from '@sveltejs/kit';
 import { UserFormSchema, EditUserFormSchema } from '$lib/server/form-validation/user';
 import * as z from 'zod/v4';
+import { generateId } from '$lib/utils';
 
 export const load: PageServerLoad = async () => {
 	try {
@@ -31,13 +32,13 @@ export const actions: Actions = {
 		const formData = await event.request.formData();
 		const newUsername = formData.get('username');
 		if (!newUsername || typeof newUsername !== 'string') {
-			return fail(400, { message: 'no Email provided/ email not valid' });
+			return fail(400, { message: 'no username provided' });
 		}
 		const result = await db.select().from(table.users).where(eq(table.users.username, newUsername));
 
 		const existingUser = result.at(0);
 		if (existingUser) {
-			return fail(422, { message: 'email sudah ada di database, gunakan email lain' });
+			return fail(422, { message: 'username sudah ada di database, gunakan username lain' });
 		}
 		const userFormData = Object.fromEntries(
 			Array.from(formData.keys()).map((key) => [
@@ -57,7 +58,8 @@ export const actions: Actions = {
 
 		const { username, password, nama, role } = validationResult.data;
 
-		const userId = generateUserId();
+		const userId = generateId();
+		const id = generateId();
 		const passwordHash = await hash(password, {
 			// recommended minimum parameters
 			memoryCost: 19456,
@@ -70,9 +72,9 @@ export const actions: Actions = {
 			await db.transaction(async (tx) => {
 				await tx.insert(table.users).values({ id: userId, username, passwordHash, role, nama });
 				if (role === 'guru') {
-					await tx.insert(table.guru).values({ userId: userId, status: 'aktif' });
+					await tx.insert(table.guru).values({ id: id, userId: userId });
 				} else if (role === 'santri') {
-					await tx.insert(table.santri).values({ userId: userId, status: 'aktif' });
+					await tx.insert(table.santri).values({ id: id, userId: userId });
 				}
 			});
 			return { success: true, message: 'Berhasil Menambahkan Data' };
@@ -144,10 +146,3 @@ export const actions: Actions = {
 		}
 	}
 };
-
-function generateUserId() {
-	// ID with 120 bits of entropy, or about the same as UUID v4.
-	const bytes = crypto.getRandomValues(new Uint8Array(15));
-	const id = encodeBase32LowerCase(bytes);
-	return id;
-}

@@ -5,11 +5,12 @@ import * as table from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
 import { AbsensiSantriFormSchema } from '$lib/server/form-validation/absensi';
 import * as z from 'zod/v4';
+import { generateId } from '$lib/utils';
 
 export const load: PageServerLoad = async ({ params }) => {
-	const id = Number(params.id);
-	if (isNaN(id)) {
-		error(400, 'ID tidak valid');
+	const id = params.id;
+	if (!id || typeof id !== 'string') {
+		error(404, 'Data not found');
 	}
 	try {
 		const isDataExist = await db.query.absensi_santri.findFirst({
@@ -31,7 +32,10 @@ export const load: PageServerLoad = async ({ params }) => {
 				}
 			}
 		});
-		const idKelas = Number(dataPertemuan?.jadwal.kelasId);
+		const idKelas = dataPertemuan?.jadwal.kelasId;
+		if (!idKelas || typeof idKelas !== 'string') {
+			error(404, 'Data kelas tidak ditemukan');
+		}
 		const santriKelasData = await db.query.kelas_santri.findMany({
 			where: eq(table.kelas_santri.kelasId, idKelas),
 			with: {
@@ -58,13 +62,13 @@ export const load: PageServerLoad = async ({ params }) => {
 
 export const actions: Actions = {
 	create: async (event: RequestEvent) => {
-		const id = Number(event.params.id);
+		const id = event.params.id;
 		const formData = await event.request.formData();
 
 		const idSantriList = formData.getAll('santriId');
 		const santriListArray: object[] = [];
 		idSantriList.forEach((santri) => {
-			const santriId = Number(santri);
+			const santriId = santri;
 			const status = formData.get(`status_${santriId}`);
 			return santriListArray.push({
 				pertemuanId: id,
@@ -80,9 +84,9 @@ export const actions: Actions = {
 				error: z.prettifyError(validationResult.error)
 			});
 		}
-
+		const absensiData = validationResult.data.map((item) => ({ id: generateId(), ...item }));
 		try {
-			await db.insert(table.absensi_santri).values(validationResult.data);
+			await db.insert(table.absensi_santri).values(absensiData);
 			// return { success: true, message: 'berhasil menambahkan data absensi santri' };
 		} catch (err) {
 			console.error('Terjadi kesalahan saat menambahkan data absensi santri', err);

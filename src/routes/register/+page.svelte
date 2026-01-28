@@ -18,12 +18,12 @@
 					<fieldset class="fieldset">
 						<label for="nama">Nama</label>
 						<input type="text" name="nama" id="nama" placeholder="Nama" class="input" required />
-						<label class="label" for="username"> Username(Email) </label>
+						<label class="label" for="username"> Username </label>
 						<input
 							name="username"
 							id="username"
-							placeholder="mail@mail.co"
-							type="email"
+							placeholder="Username"
+							type="text"
 							class="input"
 							required
 						/>
@@ -33,10 +33,11 @@
 							name="password"
 							id="password"
 							placeholder="Password"
-							class="input"
+							class="input validator"
+							min="6"
 							required
 						/>
-						<button class="btn btn-success hover:btn-accent mt-4">Login</button>
+						<button class="btn btn-success hover:btn-accent mt-4">Register</button>
 					</fieldset>
 				</form>
 			</div>

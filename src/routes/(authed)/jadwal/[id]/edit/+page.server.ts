@@ -1,17 +1,13 @@
 import * as table from '$lib/server/db/schema';
 import { db } from '$lib/server/db';
 import { eq } from 'drizzle-orm';
-import type { Actions, PageServerLoad, RequestEvent } from './$types';
+import type { Actions, PageServerLoad, RequestEvent } from '../../edit-data/[id]/$types';
 import { fail, error } from '@sveltejs/kit';
 import { JadwalFormSchema } from '$lib/server/form-validation/jadwal';
 import * as z from 'zod/v4';
 
 export const load: PageServerLoad = async ({ params }) => {
-	const paramsId = params.id;
-	if (!paramsId || typeof paramsId !== 'string') {
-		error(404, 'Data not found');
-	}
-	const id = parseInt(paramsId);
+	const jadwalId = params.id;
 	try {
 		const streamedPromises = {
 			kelasList: db.select().from(table.kelas),
@@ -22,7 +18,7 @@ export const load: PageServerLoad = async ({ params }) => {
 			kitabList: db.select().from(table.kitab)
 		};
 		const jadwal = db.query.jadwal.findFirst({
-			where: eq(table.jadwal.id, id),
+			where: eq(table.jadwal.id, jadwalId),
 			with: {
 				guru: {
 					with: {
@@ -43,11 +39,8 @@ export const load: PageServerLoad = async ({ params }) => {
 export const actions: Actions = {
 	edit: async (event: RequestEvent) => {
 		const formData = await event.request.formData();
-		const paramsId = event.params.id;
-		if (!paramsId || typeof paramsId !== 'string') {
-			return fail(400, { message: 'ID tidak ditemukan' });
-		}
-		const id = parseInt(paramsId);
+		const jadwalId = event.params.id;
+
 		const jadwalData = Object.fromEntries(
 			Array.from(formData.keys()).map((key) => [
 				key,
@@ -64,7 +57,7 @@ export const actions: Actions = {
 		}
 		// const { guruId, kelasId, kitabId, hari, jamMulai, jamSelesai } = validationResult.data;
 		try {
-			await db.update(table.jadwal).set(validationResult.data).where(eq(table.jadwal.id, id));
+			await db.update(table.jadwal).set(validationResult.data).where(eq(table.jadwal.id, jadwalId));
 		} catch (err) {
 			console.error(err);
 			error(500, 'An error occured');

@@ -5,6 +5,7 @@ import { eq } from 'drizzle-orm';
 import { fail, error } from '@sveltejs/kit';
 import { KitabFormSchema, EditKitabFormSchema } from '$lib/server/form-validation/kitab';
 import * as z from 'zod/v4';
+import { generateId } from '$lib/utils';
 
 export const load: PageServerLoad = async () => {
 	try {
@@ -30,7 +31,7 @@ export const actions: Actions = {
 			return fail(422, { message: 'Data yag diimputkan salah' });
 		}
 		try {
-			await db.insert(table.kitab).values(result.data);
+			await db.insert(table.kitab).values({ id: generateId(), ...result.data });
 			return { success: true, message: 'Success' };
 		} catch (err) {
 			console.error(err);
@@ -64,11 +65,10 @@ export const actions: Actions = {
 	},
 	delete: async (event: RequestEvent) => {
 		const formData = await event.request.formData();
-		const stringId = formData.get('id');
-		if (!stringId || typeof stringId !== 'string') {
+		const id = formData.get('id');
+		if (!id || typeof id !== 'string') {
 			return fail(400, { message: 'Kelas tidak ada/ id kelas salah' });
 		}
-		const id = parseInt(stringId);
 		try {
 			await db.delete(table.kitab).where(eq(table.kitab.id, id));
 			return { success: true, message: 'Berhasil dihapus' };

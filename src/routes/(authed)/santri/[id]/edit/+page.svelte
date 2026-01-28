@@ -44,20 +44,30 @@
 					{#if data.santriData.status === 'aktif'}
 						<option value=""></option>
 						<option value="aktif" selected>Aktif</option>
-						<option value="inaktif">Non Aktif</option>
-					{:else if data.santriData.status === 'inaktif'}
+						<option value="lulus">Lulus</option>
+						<option value="keluar" selected>Keluar</option>
+					{:else if data.santriData.status === 'lulus'}
 						<option value=""></option>
 						<option value="aktif">Aktif</option>
-						<option value="inaktif" selected>Non Aktif</option>
+						<option value="lulus" selected>Lulus</option>
+						<option value="keluar" selected>Keluar</option>
+					{:else if data.santriData.status === 'keluar'}
+						<option value=""></option>
+						<option value="aktif">Aktif</option>
+						<option value="lulus" selected>Lulus</option>
+						<option value="keluar" selected>Keluar</option>
 					{/if}
 				</select>
 				<label for="kamar" class="label">Kamar</label>
 				<select name="kamar" id="kamar" class="select">
-					<option value="Ibrahim1" selected>Ibrahim1</option>
-					<option value="Ibrahim2">Ibrahim2</option>
-					<option value="Ibrahim3">Ibrahim3</option>
-					<option value="Ibrahim4">Ibrahim4</option>
-					<option value="Ibrahim5">Ibrahim5</option>
+					<option value="">Belum Ditentukan</option>
+					{#each data.kamarList as kamar}
+						{#if data.santriData.kamarId === kamar.id}
+							<option value={kamar.id} selected>{kamar.nama}</option>
+						{:else}
+							<option value={kamar.id}>{kamar.nama}</option>
+						{/if}
+					{/each}
 				</select>
 			</fieldset>
 			<fieldset class="fieldset p-4">

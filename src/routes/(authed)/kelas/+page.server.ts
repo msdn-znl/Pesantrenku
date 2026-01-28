@@ -6,12 +6,14 @@ import type { RequestEvent } from './$types';
 import { fail, error } from '@sveltejs/kit';
 import { EditKelasFormSchema, KelasFormSchema } from '$lib/server/form-validation/kelas';
 import * as z from 'zod/v4';
+import { generateId } from '$lib/utils';
 
 export const load: PageServerLoad = async () => {
 	try {
 		const kelasList = await db.query.kelas.findMany({
 			with: {
-				tahun_ajaran: true
+				tahun_ajaran: true,
+				guru: true
 			}
 		});
 		const tahunAjaranList = await db.select().from(table.tahun_ajaran);
@@ -42,7 +44,7 @@ export const actions: Actions = {
 		}
 
 		try {
-			await db.insert(table.kelas).values(validationResult.data);
+			await db.insert(table.kelas).values({ id: generateId(), ...validationResult.data });
 		} catch (err) {
 			console.error(err);
 			error(500, { message: 'An error occured' });
@@ -65,9 +67,9 @@ export const actions: Actions = {
 				data: kelasData
 			});
 		}
-		const { namaKelas, tahunAjaran, id } = result.data;
+		const { namaKelas, tahunAjaranId, id } = result.data;
 		try {
-			await db.update(table.kelas).set({ namaKelas, tahunAjaran }).where(eq(table.kelas.id, id));
+			await db.update(table.kelas).set({ namaKelas, tahunAjaranId }).where(eq(table.kelas.id, id));
 			return { success: true, message: 'Success' };
 		} catch (err) {
 			console.error(err);
@@ -80,9 +82,8 @@ export const actions: Actions = {
 		if (!id || typeof id !== 'string') {
 			return fail(400, { message: 'Kelas tidak ada/ id kelas salah' });
 		}
-		const deleteId = parseInt(id);
 		try {
-			await db.delete(table.kelas).where(eq(table.kelas.id, deleteId));
+			await db.delete(table.kelas).where(eq(table.kelas.id, id));
 		} catch (err) {
 			console.error(err);
 			return fail(500, { message: 'An error occured' });

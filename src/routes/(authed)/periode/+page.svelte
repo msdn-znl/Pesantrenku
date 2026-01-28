@@ -7,7 +7,7 @@
 	let { data, form }: { data: PageServerData; form: ActionData } = $props();
 	let createPeriodeModal: HTMLDialogElement;
 	let deletePeriodeModal: HTMLDialogElement;
-	let periodeToDelete = $state<number | null>(null);
+	let periodeToDelete = $state<string | null>(null);
 </script>
 
 <div class="">

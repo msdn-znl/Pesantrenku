@@ -4,7 +4,7 @@
 
 	let { data, form }: { data: PageServerData; form: ActionData } = $props();
 	let tableBody: HTMLElement;
-	let selectedSantri: number[] = $state([]);
+	let selectedSantri: string[] = $state([]);
 
 	const toggleSelectAll = (event: Event) => {
 		const target = event.target as HTMLInputElement;
@@ -24,9 +24,6 @@
 			}
 		});
 	};
-
-	// // <input type="number" name="pertemuanId" id="" value={absensi.pertemuanId} hidden />
-	// 							<input type="number" name="santriId" id="" value={absensi.santriId} hidden />
 </script>
 
 <div class="p-2 card">
@@ -66,7 +63,7 @@
 						<td>{absensi.santri.user.nama}</td>
 						<td>
 							<div>
-								<input type="number" name="id" id="" value={absensi.id} hidden />
+								<input type="text" name="id" id="" value={absensi.id} hidden />
 							</div>
 							<div class="">
 								<input

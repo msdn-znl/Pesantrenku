@@ -1,11 +1,11 @@
 import * as z from 'zod/v4';
 
 export const JadwalFormSchema = z.object({
-	kitabId: z.coerce.number(),
-	kelasId: z.coerce.number(),
-	guruId: z.coerce.number(),
+	kitabId: z.string(),
+	kelasId: z.string(),
+	guruId: z.string(),
 	hari: z.enum(['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu']),
-	jamMulai: z.iso.time().optional(),
-	jamSelesai: z.iso.time().optional()
+	jamMulai: z.string().min(1, 'jam mulai wajib diisi'),
+	jamSelesai: z.string().min(1, 'jam selesai wajib diisi')
 });
 export type JadwalForm = z.infer<typeof JadwalFormSchema>;

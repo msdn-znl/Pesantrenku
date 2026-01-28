@@ -4,7 +4,7 @@
 
 	let { data, form }: { data: PageServerData; form: ActionData } = $props();
 	let tableBody = $state<HTMLElement>();
-	let selectedSantri: number[] = $state([]);
+	let selectedSantri: string[] = $state([]);
 
 	const toggleSelectAll = (event: Event) => {
 		const target = event.target as HTMLInputElement;
@@ -68,7 +68,7 @@
 							<td>{santrikelas.santri.user.nama}</td>
 							<td>
 								<div>
-									<input type="number" name="santriId" id="" value={santrikelas.santriId} hidden />
+									<input type="text" name="santriId" id="" value={santrikelas.santriId} hidden />
 								</div>
 								<div class="flex justify-around">
 									<input

@@ -4,6 +4,7 @@ import { db } from '$lib/server/db';
 import { eq } from 'drizzle-orm';
 import type { RequestEvent } from './$types';
 import { fail, error } from '@sveltejs/kit';
+import { generateId } from '$lib/utils';
 
 export const load: PageServerLoad = async () => {
 	try {
@@ -27,7 +28,7 @@ export const actions: Actions = {
 		)
 			return fail(422, { message: 'Data yang anda masukkan salah' });
 		try {
-			await db.insert(table.tahun_ajaran).values({ tahunAjaran: tahunAjaran });
+			await db.insert(table.tahun_ajaran).values({ id: generateId(), tahunAjaran: tahunAjaran });
 			return { success: true, message: 'Berhasil ditambahkan' };
 		} catch (err) {
 			console.error('Error while add record to Periode:', err);
@@ -37,10 +38,11 @@ export const actions: Actions = {
 	delete: async (event: RequestEvent) => {
 		const formData = await event.request.formData();
 		const id = formData.get('id');
-		const deleteId = Number(id);
-		if (isNaN(deleteId)) fail(422, { message: 'ID tidak valid' });
+		if (!id || typeof id !== 'string') {
+			return fail(422, { message: 'ID tidak valid' });
+		}
 		try {
-			await db.delete(table.tahun_ajaran).where(eq(table.tahun_ajaran.id, deleteId));
+			await db.delete(table.tahun_ajaran).where(eq(table.tahun_ajaran.id, id));
 			return { success: true, message: 'Berhasil dihapus' };
 		} catch (err) {
 			console.error('Error while deleting Periode:', err);

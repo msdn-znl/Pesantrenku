@@ -5,7 +5,7 @@
 
 <div>
 	<div class="flex flex-row-reverse">
-		<a href={'/pertemuan/' + data.idPertemuan + '/data-absensi/edit'}
+		<a href={'/pertemuan/' + data.id + '/data-absensi/edit'}
 			><button class="btn btn-accent">Edit Absensi</button></a
 		>
 	</div>

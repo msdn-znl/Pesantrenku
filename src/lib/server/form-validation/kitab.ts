@@ -7,7 +7,7 @@ export const KitabFormSchema = z.object({
 });
 
 export const EditKitabFormSchema = z.object({
-	id: z.coerce.number(),
+	id: z.string(),
 	namaKitab: z.string().max(100),
 	pengarang: z.string().max(255).optional(),
 	kategori: z.string().max(20).optional()

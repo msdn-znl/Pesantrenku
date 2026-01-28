@@ -10,7 +10,7 @@
 	let createKitabModal: HTMLDialogElement;
 	let deleteKitabModal: HTMLDialogElement;
 	let editKitabModal: HTMLDialogElement;
-	let kitabToDelete = $state<number | null>(null);
+	let kitabToDelete = $state<string | null>(null);
 	let kitabToEdit = $state<Kitab | null>(null);
 </script>
 
@@ -139,7 +139,7 @@
 				}}
 			>
 				<fieldset class="fieldset">
-					<input type="number" name="id" id="id" value={kitabToEdit?.id} hidden />
+					<input type="string" name="id" id="id" value={kitabToEdit?.id} hidden />
 					<label class="label" for="namaKitab">Nama Kitab</label>
 					<input
 						type="text"

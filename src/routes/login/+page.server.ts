@@ -18,10 +18,7 @@ export const load: PageServerLoad = async (event) => {
 export const actions: Actions = {
 	login: async (event) => {
 		const formData = await event.request.formData();
-		// const username = formData.get('username');
-		// const password = formData.get('password');
 		const loginData = Object.fromEntries(formData);
-		console.log(loginData);
 		const validationResult = LoginUserFormSchema.safeParse(loginData);
 
 		if (!validationResult.success) {
@@ -33,14 +30,6 @@ export const actions: Actions = {
 		}
 		const username = validationResult.data.username;
 		const password = validationResult.data.password;
-		// if (!validateUsername(username)) {
-		// 	return fail(400, {
-		// 		message: 'Invalid username (min 3, max 31 characters, alphanumeric only)'
-		// 	});
-		// }
-		// if (!validatePassword(password)) {
-		// 	return fail(400, { message: 'Invalid password (min 6, max 255 characters)' });
-		// }
 
 		const results = await db.select().from(table.users).where(eq(table.users.username, username));
 
@@ -66,16 +55,3 @@ export const actions: Actions = {
 		return redirect(302, '/dashboard');
 	}
 };
-
-// function validateUsername(username: unknown): username is string {
-// 	return (
-// 		typeof username === 'string' &&
-// 		username.length >= 3 &&
-// 		username.length <= 31 &&
-// 		/^[a-z0-9_-]+$/.test(username)
-// 	);
-// }
-
-// function validatePassword(password: unknown): password is string {
-// 	return typeof password === 'string' && password.length >= 6 && password.length <= 255;
-// }

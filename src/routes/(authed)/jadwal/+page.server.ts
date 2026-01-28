@@ -5,6 +5,8 @@ import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
 
+import { generateId } from '$lib/utils';
+
 export const load: PageServerLoad = async () => {
 	try {
 		const streamedPromises = {
@@ -15,21 +17,14 @@ export const load: PageServerLoad = async () => {
 				.innerJoin(table.users, eq(table.guru.userId, table.users.id)), //harusnya tabel join antara guru dan user
 			kitabList: db.select().from(table.kitab)
 		};
-		const jadwalListPromise = db
-			.select({
-				id: table.jadwal.id,
-				nama: table.users.nama,
-				kelas: table.kelas.namaKelas,
-				kitab: table.kitab.namaKitab,
-				hari: table.jadwal.hari,
-				jamMulai: table.jadwal.jamMulai,
-				jamSelesai: table.jadwal.jamSelesai
-			})
-			.from(table.jadwal)
-			.innerJoin(table.guru, eq(table.jadwal.guruId, table.guru.id))
-			.innerJoin(table.users, eq(table.guru.userId, table.users.id))
-			.innerJoin(table.kelas, eq(table.jadwal.kelasId, table.kelas.id))
-			.innerJoin(table.kitab, eq(table.jadwal.kitabId, table.kitab.id));
+		const jadwalListPromise = db.query.jadwal.findMany({
+			with: {
+				guru: { with: { user: true } },
+				kelas: true,
+				kitab: true
+			}
+		});
+
 		return { streamed: streamedPromises, jadwalList: await jadwalListPromise };
 	} catch (err) {
 		console.error(err);
@@ -39,12 +34,13 @@ export const load: PageServerLoad = async () => {
 export const actions: Actions = {
 	create: async (event: RequestEvent) => {
 		const formData = await event.request.formData();
-		const jadwalFormData = Object.fromEntries(
-			Array.from(formData.keys()).map((key) => [
-				key,
-				formData.getAll(key).length > 1 ? formData.getAll(key) : formData.get(key)
-			])
-		);
+		// const jadwalFormData = Object.fromEntries(
+		// 	Array.from(formData.keys()).map((key) => [
+		// 		key,
+		// 		formData.getAll(key).length > 1 ? formData.getAll(key) : formData.get(key)
+		// 	])
+		// );
+		const jadwalFormData = Object.fromEntries(formData);
 		const validationResult = JadwalFormSchema.safeParse(jadwalFormData);
 
 		if (!validationResult.success) {
@@ -53,7 +49,7 @@ export const actions: Actions = {
 		console.log(validationResult.data);
 		// const { kitabId, kelasId, guruId, hari, jamMulai, jamSelesai } = validationResult.data;
 		try {
-			await db.insert(table.jadwal).values(validationResult.data);
+			await db.insert(table.jadwal).values({ id: generateId(), ...validationResult.data });
 			return { success: true, message: 'Data berhasil ditambahkan' };
 		} catch (err) {
 			console.error(err);
@@ -64,14 +60,14 @@ export const actions: Actions = {
 		const formData = await event.request.formData();
 		const entryId = formData.get('id');
 		if (!entryId) {
-			return fail(400, { message: 'userId  tidak ada' });
+			return fail(400, { message: 'ID  tidak ada' });
 		}
 		if (typeof entryId !== 'string') {
-			return fail(400, { message: 'userId tidak valid' });
+			return fail(400, { message: 'ID tidak valid' });
 		}
-		const id = parseInt(entryId);
+
 		try {
-			await db.delete(table.jadwal).where(eq(table.jadwal.id, id));
+			await db.delete(table.jadwal).where(eq(table.jadwal.id, entryId));
 			return { success: true, message: 'Berhasil Dihapus' };
 		} catch (err) {
 			console.error(err);

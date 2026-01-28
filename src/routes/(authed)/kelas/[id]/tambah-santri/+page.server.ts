@@ -3,13 +3,13 @@ import { db } from '$lib/server/db';
 import { eq, and, count, lt, sql } from 'drizzle-orm';
 import type { PageServerLoad, Actions, RequestEvent } from './$types';
 import { error, fail } from '@sveltejs/kit';
+import { generateId } from '$lib/utils';
 
 export const load: PageServerLoad = async ({ params }) => {
-	const paramsId = params.id;
-	if (!paramsId || typeof paramsId !== 'string') {
+	const id = params.id;
+	if (!id || typeof id !== 'string') {
 		error(404, 'Data not found');
 	}
-	const id = parseInt(paramsId);
 	try {
 		const santriWithoutClass = await db
 			.select({
@@ -52,11 +52,10 @@ export const load: PageServerLoad = async ({ params }) => {
 
 export const actions: Actions = {
 	create: async (event: RequestEvent) => {
-		const paramsId = event.params.id;
-		if (!paramsId || typeof paramsId !== 'string') {
+		const id = event.params.id;
+		if (!id || typeof id !== 'string') {
 			error(404, 'Id tidak ditemukan');
 		}
-		const id = parseInt(paramsId);
 		const formData = await event.request.formData();
 		const inputData = Object.fromEntries(
 			Array.from(formData.keys()).map((key) => [
@@ -67,9 +66,10 @@ export const actions: Actions = {
 		if (!inputData.id || typeof inputData.id !== 'string') {
 			return fail(400, { message: 'Id santri tidak ditemukan' });
 		}
-		const idSantri = parseInt(inputData.id);
 		try {
-			await db.insert(table.kelas_santri).values({ santriId: idSantri, kelasId: id });
+			await db
+				.insert(table.kelas_santri)
+				.values({ id: generateId(), santriId: inputData.id, kelasId: id });
 			return { success: true };
 		} catch (err) {
 			console.error(`Terjadi Error:`, err);
@@ -78,11 +78,10 @@ export const actions: Actions = {
 	},
 
 	delete: async (event: RequestEvent) => {
-		const paramsId = event.params.id;
-		if (!paramsId || typeof paramsId !== 'string') {
+		const id = event.params.id;
+		if (!id || typeof id !== 'string') {
 			error(404, 'Id tidak ditemukan');
 		}
-		const id = parseInt(paramsId);
 		const formData = await event.request.formData();
 		const inputData = Object.fromEntries(
 			Array.from(formData.keys()).map((key) => [
@@ -90,11 +89,15 @@ export const actions: Actions = {
 				formData.getAll(key).length > 1 ? formData.getAll(key) : formData.get(key)
 			])
 		);
-		const santriId = Number(inputData.id);
+		if (!inputData.id || typeof inputData.id !== 'string') {
+			return fail(400, { message: 'Id santri tidak ditemukan' });
+		}
 		try {
 			await db
 				.delete(table.kelas_santri)
-				.where(and(eq(table.kelas_santri.santriId, santriId), eq(table.kelas_santri.kelasId, id)));
+				.where(
+					and(eq(table.kelas_santri.santriId, inputData.id), eq(table.kelas_santri.kelasId, id))
+				);
 			return { success: true, message: 'Berhasil Dihapus' };
 		} catch (err) {
 			console.error(`Terjadi Error:`, err);

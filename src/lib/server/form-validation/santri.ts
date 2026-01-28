@@ -5,9 +5,9 @@ export const SantriFormSchema = z.object({
 	tahunMasuk: z.coerce.number().optional(),
 	tahunKeluar: z.coerce.number().optional(),
 	nomorTelepon: z.string().optional(),
-	status: z.enum(['aktif', 'inaktif']).optional(),
+	status: z.enum(['aktif', 'lulus', 'keluar']).optional(),
 	tempatLahir: z.string().optional(),
-	tanggalLahir: z.coerce.date().optional(),
+	tanggalLahir: z.string().optional(),
 	kamar: z.string().optional()
 });
 

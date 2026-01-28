@@ -11,7 +11,7 @@
 	let createJadwalModal: HTMLDialogElement;
 	let deleteJadwalModal: HTMLDialogElement;
 	let editJadwalModal: HTMLDialogElement;
-	let jadwalToDelete = $state<number | null>(null);
+	let jadwalToDelete = $state<string | null>(null);
 	let jadwalToEdit = $state<Jadwal | null>(null);
 </script>
 
@@ -138,20 +138,7 @@
 			</div>
 		</div>
 	</dialog>
-	<dialog class="modal" id="edit_jadwal_modal" bind:this={editJadwalModal}>
-		<div class="modal-box">
-			<h2>Edit Jadwal</h2>
-			<form method="dialog">
-				<button
-					class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
-					onclick={() => (jadwalToEdit = null)}>✕</button
-				>
-			</form>
-			<form action="?/edit" method="post">
-				<fieldset class="fieldset"></fieldset>
-			</form>
-		</div>
-	</dialog>
+
 	<div class="flex flex-row-reverse p-2">
 		<button class="btn btn-success" onclick={() => createJadwalModal.showModal()}
 			>Tambah Jadwal</button
@@ -176,7 +163,7 @@
 					{#each data.jadwalList as jadwal, i (jadwal.id)}
 						<tr class="hover:bg-base-300">
 							<th>{i + 1}</th>
-							<td>{jadwal.namaGuru}</td>
+							<td>{jadwal.guru.user.nama}</td>
 							<td>{jadwal.kelas}</td>
 							<td>{jadwal.kitab}</td>
 							<td>{jadwal.hari}</td>
@@ -186,7 +173,7 @@
 								<a href={'/jadwal/' + jadwal.id + '/pertemuan'}
 									><button class="btn btn-success">Data Pertemuan</button></a
 								>
-								<a href={'/jadwal/edit-data/' + jadwal.id}
+								<a href={'/jadwal/' + jadwal.id + '/edit'}
 									><button class="btn btn-accent">Edit</button></a
 								>
 

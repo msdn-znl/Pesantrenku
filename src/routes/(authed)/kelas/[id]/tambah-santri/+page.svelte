@@ -32,7 +32,7 @@
 								<td>{santri.daftarKelas}</td>
 								<td>
 									<form action="?/create" method="post" use:enhance>
-										<input type="number" name="id" id="id" value={santri.id} hidden />
+										<input type="string" name="id" id="id" value={santri.id} hidden />
 										<button type="submit" class="btn btn-success">Tambah</button>
 									</form>
 								</td>
@@ -63,7 +63,7 @@
 					<td>{santri.santri.user.nama}</td>
 					<td>
 						<form action="?/delete" method="post" use:enhance>
-							<input type="number" name="id" id="id" value={santri.santriId} hidden />
+							<input type="string" name="id" id="id" value={santri.santriId} hidden />
 							<button type="submit" class="btn btn-error">Hapus Data</button>
 						</form>
 					</td>

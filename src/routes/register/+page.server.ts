@@ -1,5 +1,5 @@
 import { hash, verify } from '@node-rs/argon2';
-import { encodeBase32LowerCase } from '@oslojs/encoding';
+// import { encodeBase32LowerCase } from '@oslojs/encoding';
 import * as table from '$lib/server/db/schema';
 import { db } from '$lib/server/db';
 import { count, eq } from 'drizzle-orm';
@@ -9,12 +9,7 @@ import { fail, redirect } from '@sveltejs/kit';
 import { RegisterFormSchema } from '$lib/server/form-validation/user';
 import * as z from 'zod/v4';
 
-function generateUserId() {
-	// ID with 120 bits of entropy, or about the same as UUID v4.
-	const bytes = crypto.getRandomValues(new Uint8Array(15));
-	const id = encodeBase32LowerCase(bytes);
-	return id;
-}
+import { generateId } from '$lib/utils';
 
 export const load: PageServerLoad = async () => {
 	const result = await db.select({ count: count() }).from(table.users);
@@ -30,7 +25,7 @@ export const actions: Actions = {
 	register: async (event: RequestEvent) => {
 		const countResult = await db.select({ count: count() }).from(table.users);
 		if (countResult[0].count > 0) {
-			return fail(403, { message: 'Setup Pertama Kali sudah dilakuakn, tidka bisa register lagi' });
+			return fail(403, { message: 'Setup Pertama Kali sudah dilakukan, tidak bisa register lagi' });
 		}
 		const formData = await event.request.formData();
 		const userFormData = Object.fromEntries(
@@ -51,7 +46,7 @@ export const actions: Actions = {
 
 		const { username, password, nama } = validationResult.data;
 		const role = 'admin';
-		const userId = generateUserId();
+		const userId = generateId();
 		const passwordHash = await hash(password, {
 			// recommended minimum parameters
 			memoryCost: 19456,

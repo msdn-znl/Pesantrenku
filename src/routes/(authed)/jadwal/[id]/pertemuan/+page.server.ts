@@ -5,9 +5,10 @@ import * as table from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
 import { SinglePertemuanFormSchema } from '$lib/server/form-validation/pertemuan';
 import * as z from 'zod/v4';
+import { generateId } from '$lib/utils';
 
 export const load: PageServerLoad = async ({ params }) => {
-	const jadwalId = Number(params.jadwalId);
+	const jadwalId = params.id;
 	try {
 		const pertemuanList = await db.query.pertemuan.findMany({
 			where: eq(table.pertemuan.jadwalId, jadwalId),
@@ -55,10 +56,10 @@ export const actions: Actions = {
 				data: validationResult.data
 			});
 		}
-		console.log(validationResult.data);
 		const dataPertemuan = {
-			jadwalId: Number(event.params.jadwalId),
-			tanggalPertemuan: new Date().toISOString(),
+			jadwalId: event.params.id,
+			id: generateId(),
+			tanggalPertemuan: new Date().toISOString().split('T')[0],
 			...validationResult.data
 		};
 		console.log(dataPertemuan);
@@ -74,10 +75,11 @@ export const actions: Actions = {
 	delete: async (event: RequestEvent) => {
 		const formData = await event.request.formData();
 		const entryId = formData.get('id');
-		const id = Number(entryId);
-
+		if (typeof entryId !== 'string') {
+			return fail(400, { message: 'ID pertemuan tidak valid' });
+		}
 		try {
-			await db.delete(table.pertemuan).where(eq(table.pertemuan.id, id));
+			await db.delete(table.pertemuan).where(eq(table.pertemuan.id, entryId));
 			return { success: true, message: 'data pertemuan berhasil dihapus' };
 		} catch (err) {
 			console.error('Error saat menghapus data pertemuan.', err);

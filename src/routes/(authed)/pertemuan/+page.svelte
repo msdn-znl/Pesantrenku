@@ -10,7 +10,7 @@
 	let deletePertemuanModal: HTMLDialogElement;
 	let editPertemuanModal: HTMLDialogElement;
 	let pertemuanToEdit = $state<Pertemuan | null>(null);
-	let pertemuanToDelete = $state<number | null>(null);
+	let pertemuanToDelete = $state<string | null>(null);
 </script>
 
 <div class="">
@@ -107,7 +107,7 @@
 						};
 					}}
 				>
-					<input type="number" name="id" id="id" value={pertemuanToDelete} hidden />
+					<input type="string" name="id" id="id" value={pertemuanToDelete} hidden />
 					<button type="submit" class="btn btn-error">Hapus Data Pertemuan</button>
 				</form>
 			</div>

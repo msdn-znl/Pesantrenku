@@ -11,7 +11,7 @@
 	let createKelasModal: HTMLDialogElement;
 	let deleteKelasModal: HTMLDialogElement;
 	let editKelasModal: HTMLDialogElement;
-	let kelasToDelete = $state<number | null>(null);
+	let kelasToDelete = $state<string | null>(null);
 	let kelasToEdit = $state<Kelas | null>(null);
 </script>
 
@@ -178,7 +178,7 @@
 						<th>{i + 1}</th>
 						<td>{kelas.namaKelas}</td>
 						<td>{kelas.tahun_ajaran?.tahunAjaran}</td>
-						<td>{kelas.ketuaKelas}</td>
+						<td>{kelas.guru?.nama}</td>
 						<td class="flex flex-col">
 							<a href={'/kelas/tambah-santri/' + kelas.id}
 								><button class="btn btn-accent w-full">Edit Anggota Kelas</button></a

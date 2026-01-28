@@ -14,7 +14,10 @@ export const load: PageServerLoad = async ({ params }) => {
 			error(404, { message: 'Tidak ditemukan' });
 		}
 		const santriData = santriArray[0];
-		return { santriData: santriData };
+		const kamarList = await db
+			.select({ id: table.kamar.id, nama: table.kamar.namaKamar })
+			.from(table.kamar);
+		return { santriData: santriData, kamarList: kamarList };
 	} catch (err) {
 		console.error(err);
 		error(500, { message: 'An error occured' });

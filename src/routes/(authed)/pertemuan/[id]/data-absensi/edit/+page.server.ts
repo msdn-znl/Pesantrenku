@@ -7,13 +7,14 @@ import { EditAbsensiSantriFormSchema } from '$lib/server/form-validation/absensi
 import * as z from 'zod/v4';
 
 export const load: PageServerLoad = async ({ params }) => {
-	const idPertemuan = Number(params.id);
-	if (isNaN(idPertemuan)) {
-		error(400, 'ID tidak valid');
+	const id = params.id;
+	if (!id || typeof id !== 'string') {
+		error(404, 'Data not found');
 	}
+
 	try {
 		const absensiList = await db.query.absensi_santri.findMany({
-			where: eq(table.absensi_santri.pertemuanId, idPertemuan),
+			where: eq(table.absensi_santri.pertemuanId, id),
 			with: {
 				santri: {
 					columns: { id: true },
@@ -38,7 +39,7 @@ export const actions: Actions = {
 		console.log(idAbsensiList);
 
 		const itemToUpdated = idAbsensiList.map((item) => {
-			const id = Number(item);
+			const id = item;
 			const status = formData.get(`status_${id}`);
 			return { id: id, status_kehadiran: status };
 		});

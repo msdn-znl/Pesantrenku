@@ -17,7 +17,7 @@ export const load: PageServerLoad = async () => {
 				nama: table.users.nama,
 				tahun_masuk: table.santri.tahunMasuk,
 				status: table.santri.status,
-				kamar: table.santri.kamar
+				kamar: table.santri.kamarId
 			})
 			.from(table.santri)
 			.innerJoin(table.users, eq(table.santri.userId, table.users.id));

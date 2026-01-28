@@ -8,6 +8,7 @@ import {
 	EditPertemuanFormSchema
 } from '$lib/server/form-validation/pertemuan';
 import * as z from 'zod/v4';
+import { generateId} from '$lib/utils'
 
 export const load: PageServerLoad = async () => {
 	try {
@@ -87,7 +88,7 @@ export const actions: Actions = {
 		}
 
 		try {
-			await db.insert(table.pertemuan).values(validationResult.data);
+			await db.insert(table.pertemuan).values({ id: generateId(), ...validationResult.data });
 			return { success: true, message: 'berhasil menambahkan data pertemuan' };
 		} catch (err) {
 			console.error('Terjadi kesalahan saat menambahkan data pertemuan', err);
@@ -122,9 +123,10 @@ export const actions: Actions = {
 	},
 	delete: async (event: RequestEvent) => {
 		const formData = await event.request.formData();
-		const entryId = formData.get('id');
-		const id = Number(entryId);
-
+		const id = formData.get('id');
+		if (!id || typeof id !== 'string') {
+			return fail(422, { message: 'ID tidak valid' });
+		}
 		try {
 			await db.delete(table.pertemuan).where(eq(table.pertemuan.id, id));
 			return { success: true, message: 'data pertemuan berhasil dihapus' };

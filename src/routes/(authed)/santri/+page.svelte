@@ -3,7 +3,6 @@
 	import { enhance } from '$app/forms';
 
 	let { data, form }: { data: PageServerData; form: ActionData } = $props();
-	console.log(data);
 </script>
 
 <div class="overflow-auto">
@@ -29,7 +28,7 @@
 						<td>{santri.kamar}</td>
 						<td>
 							<div>
-								<a href={'/santri/edit-data/' + santri.userId} class="btn btn-accent">Edit</a>
+								<a href={'/santri/' + santri.userId + '/edit'} class="btn btn-accent">Edit</a>
 							</div>
 							<div>
 								<!-- Todo: Update list setelah tombol di delete tanpa reload halaman -->

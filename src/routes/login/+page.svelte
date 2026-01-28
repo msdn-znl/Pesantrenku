@@ -22,7 +22,7 @@
 							name="username"
 							id="username"
 							placeholder="mail@mail.co"
-							type="email"
+							type="text"
 							class="input"
 						/>
 						<label class="label" for="password"> Password </label>
@@ -31,7 +31,8 @@
 							name="password"
 							id="password"
 							placeholder="Password"
-							class="input"
+							class="input validator"
+							min="6"
 						/>
 						<button class="btn btn-success hover:btn-accent mt-4">Login</button>
 					</fieldset>

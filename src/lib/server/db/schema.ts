@@ -9,21 +9,23 @@ import {
 	text,
 	time,
 	serial,
-	unique
+	unique,
+	boolean
 } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 
 // Enums defined for PostgreSQL
 export const userRoleEnum = pgEnum('user_role', ['admin', 'guru', 'santri']);
 export const statusEnum = pgEnum('status', ['aktif', 'inaktif']);
+export const santriStatusEnum = pgEnum('santri_status', ['aktif', 'lulus', 'keluar']);
 export const dayEnum = pgEnum('day', [
+	'Minggu',
 	'Senin',
 	'Selasa',
 	'Rabu',
 	'Kamis',
 	'Jumat',
-	'Sabtu',
-	'Minggu'
+	'Sabtu'
 ]);
 export const pertemuanStatusEnum = pgEnum('pertemuan_status', [
 	'selesai',
@@ -33,137 +35,181 @@ export const pertemuanStatusEnum = pgEnum('pertemuan_status', [
 export const kehadiranSantriEnum = pgEnum('kehadiran_santri', ['hadir', 'alfa', 'izin', 'sakit']);
 export const kehadiranGuruEnum = pgEnum('kehadiran_guru', ['hadir', 'tidak hadir']);
 
+// Timestamp
+const timestampColumns = {
+	createdAt: timestamp('created_at').defaultNow().notNull(),
+	updatedAt: timestamp('updated_at')
+		.defaultNow()
+		.notNull()
+		.$onUpdate(() => new Date())
+};
+
 // Table Definitions
 export const users = pgTable('users', {
-	id: varchar('id', { length: 255 }).primaryKey(),
-	age: integer('age'),
-	nama: varchar('nama', { length: 255 }),
-	username: varchar('username', { length: 255 }).notNull().unique(),
-	passwordHash: varchar('password_hash', { length: 255 }).notNull(),
-	role: userRoleEnum('role')
+	id: text('id').primaryKey(),
+	nama: text('nama'),
+	username: text('username').notNull().unique(),
+	passwordHash: text('password_hash').notNull(),
+	role: userRoleEnum('role'),
+	isActive: boolean('is_active').default(true).notNull(),
+	...timestampColumns
 });
 
 export const session = pgTable('session', {
-	id: varchar('id', { length: 255 }).primaryKey(),
-	userId: varchar('user_id', { length: 255 })
+	id: text('id').primaryKey(),
+	userId: text('user_id')
 		.notNull()
-		.references(() => users.id),
+		.references(() => users.id, { onDelete: 'cascade' }),
 	expiresAt: timestamp('expires_at', { withTimezone: true, mode: 'date' }).notNull()
 });
 
 export const tahun_ajaran = pgTable('tahun_ajaran', {
-	id: serial('id').primaryKey(),
-	tahunAjaran: varchar('tahun_ajaran', { length: 25 })
+	id: text('id').primaryKey(),
+	tahunAjaran: text('tahun_ajaran').notNull(),
+	isActive: boolean('is_active').default(false),
+	...timestampColumns
 });
 
 export const santri = pgTable('santri', {
-	id: serial('id').primaryKey(),
-	nomorIndukSantri: char('nomor_induk_santri', { length: 10 }),
+	id: text('id').primaryKey(),
+	nomorIndukSantri: text('nomor_induk_santri').unique(),
 	tahunMasuk: integer('tahun_masuk'),
 	tahunKeluar: integer('tahun_keluar'),
-	nomorTelepon: varchar('nomor_telepon', { length: 15 }),
-	status: statusEnum('status').notNull(),
-	tempatLahir: varchar('tempat_lahir', { length: 255 }),
+	nomorTelepon: text('nomor_telepon'),
+	status: santriStatusEnum('santri_status').default('aktif'),
+	tempatLahir: text('tempat_lahir'),
 	tanggalLahir: date('tanggal_lahir'),
-	kamar: varchar('kamar', { length: 255 }),
-	userId: varchar('user_id', { length: 255 })
+	kamarId: text('kamar_id').references(() => kamar.id, { onDelete: 'set null' }),
+	userId: text('user_id')
 		.notNull()
-		.references(() => users.id, { onDelete: 'cascade' })
+		.unique()
+		.references(() => users.id, { onDelete: 'cascade' }),
+	...timestampColumns
 });
 
 export const guru = pgTable('guru', {
-	id: serial('id').primaryKey(),
-	nomorIndukGuru: char('nomor_induk_guru', { length: 10 }),
-	nomorTelepon: varchar('nomor_telepon', { length: 15 }),
-	status: statusEnum('status'),
-	userId: varchar('user_id', { length: 255 })
+	id: text('id').primaryKey(),
+	nomorIndukGuru: text('nomor_induk_guru').unique(),
+	nomorTelepon: text('nomor_telepon'),
+	status: statusEnum('status').default('aktif'),
+	userId: text('user_id')
 		.notNull()
-		.references(() => users.id, { onDelete: 'cascade' })
+		.unique()
+		.references(() => users.id, { onDelete: 'cascade' }),
+	...timestampColumns
 });
 
 export const kelas = pgTable('kelas', {
-	id: serial('id').primaryKey(),
-	namaKelas: varchar('nama_kelas', { length: 50 }),
-	tahunAjaran: integer('tahun_ajaran').references(() => tahun_ajaran.id, {
+	id: text('id').primaryKey(),
+
+	namaKelas: text('nama_kelas').notNull(),
+	tahunAjaranId: text('tahun_ajaran_id').references(() => tahun_ajaran.id, {
+		onDelete: 'cascade'
+	}),
+	waliKelasId: text('wali_kelas_id').references(() => guru.id, {
 		onDelete: 'set null'
 	}),
-	ketuaKelas: integer('ketua_kelas').references(() => santri.id, {
-		onDelete: 'set null'
-	})
+	...timestampColumns
 });
 
 export const kelas_santri = pgTable(
 	'kelas_santri',
 	{
-		id: serial('id').primaryKey(),
-		santriId: integer('santri_id')
+		id: text('id').primaryKey(),
+		santriId: text('santri_id')
 			.references(() => santri.id, { onDelete: 'cascade' })
 			.notNull(),
-		kelasId: integer('kelas_id')
+		kelasId: text('kelas_id')
 			.references(() => kelas.id, { onDelete: 'cascade' })
-			.notNull()
+			.notNull(),
+		assignedAt: timestamp('assigned_at').defaultNow()
 	},
 	(t) => [unique().on(t.santriId, t.kelasId)]
 );
 
 export const kitab = pgTable('kitab', {
-	id: serial('id').primaryKey(),
-	namaKitab: varchar('nama_kitab', { length: 100 }),
-	pengarang: varchar('pengarang', { length: 255 }),
-	kategori: varchar('kategori', { length: 20 })
+	id: text('id').primaryKey(),
+	namaKitab: text('nama_kitab').notNull(),
+	pengarang: text('pengarang'),
+	kategori: text('kategori'),
+	...timestampColumns
 });
 
 export const jadwal = pgTable('jadwal', {
-	id: serial('id').primaryKey(),
-	kitabId: integer('kitab_id')
+	id: text('id').primaryKey(),
+
+	kitabId: text('kitab_id')
 		.notNull()
 		.references(() => kitab.id),
-	kelasId: integer('kelas_id')
+	kelasId: text('kelas_id')
 		.notNull()
 		.references(() => kelas.id),
-	guruId: integer('guru_id')
+	guruId: text('guru_id')
 		.notNull()
 		.references(() => guru.id),
-	hari: dayEnum('hari'),
-	jamMulai: time('jam_mulai'),
-	jamSelesai: time('jam_selesai')
+	hari: dayEnum('hari').notNull(),
+	jamMulai: time('jam_mulai').notNull(),
+	jamSelesai: time('jam_selesai').notNull(),
+	isActive: boolean('is_active').default(true),
+	...timestampColumns
 });
 
-export const pertemuan = pgTable('pertemuan', {
-	id: serial('id').primaryKey(),
-	jadwalId: integer('jadwal_id')
-		.notNull()
-		.references(() => jadwal.id),
-	jurnalMengajar: text('jurnal_mengajar'),
-	tanggalPertemuan: date('tanggal_pertemuan'),
-	status: pertemuanStatusEnum('status')
-});
+export const pertemuan = pgTable(
+	'pertemuan',
+	{
+		id: text('id').primaryKey(),
 
-export const absensi_santri = pgTable('absensi_santri', {
-	id: serial('id').primaryKey(),
-	pertemuanId: integer('pertemuan_id')
-		.notNull()
-		.references(() => pertemuan.id, { onDelete: 'cascade' }),
-	santriId: integer('santri_id')
-		.notNull()
-		.references(() => santri.id, { onDelete: 'cascade' }),
-	status_kehadiran: kehadiranSantriEnum('status_kehadiran')
-});
+		jadwalId: text('jadwal_id')
+			.notNull()
+			.references(() => jadwal.id, { onDelete: 'cascade' }),
+		jurnalMengajar: text('jurnal_mengajar'),
+		tanggalPertemuan: date('tanggal_pertemuan'),
+		status: pertemuanStatusEnum('status').default('selesai'),
+		...timestampColumns
+	},
+	(t) => [unique().on(t.jadwalId, t.tanggalPertemuan)]
+);
 
-export const absensi_guru = pgTable('absensi_guru', {
-	id: serial('id').primaryKey(),
-	pertemuanId: integer('pertemuan_id')
-		.notNull()
-		.references(() => pertemuan.id, { onDelete: 'cascade' }),
-	guruId: integer('guru_id')
-		.notNull()
-		.references(() => guru.id, { onDelete: 'cascade' }),
-	status_kehadiran: kehadiranGuruEnum('status_kehadiran')
-});
+export const absensi_santri = pgTable(
+	'absensi_santri',
+	{
+		id: text('id').primaryKey(),
+
+		pertemuanId: text('pertemuan_id')
+			.notNull()
+			.references(() => pertemuan.id, { onDelete: 'cascade' }),
+		santriId: text('santri_id')
+			.notNull()
+			.references(() => santri.id, { onDelete: 'cascade' }),
+		status_kehadiran: kehadiranSantriEnum('status_kehadiran').notNull().default('hadir'),
+		keterangan: text('keterangan'),
+		...timestampColumns
+	},
+	(t) => [unique().on(t.pertemuanId, t.santriId)]
+);
+
+export const absensi_guru = pgTable(
+	'absensi_guru',
+	{
+		id: text('id').primaryKey(),
+
+		pertemuanId: text('pertemuan_id')
+			.notNull()
+			.references(() => pertemuan.id, { onDelete: 'cascade' }),
+		guruId: text('guru_id')
+			.notNull()
+			.references(() => guru.id, { onDelete: 'cascade' }),
+		status_kehadiran: kehadiranGuruEnum('status_kehadiran'),
+		...timestampColumns
+	},
+	(t) => [unique().on(t.pertemuanId, t.guruId)]
+);
 
 export const kamar = pgTable('kamar', {
-	id: serial('id').primaryKey(),
-	namaKamar: varchar('nama_kamar', { length: 255 })
+	id: text('id').primaryKey(),
+
+	namaKamar: text('nama_kamar').notNull(),
+	...timestampColumns
 });
 
 // Relations Definitions
@@ -193,7 +239,7 @@ export const santriRelations = relations(santri, ({ one, many }) => ({
 	kelas_santri: many(kelas_santri),
 	absensi_santri: many(absensi_santri),
 	kamar: one(kamar, {
-		fields: [santri.kamar],
+		fields: [santri.kamarId],
 		references: [kamar.id]
 	})
 }));
@@ -201,8 +247,12 @@ export const santriRelations = relations(santri, ({ one, many }) => ({
 export const kelasRelations = relations(kelas, ({ many, one }) => ({
 	kelas_santri: many(kelas_santri),
 	tahun_ajaran: one(tahun_ajaran, {
-		fields: [kelas.tahunAjaran],
+		fields: [kelas.tahunAjaranId],
 		references: [tahun_ajaran.id]
+	}),
+	guru: one(guru, {
+		fields: [kelas.waliKelasId],
+		references: [guru.id]
 	})
 }));
 
