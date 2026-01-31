@@ -1,0 +1,2 @@
+- [] cek logika pengambilan data di server.ts
+- [] cek ulang penggunaan data yang sudah diambil dari database di page.svelte

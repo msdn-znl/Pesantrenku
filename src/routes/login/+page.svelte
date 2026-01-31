@@ -17,14 +17,8 @@
 				<h2 class="card-title">Silahkan Login</h2>
 				<form method="post" action="?/login" use:enhance>
 					<fieldset class="fieldset">
-						<label class="label" for="username"> Username(Email) </label>
-						<input
-							name="username"
-							id="username"
-							placeholder="mail@mail.co"
-							type="text"
-							class="input"
-						/>
+						<label class="label" for="username"> Username </label>
+						<input name="username" id="username" placeholder="username" type="text" class="input" />
 						<label class="label" for="password"> Password </label>
 						<input
 							type="password"

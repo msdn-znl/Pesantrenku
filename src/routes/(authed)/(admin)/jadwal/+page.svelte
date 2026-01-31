@@ -15,7 +15,7 @@
 	let jadwalToEdit = $state<Jadwal | null>(null);
 </script>
 
-<div class="">
+<div>
 	<dialog class="modal" id="create_jadwal_modal" bind:this={createJadwalModal}>
 		<div class="modal-box">
 			<h2 class="card-title">Tambah Jadwal</h2>

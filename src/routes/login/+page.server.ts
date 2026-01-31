@@ -9,8 +9,11 @@ import { LoginUserFormSchema } from '$lib/server/form-validation/user';
 import * as z from 'zod/v4';
 
 export const load: PageServerLoad = async (event) => {
-	if (event.locals.user) {
+	if (event.locals.user && event.locals.user.role === 'admin') {
 		return redirect(302, '/dashboard');
+	}
+	if (event.locals.user && event.locals.user.role === 'guru') {
+		return redirect(302, '/dashboard-guru');
 	}
 	return {};
 };
@@ -52,6 +55,11 @@ export const actions: Actions = {
 		const session = await auth.createSession(sessionToken, existingUser.id);
 		auth.setSessionTokenCookie(event, sessionToken, session.expiresAt);
 
-		return redirect(302, '/dashboard');
+		if (existingUser.role === 'admin') {
+			return redirect(302, '/dashboard');
+		}
+		if (existingUser.role === 'guru') {
+			return redirect(302, '/dashboard-guru');
+		}
 	}
 };

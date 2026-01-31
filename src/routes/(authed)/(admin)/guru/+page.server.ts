@@ -51,7 +51,7 @@ export const actions: Actions = {
 		}
 		const { id, ...rest } = result.data;
 		try {
-			const operation = await db.update(table.guru).set(rest).where(eq(table.guru.userId, id));
+			await db.update(table.guru).set(rest).where(eq(table.guru.userId, id));
 			return { success: true, message: 'Berhasil di-edit' };
 		} catch {
 			return fail(500, { message: 'An error has occured.' });

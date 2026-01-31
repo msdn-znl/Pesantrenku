@@ -161,7 +161,7 @@
 </div>
 
 <div class="card overflow-auto">
-	<h1 class="card-title ml-6">List Kelas</h1>
+	<h1 class="card-title">List Kelas</h1>
 	<div class="card-body">
 		<table class="table">
 			<thead>

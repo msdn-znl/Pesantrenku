@@ -176,7 +176,7 @@
 			>Tambah Kitab</button
 		>
 	</div>
-	<div class="p-2">
+	<div>
 		<h1 class="card-title">List Kitab</h1>
 		<div class="overflow-auto">
 			<table class="table">

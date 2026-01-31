@@ -4,7 +4,10 @@ import { redirect } from '@sveltejs/kit';
 
 export const load: LayoutServerLoad = async ({ locals }) => {
 	if (!locals.user) {
-		throw redirect(302, '/login');
+		redirect(302, '/login');
 	}
-	return { user: locals.user };
+	if (locals.user.role !== 'admin') {
+		redirect(302, '/login');
+	}
+	return {};
 };

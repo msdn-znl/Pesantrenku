@@ -83,6 +83,11 @@ export const actions: Actions = {
 		const session = await auth.createSession(sessionToken, existingUser.id);
 		auth.setSessionTokenCookie(event, sessionToken, session.expiresAt);
 
-		return redirect(302, '/dashboard');
+		if (existingUser.role === 'admin') {
+			return redirect(302, '/dashboard');
+		}
+		if (existingUser.role === 'guru') {
+			return redirect(302, '/dashboard-guru');
+		}
 	}
 };

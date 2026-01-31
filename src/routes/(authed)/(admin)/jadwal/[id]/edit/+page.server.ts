@@ -1,7 +1,7 @@
 import * as table from '$lib/server/db/schema';
 import { db } from '$lib/server/db';
 import { eq } from 'drizzle-orm';
-import type { Actions, PageServerLoad, RequestEvent } from '../../edit-data/[id]/$types';
+import type { Actions, PageServerLoad, RequestEvent } from './$types';
 import { fail, error } from '@sveltejs/kit';
 import { JadwalFormSchema } from '$lib/server/form-validation/jadwal';
 import * as z from 'zod/v4';

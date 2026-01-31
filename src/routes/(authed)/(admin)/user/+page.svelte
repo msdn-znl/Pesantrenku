@@ -16,7 +16,7 @@
 	let userToEdit = $state<User | null>(null);
 </script>
 
-<div class="">
+<div>
 	<dialog class="modal" id="create_user_modal" bind:this={createUserModal}>
 		<div class="modal-box">
 			<form method="dialog">
@@ -51,7 +51,7 @@
 					<label for="username" class="text-base label"> Email </label>
 					<input
 						name="username"
-						type="email"
+						type="string"
 						id="username"
 						placeholder="Email"
 						class="input w-full"
@@ -180,55 +180,54 @@
 			>Tambah User</button
 		>
 	</div>
-	<div class="p-2">
-		<div class="">
-			<div class="flex">
-				<h2 class="card-title">List User</h2>
-			</div>
-			<div class="overflow-auto">
-				<table class="table">
-					<thead>
-						<tr>
-							<th></th>
-							<th>Nama</th>
-							<th>Username</th>
-							<th>Role</th>
-							<th>Action</th>
+
+	<div class="">
+		<div class="flex">
+			<h2 class="card-title">List User</h2>
+		</div>
+		<div class="overflow-auto">
+			<table class="table">
+				<thead>
+					<tr>
+						<th></th>
+						<th>Nama</th>
+						<th>Username</th>
+						<th>Role</th>
+						<th>Action</th>
+					</tr>
+				</thead>
+				<tbody>
+					{#each data.userList as user, i (user.id)}
+						<tr class="hover:bg-base-300">
+							<th>{i + 1}</th>
+							<td>{user.nama}</td>
+							<td>{user.username}</td>
+							<td>{user.role}</td>
+
+							<td>
+								<!-- Todo: Buat modal untuk tombol edit -->
+
+								<button
+									class="btn btn-success mr-2"
+									onclick={() => {
+										userToEdit = { ...user };
+										editUserModal.showModal();
+									}}>Edit</button
+								>
+
+								<!-- Todo: Update list setelah tombol di delete tanpa reload halaman -->
+								<button
+									class="btn btn-error"
+									onclick={() => {
+										userToDelete = user.id;
+										deleteUserModal.showModal();
+									}}>Delete</button
+								>
+							</td>
 						</tr>
-					</thead>
-					<tbody>
-						{#each data.userList as user, i (user.id)}
-							<tr class="hover:bg-base-300">
-								<th>{i + 1}</th>
-								<td>{user.nama}</td>
-								<td>{user.username}</td>
-								<td>{user.role}</td>
-
-								<td>
-									<!-- Todo: Buat modal untuk tombol edit -->
-
-									<button
-										class="btn btn-success mr-2"
-										onclick={() => {
-											userToEdit = { ...user };
-											editUserModal.showModal();
-										}}>Edit</button
-									>
-
-									<!-- Todo: Update list setelah tombol di delete tanpa reload halaman -->
-									<button
-										class="btn btn-error"
-										onclick={() => {
-											userToDelete = user.id;
-											deleteUserModal.showModal();
-										}}>Delete</button
-									>
-								</td>
-							</tr>
-						{/each}
-					</tbody>
-				</table>
-			</div>
+					{/each}
+				</tbody>
+			</table>
 		</div>
 	</div>
 </div>
