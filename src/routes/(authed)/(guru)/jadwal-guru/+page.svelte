@@ -1,0 +1,37 @@
+<script lang="ts">
+	import type { PageServerData } from './$types';
+	let data: PageServerData = $props();
+</script>
+
+<svelte:head>
+	<title>Menu Jadwal Guru</title>
+</svelte:head>
+
+<div class="flex flex-col flex-wrap gap-4 w-full md:flex-row">
+	{#each data.jadwalList as jadwal, i (jadwal.id)}
+		<div class="card bg-base-100 shadow-sm">
+			<div class="card-body">
+				<h2 class="card-title">{jadwal.kitab.namaKitab} - {jadwal.hari}</h2>
+				<div class="card-actions justify-end">
+					<a href={'jadwal-guru' + jadwal.id} class="btn btn-primary">Detail</a>
+				</div>
+			</div>
+		</div>
+	{/each}
+	<div class="card bg-base-100 shadow-sm card-md">
+		<div class="card-body">
+			<h2 class="card-title">Ini Preview Card-nya</h2>
+			<div class="card-actions justify-end">
+				<a href="/#" class="btn btn-primary">Detail</a>
+			</div>
+		</div>
+	</div>
+	<div class="card bg-base-100 shadow-sm card-md">
+		<div class="card-body">
+			<h2 class="card-title">Ini Preview Card-nya</h2>
+			<div class="card-actions justify-end">
+				<a href="/#" class="btn btn-primary">Detail</a>
+			</div>
+		</div>
+	</div>
+</div>
