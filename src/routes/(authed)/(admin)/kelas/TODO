@@ -1,2 +1,6 @@
-- [] cek logika pengambilan data di server.ts
-- [] cek ulang penggunaan data yang sudah diambil dari database di page.svelte
+- [x] cek logika pengambilan data di server.ts
+- [x] cek ulang penggunaan data yang sudah diambil dari database di page.svelte
+
+Sudah Dicek dan Berhasil menambahkan data
+
+Cek Ulang lagi pengambilan data santri ayng sudah masuk kelas dan elm masuk kelas. Perhatikan pada tipe kelas, apakah diniyah atau quran

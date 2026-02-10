@@ -14,7 +14,7 @@
 	let kitabToEdit = $state<Kitab | null>(null);
 </script>
 
-<div class="">
+<div>
 	<dialog class="modal" id="create_kitab_modal" bind:this={createKitabModal}>
 		<div class="modal-box">
 			<form method="dialog">
@@ -171,14 +171,14 @@
 			</form>
 		</div>
 	</dialog>
-	<div class="flex flex-row-reverse p-2">
+	<div class="flex flex-row-reverse">
 		<button class="btn btn-success" onclick={() => createKitabModal.showModal()}
 			>Tambah Kitab</button
 		>
 	</div>
-	<div>
-		<h1 class="card-title">List Kitab</h1>
-		<div class="overflow-auto">
+	<div class="card overflow-auto">
+		<h2 class="card-title">List Kitab</h2>
+		<div class="card-body">
 			<table class="table">
 				<thead>
 					<tr>

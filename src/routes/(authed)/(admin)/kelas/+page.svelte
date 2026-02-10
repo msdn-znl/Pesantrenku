@@ -15,6 +15,10 @@
 	let kelasToEdit = $state<Kelas | null>(null);
 </script>
 
+<svelte:head>
+	<title>Menu Kelas</title>
+</svelte:head>
+
 <div>
 	<dialog class="modal" id="create_kelas_modal" bind:this={createKelasModal}>
 		<div class="modal-box">
@@ -53,8 +57,14 @@
 						placeholder="Contoh: Dirosah 2"
 						required
 					/>
-					<label for="tahunAjaran" class="label">Tahun Ajaran</label>
-					<select name="tahunAjaran" id="tahunAjaran" class="select w-full">
+					<label for="tipekelas">Tipe Kelas</label>
+					<select name="tipeKelas" id="tipeKelas">
+						<option value=""></option>
+						<option value="diniyah">Diniyah</option>
+						<option value="quran">Quran</option>
+					</select>
+					<label for="tahunAjaranId" class="label">Tahun Ajaran</label>
+					<select name="tahunAjaranId" id="tahunAjaranId" class="select w-full">
 						<option value=""></option>
 						{#each data.tahunAjaranList as item}
 							<option value={item.id}>{item.tahunAjaran}</option>
@@ -153,8 +163,8 @@
 			</form>
 		</div>
 	</dialog>
-	<div class="flex flex-row-reverse p-2">
-		<button class="btn btn-success mt-2" onclick={() => createKelasModal.showModal()}>
+	<div class="flex flex-row-reverse">
+		<button class="btn btn-success" onclick={() => createKelasModal.showModal()}>
 			Tambah Kelas</button
 		>
 	</div>
@@ -180,8 +190,8 @@
 						<td>{kelas.tahun_ajaran?.tahunAjaran}</td>
 						<td>{kelas.guru?.nama}</td>
 						<td class="flex flex-col">
-							<a href={'/kelas/tambah-santri/' + kelas.id}
-								><button class="btn btn-accent w-full">Edit Anggota Kelas</button></a
+							<a href={'/kelas/tambah-santri/' + kelas.id} class="btn btn-accent w-full"
+								>Edit Anggota Kelas</a
 							>
 
 							<button

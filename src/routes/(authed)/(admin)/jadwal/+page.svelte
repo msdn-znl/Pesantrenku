@@ -15,6 +15,9 @@
 	let jadwalToEdit = $state<Jadwal | null>(null);
 </script>
 
+<svelte:head>
+	<title>Menu Jadwal</title>
+</svelte:head>
 <div>
 	<dialog class="modal" id="create_jadwal_modal" bind:this={createJadwalModal}>
 		<div class="modal-box">
@@ -139,7 +142,7 @@
 		</div>
 	</dialog>
 
-	<div class="flex flex-row-reverse p-2">
+	<div class="flex flex-row-reverse">
 		<button class="btn btn-success" onclick={() => createJadwalModal.showModal()}
 			>Tambah Jadwal</button
 		>

@@ -5,8 +5,11 @@
 	let { data, form }: { data: PageServerData; form: ActionData } = $props();
 </script>
 
+<svelte:head>
+	<title>Menu Santri: Edit Data Santri</title>
+</svelte:head>
 <div class="">
-	<div class="card p-4 justify-center shadow">
+	<div class="card justify-center">
 		<form
 			action="?/edit"
 			method="POST"

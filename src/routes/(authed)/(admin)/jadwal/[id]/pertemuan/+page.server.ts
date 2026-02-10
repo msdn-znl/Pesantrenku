@@ -69,7 +69,7 @@ export const actions: Actions = {
 			return { success: true, message: 'berhasil menambahkan data pertemuan' };
 		} catch (err) {
 			console.error('Terjadi kesalahan saat menambahkan data pertemuan', err);
-			fail(500, { message: 'Error saat menambahkan data pertemuan' });
+			return fail(500, { message: 'Error saat menambahkan data pertemuan' });
 		}
 	},
 	delete: async (event: RequestEvent) => {

@@ -6,6 +6,9 @@
 	const hari = ['', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
 </script>
 
+<svelte:head>
+	<title>Menu Jadwal: Edit Jadwal</title>
+</svelte:head>
 <div class="flex flex-row">
 	<div class="w-xs">
 		<h2>Tambah Jadwal</h2>

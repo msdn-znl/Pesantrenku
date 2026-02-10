@@ -5,6 +5,12 @@
 	let { data, form }: { data: PageServerData; form: ActionData } = $props();
 </script>
 
+<svelte:head>
+	<title>Menu Santri</title>
+</svelte:head>
+<div>
+	<h2 class="card-title">List Santri</h2>
+</div>
 <div class="overflow-auto">
 	<table class="table">
 		<thead>

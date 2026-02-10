@@ -16,6 +16,9 @@
 	let userToEdit = $state<User | null>(null);
 </script>
 
+<svelte:head>
+	<title>Menu User</title>
+</svelte:head>
 <div>
 	<dialog class="modal" id="create_user_modal" bind:this={createUserModal}>
 		<div class="modal-box">
@@ -175,13 +178,11 @@
 			</form>
 		</div>
 	</dialog>
-	<div class="flex flex-row-reverse p-2">
-		<button class="btn btn-success mr-2" onclick={() => createUserModal.showModal()}
-			>Tambah User</button
-		>
+	<div class="flex flex-row-reverse">
+		<button class="btn btn-success" onclick={() => createUserModal.showModal()}>Tambah User</button>
 	</div>
 
-	<div class="">
+	<div>
 		<div class="flex">
 			<h2 class="card-title">List User</h2>
 		</div>

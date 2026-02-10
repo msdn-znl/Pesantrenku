@@ -184,8 +184,8 @@
 			</form>
 		</div>
 	</dialog>
-	<div class="flex flex-row-reverse p-2">
-		<button onclick={() => createPertemuanModal.showModal()} class="btn btn-success mt-2">
+	<div class="flex flex-row-reverse">
+		<button onclick={() => createPertemuanModal.showModal()} class="btn btn-success">
 			Tambah Pertemuan
 		</button>
 	</div>

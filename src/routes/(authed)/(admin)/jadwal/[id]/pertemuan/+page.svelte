@@ -10,6 +10,9 @@
 	let pertemuanToDelete = $state<string | null>(null);
 </script>
 
+<svelte:head>
+	<title>Menu Jadwal: Pertemuan</title>
+</svelte:head>
 <div class="">
 	<dialog class="modal" id="create_pertemuan_modal" bind:this={createPertemuanModal}>
 		<div class="modal-box">

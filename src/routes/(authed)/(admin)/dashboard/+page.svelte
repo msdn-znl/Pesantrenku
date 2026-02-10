@@ -7,4 +7,7 @@
 	let jadwalId = $state<string | null>(null);
 </script>
 
+<svelte:head>
+	<title>Dashboard Admin</title>
+</svelte:head>
 <h1>Hi, {data.user.username}!</h1>

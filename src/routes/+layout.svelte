@@ -6,9 +6,9 @@
 	let { children, data } = $props();
 </script>
 
-<svelte:head>
+<!-- <svelte:head>
 	<title>{page.url.pathname}</title>
-</svelte:head>
+</svelte:head> -->
 {#if data.user}
 	<div class="drawer lg:drawer-open">
 		<Toaster position="top-right" richColors />

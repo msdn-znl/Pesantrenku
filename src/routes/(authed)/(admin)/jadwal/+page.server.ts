@@ -34,20 +34,12 @@ export const load: PageServerLoad = async () => {
 export const actions: Actions = {
 	create: async (event: RequestEvent) => {
 		const formData = await event.request.formData();
-		// const jadwalFormData = Object.fromEntries(
-		// 	Array.from(formData.keys()).map((key) => [
-		// 		key,
-		// 		formData.getAll(key).length > 1 ? formData.getAll(key) : formData.get(key)
-		// 	])
-		// );
 		const jadwalFormData = Object.fromEntries(formData);
 		const validationResult = JadwalFormSchema.safeParse(jadwalFormData);
 
 		if (!validationResult.success) {
 			return fail(422, { message: 'Data yang anda masukkan salah' });
 		}
-		console.log(validationResult.data);
-		// const { kitabId, kelasId, guruId, hari, jamMulai, jamSelesai } = validationResult.data;
 		try {
 			await db.insert(table.jadwal).values({ id: generateId(), ...validationResult.data });
 			return { success: true, message: 'Data berhasil ditambahkan' };

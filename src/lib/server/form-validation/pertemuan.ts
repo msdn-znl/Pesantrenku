@@ -9,7 +9,7 @@ export const PertemuanFormSchema = z.object({
 
 export const SinglePertemuanFormSchema = z.object({
 	jurnalMengajar: z.string().optional(),
-	status: z.enum(['selesai', 'batal', 'tugas mandiri'])
+	status: z.enum(['selesai', 'batal', 'tugas mandiri']).optional()
 });
 
 export const EditPertemuanFormSchema = z.object({

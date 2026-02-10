@@ -12,6 +12,9 @@
 	let guruToEdit = $state<Guru | null>(null);
 </script>
 
+<svelte:head>
+	<title>Menu Guru</title>
+</svelte:head>
 <div>
 	<dialog class="modal" id="delete_guru_modal" bind:this={deleteGuruModal}>
 		<div class="modal-box">
@@ -117,7 +120,9 @@
 		</div>
 	</dialog>
 </div>
-
+<div>
+	<h2 class="card-title">List Guru</h2>
+</div>
 <div class="overflow-auto">
 	<table class="table">
 		<thead>

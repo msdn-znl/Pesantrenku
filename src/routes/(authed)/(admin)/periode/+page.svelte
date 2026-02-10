@@ -10,7 +10,10 @@
 	let periodeToDelete = $state<string | null>(null);
 </script>
 
-<div class="">
+<svelte:head>
+	<title>Menu Tahun Ajar</title>
+</svelte:head>
+<div>
 	<dialog class="modal" id="create_periode_modal" bind:this={createPeriodeModal}>
 		<div class="modal-box">
 			<form method="dialog">
@@ -55,8 +58,8 @@
 			</div>
 		</div>
 	</dialog>
-	<div class="flex flex-row-reverse p-2">
-		<button class="btn btn-success mr-2" onclick={() => createPeriodeModal.showModal()}
+	<div class="flex flex-row-reverse">
+		<button class="btn btn-success" onclick={() => createPeriodeModal.showModal()}
 			>Tambah Periode</button
 		>
 	</div>

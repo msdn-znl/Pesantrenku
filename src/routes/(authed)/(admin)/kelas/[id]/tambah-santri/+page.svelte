@@ -6,6 +6,9 @@
 	let tambahData: HTMLDialogElement | undefined;
 </script>
 
+<svelte:head>
+	<title>Menu Kelas: Tambah Santri</title>
+</svelte:head>
 <div>
 	<h1>Tambah Santri</h1>
 	<div>

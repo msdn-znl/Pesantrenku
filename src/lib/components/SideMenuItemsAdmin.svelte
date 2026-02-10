@@ -6,6 +6,7 @@
 		{ href: '/user', nama: 'User' },
 		{ href: '/guru', nama: 'Guru' },
 		{ href: '/santri', nama: 'Santri' },
+		{ href: '/kamar', nama: 'Kamar' },
 		{ href: '/periode', nama: 'Tahun Ajaran' },
 		{ href: '/kelas', nama: 'Kelas' },
 		{ href: '/kitab', nama: 'Kitab' },

@@ -33,7 +33,6 @@ export const actions: Actions = {
 				formData.getAll(key).length > 1 ? formData.getAll(key) : formData.get(key)
 			])
 		);
-
 		const validationResult = KelasFormSchema.safeParse(kelasFormData);
 		if (!validationResult.success) {
 			return fail(422, {

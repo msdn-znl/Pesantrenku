@@ -18,6 +18,7 @@ import { relations } from 'drizzle-orm';
 export const userRoleEnum = pgEnum('user_role', ['admin', 'guru', 'santri']);
 export const statusEnum = pgEnum('status', ['aktif', 'inaktif']);
 export const santriStatusEnum = pgEnum('santri_status', ['aktif', 'lulus', 'keluar']);
+export const tipeKelasEnum = pgEnum('tipe_kelas', ['diniyah', 'quran']);
 export const dayEnum = pgEnum('day', [
 	'Minggu',
 	'Senin',
@@ -109,6 +110,7 @@ export const kelas = pgTable('kelas', {
 	waliKelasId: text('wali_kelas_id').references(() => guru.id, {
 		onDelete: 'set null'
 	}),
+	tipeKelas: tipeKelasEnum('tipe_kelas').default('diniyah'),
 	...timestampColumns
 });
 
