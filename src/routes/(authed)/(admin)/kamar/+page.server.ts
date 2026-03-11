@@ -31,8 +31,12 @@ export const actions: Actions = {
 				data: kamarFormData
 			});
 		}
+		const dataKamar = validationResult.data.namaKamar.map((item) => ({
+			id: generateId(),
+			namaKamar: item
+		}));
 		try {
-			await db.insert(table.kamar).values({ id: generateId(), ...validationResult.data });
+			await db.insert(table.kamar).values(dataKamar);
 		} catch (err) {
 			console.error(err);
 			error(500, { message: 'An error occured' });
@@ -55,6 +59,20 @@ export const actions: Actions = {
 		} catch (err) {
 			console.error(err);
 			error(500, 'An Error occured');
+		}
+	},
+	delete: async (event: RequestEvent) => {
+		const formData = await event.request.formData();
+		const id = formData.get('id');
+		if (!id || typeof id !== 'string') {
+			return fail(400, { message: 'Kelas tidak ada/ id kelas salah' });
+		}
+		try {
+			await db.delete(table.kamar).where(eq(table.kamar.id, id));
+			return { success: true, message: 'Berhasil dihapus' };
+		} catch (err) {
+			console.error(err);
+			return fail(500, { message: 'An Error occured' });
 		}
 	}
 };
