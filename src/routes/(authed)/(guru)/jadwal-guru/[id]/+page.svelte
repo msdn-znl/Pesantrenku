@@ -78,6 +78,7 @@
 							editPertemuanModal.showModal();
 						}}>Edit Jurnal</button
 					>
+					<a href={'pertemuan-guru' + jurnal.id}>Detail Absensi</a>
 				</div>
 			</div>
 		</div>
@@ -86,7 +87,7 @@
 	<div class="card bg-base-100 shadow-sm">
 		<div class="card-body">
 			<h2 class="card-title">10-10-2025</h2>
-			<p>Preview Jurnal Mengajar, sdah bisa dilihat</p>
+			<p>Preview Jurnal Mengajar, sudah bisa dilihat</p>
 			<p>Status: Selesai</p>
 			<div class="card-actions justify-end">
 				<button
@@ -116,6 +117,7 @@
 						editPertemuanModal.showModal();
 					}}>Edit Jurnal</button
 				>
+				<a href="/pertemuan-guru/abc" class="btn btn-accent">Detail Absensi</a>
 			</div>
 		</div>
 	</div>

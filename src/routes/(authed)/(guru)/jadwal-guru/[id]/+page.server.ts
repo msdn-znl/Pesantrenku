@@ -3,7 +3,6 @@ import { error, fail } from '@sveltejs/kit';
 import { eq, and } from 'drizzle-orm';
 import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
-import * as z from 'zod';
 import { EditPertemuanFormSchema } from '$lib/server/form-validation/pertemuan';
 
 export const load: PageServerLoad = async (event: RequestEvent) => {

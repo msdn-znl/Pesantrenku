@@ -8,7 +8,7 @@ export const load: PageServerLoad = async ({ parent }) => {
 	const { user } = await parent();
 	try {
 		const jadwalList = await db.query.jadwal.findMany({
-			where: and(eq(table.jadwal.guruId, user.id), eq(table.jadwal.isActive, true)),
+			where: and(eq(table.jadwal.guruId, user.roleId), eq(table.jadwal.isActive, true)),
 			with: { kelas: true, kitab: true }
 		});
 		return { jadwalList };
