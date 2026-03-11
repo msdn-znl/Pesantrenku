@@ -90,7 +90,7 @@ export const actions: Actions = {
 			// return { success: true, message: 'berhasil menambahkan data absensi santri' };
 		} catch (err) {
 			console.error('Terjadi kesalahan saat menambahkan data absensi santri', err);
-			fail(500, { message: 'Error saat menambahkan data absensi santri' });
+			return fail(500, { message: 'Error saat menambahkan data absensi santri' });
 		}
 		return redirect(303, '/pertemuan/' + id + `/data-absensi`);
 	}
