@@ -230,7 +230,11 @@ export const guruRelations = relations(guru, ({ one, many }) => ({
 		references: [users.id]
 	}),
 	jadwal: many(jadwal),
-	absensi_guru: many(absensi_guru)
+	absensi_guru: many(absensi_guru),
+	kelas: one(kelas, {
+		fields: [guru.id],
+		references: [kelas.waliKelasId]
+	})
 }));
 
 export const santriRelations = relations(santri, ({ one, many }) => ({
