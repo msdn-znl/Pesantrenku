@@ -1,5 +1,5 @@
 import type { RequestEvent } from '@sveltejs/kit';
-import { eq } from 'drizzle-orm';
+import { eq, sql } from 'drizzle-orm';
 import { sha256 } from '@oslojs/crypto/sha2';
 import { encodeBase64url, encodeHexLowerCase } from '@oslojs/encoding';
 import { db } from '$lib/server/db';
@@ -35,12 +35,20 @@ export async function validateSessionToken(token: string) {
 				id: table.users.id,
 				username: table.users.username,
 				role: table.users.role,
-				nama: table.users.nama
+				nama: table.users.nama,
+				roleId: sql<string | null>`CASE
+				WHEN ${table.users.role} = 'guru' THEN ${table.guru.id}
+				WHEN ${table.users.role} = 'santri' THEN ${table.santri.id}
+				ELSE NULL
+				END
+			`.as('role_id')
 			},
 			session: table.session
 		})
 		.from(table.session)
 		.innerJoin(table.users, eq(table.session.userId, table.users.id))
+		.leftJoin(table.guru, eq(table.users.id, table.guru.userId))
+		.leftJoin(table.santri, eq(table.users.id, table.santri.userId))
 		.where(eq(table.session.id, sessionId));
 
 	if (!result) {
