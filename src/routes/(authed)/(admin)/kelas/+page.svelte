@@ -57,8 +57,8 @@
 						placeholder="Contoh: Dirosah 2"
 						required
 					/>
-					<label for="tipekelas">Tipe Kelas</label>
-					<select name="tipeKelas" id="tipeKelas">
+					<label for="tipekelas" class="label">Tipe Kelas</label>
+					<select name="tipeKelas" id="tipeKelas" class="select w-full">
 						<option value=""></option>
 						<option value="diniyah">Diniyah</option>
 						<option value="quran">Quran</option>
@@ -188,11 +188,9 @@
 						<th>{i + 1}</th>
 						<td>{kelas.namaKelas}</td>
 						<td>{kelas.tahun_ajaran?.tahunAjaran}</td>
-						<td>{kelas.guru?.nama}</td>
+						<td>{kelas.guru?.user.nama}</td>
 						<td class="flex flex-col">
-							<a href={'/kelas/tambah-santri/' + kelas.id} class="btn btn-accent w-full"
-								>Edit Anggota Kelas</a
-							>
+							<a href={`/kelas/${kelas.id}`} class="btn btn-accent w-full">Detail</a>
 
 							<button
 								class="btn btn-warning w-full"

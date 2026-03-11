@@ -13,7 +13,7 @@ export const load: PageServerLoad = async () => {
 		const kelasList = await db.query.kelas.findMany({
 			with: {
 				tahun_ajaran: true,
-				guru: true
+				guru: { with: { user: { columns: { nama: true } } } }
 			}
 		});
 		const tahunAjaranList = await db.select().from(table.tahun_ajaran);
