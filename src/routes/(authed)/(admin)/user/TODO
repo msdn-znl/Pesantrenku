@@ -1,0 +1,5 @@
+- [x] filter data yang dikembalikan dari server berdasarkan role
+- [] buat render berdasarkan role
+- [] buat tombol filter berdasarkan role
+- [] render admin tanpa tombol delete
+- [] buat input bisa menerima banyak data atau sediakan fitur membaca dari file csv
