@@ -7,6 +7,11 @@
 
 	let { form, data }: { form: ActionData; data: PageServerData } = $props();
 
+	const users = $derived({
+		admin: data.userList.filter((a) => a.role === 'admin'),
+		santri: data.userList.filter((s) => s.role === 'santri'),
+		guru: data.userList.filter((g) => g.role === 'guru')
+	});
 	let createUserForm: HTMLFormElement;
 	let createUserModal: HTMLDialogElement;
 	let deleteUserModal: HTMLDialogElement;
@@ -14,6 +19,11 @@
 	let editUserModal: HTMLDialogElement;
 	let userToDelete = $state<string | null>(null);
 	let userToEdit = $state<User | null>(null);
+	let tambah: HTMLDialogElement;
+	let role = $state();
+	let listUserToDelete = $state<string[] | null>(null);
+
+	$inspect(listUserToDelete);
 </script>
 
 <svelte:head>
@@ -51,12 +61,12 @@
 						};
 					}}
 				>
-					<label for="username" class="text-base label"> Email </label>
+					<label for="username" class="text-base label"> Username</label>
 					<input
 						name="username"
 						type="string"
 						id="username"
-						placeholder="Email"
+						placeholder="Username"
 						class="input w-full"
 					/>
 					<label for="password" class="text-base label"> Password </label>
@@ -180,6 +190,7 @@
 	</dialog>
 	<div class="flex flex-row-reverse">
 		<button class="btn btn-success" onclick={() => createUserModal.showModal()}>Tambah User</button>
+		<button class="btn btn-success" onclick={() => tambah.showModal()}>Tambah </button>
 	</div>
 
 	<div>
@@ -191,6 +202,7 @@
 				<thead>
 					<tr>
 						<th></th>
+						<th></th>
 						<th>Nama</th>
 						<th>Username</th>
 						<th>Role</th>
@@ -200,6 +212,15 @@
 				<tbody>
 					{#each data.userList as user, i (user.id)}
 						<tr class="hover:bg-base-300">
+							<th
+								><input
+									type="checkbox"
+									name="id"
+									id=""
+									value={user.id}
+									bind:group={listUserToDelete}
+								/></th
+							>
 							<th>{i + 1}</th>
 							<td>{user.nama}</td>
 							<td>{user.username}</td>
@@ -232,3 +253,74 @@
 		</div>
 	</div>
 </div>
+
+<dialog class="modal" id="tambah" bind:this={tambah}>
+	<div class="modal-box w-11/12 max-w-5xl">
+		<form method="dialog">
+			<button class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">✕</button>
+		</form>
+		<h2 class="card-title">Tambah User</h2>
+		<form action="?/tambah" method="post" class="flex flex-col gap-4">
+			<label for="role" class="label">Role</label>
+			<select name="role" id="role" bind:value={role} class="select w-full">
+				<option value="">Pilih</option>
+				<option value="admin">Admin</option>
+				<option value="guru">Guru</option>
+				<option value="santri">Santri</option>
+			</select>
+			{#if role === 'santri'}
+				<fieldset class="fieldset">
+					<legend class="fieldset-legend"> Nama Santri </legend>
+					<textarea
+						name="nama"
+						id="nama"
+						class="textarea w-full h-24"
+						placeholder="Masukkan satu Nama untuk satu baris. Contoh: 
+Abdullah Zaid 
+Ahmad Umar"
+					></textarea>
+					<label for="tipe" class="label">Pondok</label>
+					<select name="tipe" id="tipe" class="select w-full">
+						<option value=""></option>
+						<option value="putra">Putra</option>
+						<option value="putri">Putri</option>
+					</select>
+				</fieldset>
+				<button type="submit" class="btn btn-success">Kirim</button>
+			{:else if role === 'guru'}
+				<fieldset class="fieldset">
+					<legend class="fieldset-legend"> Nama Guru </legend>
+					<textarea
+						name="nama"
+						id="nama"
+						class="textarea w-full h-24"
+						placeholder="Masukkan satu Nama untuk satu baris. Contoh:
+Abdul Aziz
+Amirul Hasan"
+					></textarea>
+				</fieldset>
+				<button type="submit" class="btn btn-success">Kirim</button>
+			{:else if role === 'admin'}
+				<label for="username" class="text-base label"> Username</label>
+				<input
+					name="username"
+					type="string"
+					id="username"
+					placeholder="Username"
+					class="input w-full"
+				/>
+				<label for="password" class="text-base label"> Password </label>
+				<input
+					type="password"
+					name="password"
+					id="password"
+					placeholder="Password"
+					class="input w-full"
+				/>
+				<label for="nama" class="text-base label"> Nama </label>
+				<input type="text" name="nama" id="nama" placeholder="Nama" class="input w-full" />
+				<button type="submit" class="btn btn-success">Kirim</button>
+			{/if}
+		</form>
+	</div>
+</dialog>
