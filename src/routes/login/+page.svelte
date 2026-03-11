@@ -5,6 +5,7 @@
 	let { form }: { form: ActionData } = $props();
 </script>
 
+<svelte:head><title>Halaman Login</title></svelte:head>
 <p style="color: red">{form?.message ?? ''}</p>
 <div class="hero bg-base-200 min-h-screen">
 	<div class="hero-content flex-col lg:flex-row-reverse">
