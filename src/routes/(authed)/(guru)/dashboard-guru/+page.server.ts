@@ -6,7 +6,8 @@ import * as table from '$lib/server/db/schema';
 
 import { SinglePertemuanFormSchema } from '$lib/server/form-validation/pertemuan';
 import * as z from 'zod/v4';
-import { getHariIni, type dayString, generateId } from '$lib/utils';
+import { getHariIni, getTanggalSekarang, type dayString, generateId } from '$lib/utils';
+
 export const load: PageServerLoad = async ({ parent }) => {
 	const { user } = await parent();
 	const guruProfile = await db.query.guru.findFirst({
@@ -25,7 +26,7 @@ export const load: PageServerLoad = async ({ parent }) => {
 			with: { kelas: true, kitab: true }
 		});
 	}
-
+	console.log(jadwalHariIni);
 	return { user, isGuru: !!guruProfile, jadwalHariIni };
 };
 
@@ -36,7 +37,7 @@ export const actions: Actions = {
 		if (typeof jadwalId !== 'string') {
 			return fail(400, { message: 'ID Jadwal tidak valid' });
 		}
-		const tanggalHariIni = getHariIni();
+		const tanggalHariIni = getTanggalSekarang();
 		const pertemuan = await db.query.pertemuan.findFirst({
 			where: and(
 				eq(table.pertemuan.jadwalId, jadwalId),
@@ -66,8 +67,8 @@ export const actions: Actions = {
 				console.error(err);
 				return error(500, { message: 'terjadi kesalahan saat menambahkan data' });
 			}
-			redirect(303, `/pertemuan/${data.id}/absensi-santri`);
+			redirect(303, `/pertemuan-guru/${data.id}/tambah-absensi`);
 		}
-		redirect(303, `/pertemuan/${pertemuan.id}/absensi-santri`);
+		redirect(303, `/pertemuan/${pertemuan.id}`);
 	}
 };
