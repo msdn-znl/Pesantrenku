@@ -5,7 +5,7 @@ import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
 
-import { generateId } from '$lib/utils';
+import { generateId, groupJadwal } from '$lib/utils';
 
 export const load: PageServerLoad = async () => {
 	try {
@@ -19,13 +19,15 @@ export const load: PageServerLoad = async () => {
 		};
 		const jadwalListPromise = db.query.jadwal.findMany({
 			with: {
-				guru: { with: { user: true } },
-				kelas: true,
-				kitab: true
+				guru: { with: { user: { columns: { nama: true } } }, columns: {} },
+				kelas: { columns: { namaKelas: true } },
+				kitab: { columns: { namaKitab: true } }
 			}
 		});
+		const dataJadwal = await jadwalListPromise;
+		const groupedJadwalData = groupJadwal(dataJadwal);
 
-		return { streamed: streamedPromises, jadwalList: await jadwalListPromise };
+		return { streamed: streamedPromises, jadwalList: dataJadwal, grouped: groupedJadwalData };
 	} catch (err) {
 		console.error(err);
 		error(500, 'An error occured');
@@ -34,14 +36,28 @@ export const load: PageServerLoad = async () => {
 export const actions: Actions = {
 	create: async (event: RequestEvent) => {
 		const formData = await event.request.formData();
-		const jadwalFormData = Object.fromEntries(formData);
+
+		const jadwalFormData = Object.fromEntries(
+			Array.from(formData.keys()).map((key) => [
+				key,
+				formData.getAll(key).length > 1 ? formData.getAll(key) : formData.get(key)
+			])
+		);
+
 		const validationResult = JadwalFormSchema.safeParse(jadwalFormData);
 
 		if (!validationResult.success) {
 			return fail(422, { message: 'Data yang anda masukkan salah' });
 		}
+
+		const { hari, ...dataLain } = validationResult.data;
+		const dataToInsert = hari.map((namaHari) => ({
+			...dataLain,
+			hari: namaHari,
+			id: generateId()
+		}));
 		try {
-			await db.insert(table.jadwal).values({ id: generateId(), ...validationResult.data });
+			await db.insert(table.jadwal).values(dataToInsert);
 			return { success: true, message: 'Data berhasil ditambahkan' };
 		} catch (err) {
 			console.error(err);

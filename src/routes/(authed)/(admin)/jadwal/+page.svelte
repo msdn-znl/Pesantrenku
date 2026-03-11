@@ -28,7 +28,7 @@
 			<form
 				action="?/create"
 				method="post"
-				class="flex flex-col"
+				class="flex flex-col gap-4"
 				use:enhance={() => {
 					return async ({ result }) => {
 						if (result.type === 'success') {
@@ -47,7 +47,7 @@
 					};
 				}}
 			>
-				<label for="kitabId">Kitab</label>
+				<label for="kitabId" class="label">Kitab</label>
 				{#await data.streamed.kitabList}
 					<select class="select w-full" disabled>
 						<option>Memuat Kitab...</option>
@@ -62,7 +62,7 @@
 				{:catch error}
 					<p>{error.message}</p>
 				{/await}
-				<label for="kelasId">Kelas</label>
+				<label for="kelasId" class="label">Kelas</label>
 				{#await data.streamed.kelasList}
 					<select class="select w-full" disabled>
 						<option>Memuat Kelas...</option>
@@ -77,7 +77,7 @@
 				{:catch error}
 					<p>{error.message}</p>
 				{/await}
-				<label for="guruId">Guru</label>
+				<label for="guruId" class="label">Guru</label>
 				{#await data.streamed.guruList}
 					<select class="select w-full" disabled>
 						<option>Memuat Guru...</option>
@@ -92,16 +92,72 @@
 				{:catch error}
 					<p>{error.message}</p>
 				{/await}
-				<label for="hari">Hari</label>
-				<select name="hari" id="hari" class="select w-full">
-					<option value="">Pilih</option>
-					{#each hari as h}
-						<option value={h}>{h}</option>
-					{/each}
-				</select>
-				<label for="jamMulai">Jam Mulai</label>
+				<fieldset class="fieldset grid grid-cols-4">
+					<legend class="fieldset-legend">Hari</legend>
+
+					<label for="Minggu" class="label">
+						<input type="checkbox" name="hari" id="Minggu" value="Minggu" class="checkbox" />
+						Minggu</label
+					>
+
+					<label for="Senin" class="label">
+						<input type="checkbox" name="hari" id="Senin" value="Senin" class="checkbox" />
+						Senin</label
+					>
+
+					<label for="Selasa" class="label"
+						><input
+							type="checkbox"
+							name="hari"
+							id="Selasa"
+							value="Selasa"
+							class="checkbox"
+						/>Selasa</label
+					>
+
+					<label for="Rabu" class="label"
+						><input
+							type="checkbox"
+							name="hari"
+							id="Rabu"
+							value="Rabu"
+							class="checkbox"
+						/>Rabu</label
+					>
+
+					<label for="Kamis" class="label"
+						><input
+							type="checkbox"
+							name="hari"
+							id="Kamis"
+							value="Kamis"
+							class="checkbox"
+						/>Kamis</label
+					>
+
+					<label for="Jumat" class="label"
+						><input
+							type="checkbox"
+							name="hari"
+							id="Jumat"
+							value="Jumat"
+							class="checkbox"
+						/>Jumat</label
+					>
+
+					<label for="Sabtu" class="label"
+						><input
+							type="checkbox"
+							name="hari"
+							id="Sabtu"
+							value="Sabtu"
+							class="checkbox"
+						/>Sabtu</label
+					>
+				</fieldset>
+				<label for="jamMulai" class="label">Jam Mulai</label>
 				<input type="time" name="jamMulai" id="jamMulai" class="input w-full" />
-				<label for="jamSelesai">Jam Selesai</label>
+				<label for="jamSelesai" class="label">Jam Selesai</label>
 				<input type="time" name="jamSelesai" id="jamSelesai" class="input w-full" />
 				<button type="submit" class="btn btn-success">Tambah Jadwal</button>
 			</form>
@@ -167,8 +223,8 @@
 						<tr class="hover:bg-base-300">
 							<th>{i + 1}</th>
 							<td>{jadwal.guru.user.nama}</td>
-							<td>{jadwal.kelas}</td>
-							<td>{jadwal.kitab}</td>
+							<td>{jadwal.kelas.namaKelas}</td>
+							<td>{jadwal.kitab.namaKitab}</td>
 							<td>{jadwal.hari}</td>
 							<td>{jadwal.jamMulai}</td>
 							<td>{jadwal.jamSelesai}</td>
