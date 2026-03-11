@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
-	import { success } from 'zod/v4';
 	import type { PageServerData, ActionData } from './$types';
 	let { data, form }: { data: PageServerData; form: ActionData } = $props();
 	let tambahData: HTMLDialogElement | undefined;
@@ -9,7 +8,7 @@
 <svelte:head>
 	<title>Menu Kelas: Tambah Santri</title>
 </svelte:head>
-<div>
+<!-- <div>
 	<h1>Tambah Santri</h1>
 	<div>
 		<button class="btn btn-primary" onclick={() => tambahData?.showModal()}> Tambah Data</button>
@@ -49,8 +48,8 @@
 			<button>close</button>
 		</form>
 	</dialog>
-</div>
-<div>
+</div> -->
+<!-- <div>
 	<h2>List Santri</h2>
 	<table class="table">
 		<thead>
@@ -74,4 +73,21 @@
 			{/each}
 		</tbody>
 	</table>
+</div> -->
+<div class="card">
+	<h2 class="card-title">Tambah Santri untuk Kelas {data.kelas.namaKelas}</h2>
+	<div class="card-body">
+		<form action="?/create" method="post">
+			<fieldset class="fieldset flex flex-col md:flex-row md:flex-wrap">
+				<legend class="fieldset-legend"> List Santri </legend>
+				{#each data.santriTanpaKelas as santri, i (santri.id)}
+					<label class="">
+						<input type="checkbox" name="idSantri" value={santri.id} class="checkbox" />
+						{santri.user.nama}
+					</label>
+				{/each}
+			</fieldset>
+			<button type="submit" class="btn btn-success mt-4 w-full">Tambah Santri</button>
+		</form>
+	</div>
 </div>
