@@ -1,5 +1,12 @@
-<script>
+<script lang="ts">
 	import { page } from '$app/state';
+
+	const isActive = (currentPath: string, menuHref: string) => {
+		if (menuHref === '/') {
+			return currentPath === '/';
+		}
+		return currentPath.startsWith(menuHref);
+	};
 
 	let listMenu = [
 		{ href: '/dashboard', nama: 'Dashboard' },
@@ -17,6 +24,8 @@
 
 {#each listMenu as menu}
 	<li class="font-medium">
-		<a href={menu.href} class={menu.href === page.url.pathname ? 'menu-active' : ''}>{menu.nama}</a>
+		<a href={menu.href} class={isActive(page.url.pathname, menu.href) ? 'menu-active' : ''}
+			>{menu.nama}</a
+		>
 	</li>
 {/each}
