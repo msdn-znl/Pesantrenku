@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
+	import Breadcrumbs from '$lib/components/Breadcrumbs.svelte';
 	import SideMenuItemsAdmin from '$lib/components/SideMenuItemsAdmin.svelte';
 	import SideMenuItemsGuru from '$lib/components/SideMenuItemsGuru.svelte';
 	let { children, data } = $props();
@@ -30,6 +31,7 @@
 		</form>
 	</nav>
 	<main class="p-6">
+		<Breadcrumbs />
 		{@render children()}
 	</main>
 </div>
