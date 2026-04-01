@@ -11,13 +11,14 @@ import {
 	boolean,
 	index
 } from 'drizzle-orm/pg-core';
+
 import { relations } from 'drizzle-orm';
 
 // Enums defined for PostgreSQL
-export const userRoleEnum = pgEnum('user_role', ['admin', 'guru', 'santri']);
 export const statusEnum = pgEnum('status', ['aktif', 'inaktif']);
 export const santriStatusEnum = pgEnum('santri_status', ['aktif', 'lulus', 'keluar']);
 export const tipeKelasEnum = pgEnum('tipe_kelas', ['diniyah', 'quran']);
+
 export const dayEnum = pgEnum('day', [
 	'Minggu',
 	'Senin',
@@ -27,6 +28,7 @@ export const dayEnum = pgEnum('day', [
 	'Jumat',
 	'Sabtu'
 ]);
+
 export const pertemuanStatusEnum = pgEnum('pertemuan_status', [
 	'selesai',
 	'batal',
@@ -34,6 +36,7 @@ export const pertemuanStatusEnum = pgEnum('pertemuan_status', [
 ]);
 export const kehadiranSantriEnum = pgEnum('kehadiran_santri', ['hadir', 'alfa', 'izin', 'sakit']);
 export const kehadiranGuruEnum = pgEnum('kehadiran_guru', ['hadir', 'tidak hadir']);
+export const tipeSemester = pgEnum('tipe_semester', ['ganjil', 'genap']);
 
 // Timestamp
 const timestampColumns = {
@@ -45,9 +48,7 @@ const timestampColumns = {
 };
 
 // Soft Delete
-const softDeleteColumn = {
-	deletedAt: timestamp('deleted_at')
-};
+const softDeleteColumn = { deletedAt: timestamp('deleted_at') };
 
 // User, Account, Session table definition
 export const user = pgTable('user', {
@@ -60,7 +61,7 @@ export const user = pgTable('user', {
 	createdAt: timestamp('created_at').defaultNow().notNull(),
 	updatedAt: timestamp('updated_at')
 		.defaultNow()
-		.$onUpdate(() => /* @__PURE__ */ new Date())
+		.$onUpdate((/* @__PURE__ */) => new Date())
 		.notNull(),
 	role: text('role'),
 	banned: boolean('banned').default(false),
@@ -76,7 +77,7 @@ export const session = pgTable(
 		token: text('token').notNull().unique(),
 		createdAt: timestamp('created_at').defaultNow().notNull(),
 		updatedAt: timestamp('updated_at')
-			.$onUpdate(() => /* @__PURE__ */ new Date())
+			.$onUpdate((/* @__PURE__ */) => new Date())
 			.notNull(),
 		ipAddress: text('ip_address'),
 		userAgent: text('user_agent'),
@@ -106,7 +107,7 @@ export const account = pgTable(
 		password: text('password'),
 		createdAt: timestamp('created_at').defaultNow().notNull(),
 		updatedAt: timestamp('updated_at')
-			.$onUpdate(() => /* @__PURE__ */ new Date())
+			.$onUpdate((/* @__PURE__ */) => new Date())
 			.notNull()
 	},
 	(table) => [index('account_userId_idx').on(table.userId)]
@@ -122,7 +123,7 @@ export const verification = pgTable(
 		createdAt: timestamp('created_at').defaultNow().notNull(),
 		updatedAt: timestamp('updated_at')
 			.defaultNow()
-			.$onUpdate(() => /* @__PURE__ */ new Date())
+			.$onUpdate((/* @__PURE__ */) => new Date())
 			.notNull()
 	},
 	(table) => [index('verification_identifier_idx').on(table.identifier)]
@@ -136,28 +137,27 @@ export const userRelations = relations(user, ({ many, one }) => ({
 }));
 
 export const sessionRelations = relations(session, ({ one }) => ({
-	user: one(user, {
-		fields: [session.userId],
-		references: [user.id]
-	})
+	user: one(user, { fields: [session.userId], references: [user.id] })
 }));
 
 export const accountRelations = relations(account, ({ one }) => ({
-	user: one(user, {
-		fields: [account.userId],
-		references: [user.id]
-	})
+	user: one(user, { fields: [account.userId], references: [user.id] })
 }));
 
 // Academic Year table definition
-
-export const tahun_ajaran = pgTable('tahun_ajaran', {
-	id: char('id', { length: 26 }).primaryKey(),
-	tahunAjaran: text('tahun_ajaran').notNull().unique(),
-	isActive: boolean('is_active').default(false),
-	...softDeleteColumn,
-	...timestampColumns
-});
+export const tahun_ajaran = pgTable(
+	'tahun_ajaran',
+	{
+		id: char('id', { length: 26 }).primaryKey(),
+		tahunMulai: integer('tahunMulai'),
+		tahunSelesai: integer('tahunSelesai'),
+		tipeSemester: tipeSemester('tipe_semester'),
+		isActive: boolean('is_active').default(false),
+		...softDeleteColumn,
+		...timestampColumns
+	},
+	(t) => [unique().on(t.tahunMulai, t.tahunSelesai, t.tipeSemester)]
+);
 
 export const tahunAjaranRelations = relations(tahun_ajaran, ({ many }) => ({
 	kelas: many(kelas),
@@ -168,7 +168,6 @@ export const tahunAjaranRelations = relations(tahun_ajaran, ({ many }) => ({
 // Kamar table definition
 export const kamar = pgTable('kamar', {
 	id: char('id', { length: 26 }).primaryKey(),
-
 	namaKamar: text('nama_kamar').notNull(),
 	...timestampColumns
 });
@@ -178,14 +177,12 @@ export const kamarRelations = relations(kamar, ({ many }) => ({
 }));
 
 // Profile table definition
-
 export const santri = pgTable('santri', {
 	id: char('id', { length: 26 }).primaryKey(),
 	nomorIndukSantri: text('nomor_induk_santri').unique(),
 	nomorTelepon: text('nomor_telepon'),
 	tempatLahir: text('tempat_lahir'),
 	tanggalLahir: date('tanggal_lahir'),
-
 	userId: char('user_id', { length: 26 })
 		.notNull()
 		.unique()
@@ -204,9 +201,7 @@ export const pendaftaran_santri = pgTable(
 		tahunAjaranId: char('tahun_ajaran_id', { length: 26 })
 			.notNull()
 			.references(() => tahun_ajaran.id, { onDelete: 'restrict' }),
-		kamarId: char('kamar_id', { length: 26 }).references(() => kamar.id, {
-			onDelete: 'set null'
-		}),
+		kamarId: char('kamar_id', { length: 26 }).references(() => kamar.id, { onDelete: 'set null' }),
 		status: santriStatusEnum('status').default('aktif').notNull(),
 		tanggalMasuk: date('tanggal_masuk'),
 		tanggalKeluar: date('tanggal_keluar'),
@@ -248,25 +243,16 @@ export const penugasan_guru = pgTable(
 );
 
 export const guruRelations = relations(guru, ({ one, many }) => ({
-	user: one(user, {
-		fields: [guru.userId],
-		references: [user.id]
-	}),
+	user: one(user, { fields: [guru.userId], references: [user.id] }),
 	jadwal: many(jadwal),
 	absensi_guru_utama: many(absensi_guru, { relationName: 'absensiGuru_guru' }),
 	absensi_guru_pengganti: many(absensi_guru, { relationName: 'absensiGuru_guruPengganti' }),
-	kelas: one(kelas, {
-		fields: [guru.id],
-		references: [kelas.waliKelasId]
-	}),
+	kelas: one(kelas, { fields: [guru.id], references: [kelas.waliKelasId] }),
 	penugasan_guru: many(penugasan_guru)
 }));
 
 export const santriRelations = relations(santri, ({ one, many }) => ({
-	user: one(user, {
-		fields: [santri.userId],
-		references: [user.id]
-	}),
+	user: one(user, { fields: [santri.userId], references: [user.id] }),
 	kelas_santri: many(kelas_santri),
 	absensi_santri: many(absensi_santri),
 	pendaftaran_santri: many(pendaftaran_santri)
@@ -277,21 +263,16 @@ export const pendaftaranSantriRelations = relations(pendaftaran_santri, ({ one }
 		fields: [pendaftaran_santri.santriId],
 		references: [santri.id]
 	}),
+
 	tahun_ajaran: one(tahun_ajaran, {
 		fields: [pendaftaran_santri.tahunAjaranId],
 		references: [tahun_ajaran.id]
 	}),
-	kamar: one(kamar, {
-		fields: [pendaftaran_santri.kamarId],
-		references: [kamar.id]
-	})
+	kamar: one(kamar, { fields: [pendaftaran_santri.kamarId], references: [kamar.id] })
 }));
 
 export const penugasanGuruRelations = relations(penugasan_guru, ({ one }) => ({
-	guru: one(guru, {
-		fields: [penugasan_guru.guruId],
-		references: [guru.id]
-	}),
+	guru: one(guru, { fields: [penugasan_guru.guruId], references: [guru.id] }),
 	tahun_ajaran: one(tahun_ajaran, {
 		fields: [penugasan_guru.tahunAjaranId],
 		references: [tahun_ajaran.id]
@@ -299,7 +280,6 @@ export const penugasanGuruRelations = relations(penugasan_guru, ({ one }) => ({
 }));
 
 // Pelajaran table definition
-
 export const kitab = pgTable('kitab', {
 	id: char('id', { length: 26 }).primaryKey(),
 	namaKitab: text('nama_kitab').notNull(),
@@ -308,17 +288,13 @@ export const kitab = pgTable('kitab', {
 	...timestampColumns
 });
 
-export const kitabRelations = relations(kitab, ({ many }) => ({
-	jadwal: many(jadwal)
-}));
+export const kitabRelations = relations(kitab, ({ many }) => ({ jadwal: many(jadwal) }));
 
 // Kelas table definition
-
 export const kelas = pgTable(
 	'kelas',
 	{
 		id: char('id', { length: 26 }).primaryKey(),
-
 		namaKelas: text('nama_kelas').notNull(),
 		tahunAjaranId: char('tahun_ajaran_id', { length: 26 }).references(() => tahun_ajaran.id, {
 			onDelete: 'cascade'
@@ -354,34 +330,20 @@ export const kelas_santri = pgTable(
 
 export const kelasRelations = relations(kelas, ({ many, one }) => ({
 	kelas_santri: many(kelas_santri),
-	tahun_ajaran: one(tahun_ajaran, {
-		fields: [kelas.tahunAjaranId],
-		references: [tahun_ajaran.id]
-	}),
-	guru: one(guru, {
-		fields: [kelas.waliKelasId],
-		references: [guru.id]
-	})
+	tahun_ajaran: one(tahun_ajaran, { fields: [kelas.tahunAjaranId], references: [tahun_ajaran.id] }),
+	guru: one(guru, { fields: [kelas.waliKelasId], references: [guru.id] })
 }));
 
 export const kelasSantriRelations = relations(kelas_santri, ({ one }) => ({
-	kelas: one(kelas, {
-		fields: [kelas_santri.kelasId],
-		references: [kelas.id]
-	}),
-	santri: one(santri, {
-		fields: [kelas_santri.santriId],
-		references: [santri.id]
-	})
+	kelas: one(kelas, { fields: [kelas_santri.kelasId], references: [kelas.id] }),
+	santri: one(santri, { fields: [kelas_santri.santriId], references: [santri.id] })
 }));
 
 // Jadwal table definition
-
 export const jadwal = pgTable(
 	'jadwal',
 	{
 		id: char('id', { length: 26 }).primaryKey(),
-
 		kitabId: char('kitab_id', { length: 26 })
 			.notNull()
 			.references(() => kitab.id),
@@ -401,6 +363,7 @@ export const jadwal = pgTable(
 	},
 	(t) => [unique().on(t.kelasId, t.hari, t.jamMulai), unique().on(t.guruId, t.hari, t.jamMulai)]
 );
+
 export const jadwalRelations = relations(jadwal, ({ one, many }) => ({
 	kitab: one(kitab, { fields: [jadwal.kitabId], references: [kitab.id] }),
 	kelas: one(kelas, { fields: [jadwal.kelasId], references: [kelas.id] }),
@@ -409,12 +372,10 @@ export const jadwalRelations = relations(jadwal, ({ one, many }) => ({
 }));
 
 // Pertemuan, Absensi table definition
-
 export const pertemuan = pgTable(
 	'pertemuan',
 	{
 		id: char('id', { length: 26 }).primaryKey(),
-
 		jadwalId: char('jadwal_id', { length: 26 })
 			.notNull()
 			.references(() => jadwal.id, { onDelete: 'cascade' }),
@@ -434,7 +395,6 @@ export const absensi_santri = pgTable(
 	'absensi_santri',
 	{
 		id: char('id', { length: 26 }).primaryKey(),
-
 		pertemuanId: char('pertemuan_id', { length: 26 })
 			.notNull()
 			.references(() => pertemuan.id, { onDelete: 'cascade' }),
@@ -459,7 +419,6 @@ export const absensi_guru = pgTable(
 	'absensi_guru',
 	{
 		id: char('id', { length: 26 }).primaryKey(),
-
 		pertemuanId: char('pertemuan_id', { length: 26 })
 			.notNull()
 			.references(() => pertemuan.id, { onDelete: 'cascade' }),
@@ -510,6 +469,7 @@ export const rekap_absensi_santri = pgTable(
 		index('idx_rekap_santri_bulan_tahun').on(t.santriId, t.bulan, t.tahun)
 	]
 );
+
 export const rekap_absensi_guru = pgTable(
 	'rekap_absensi_guru',
 	{
@@ -535,10 +495,7 @@ export const rekap_absensi_guru = pgTable(
 );
 
 export const pertemuanRelations = relations(pertemuan, ({ one, many }) => ({
-	jadwal: one(jadwal, {
-		fields: [pertemuan.jadwalId],
-		references: [jadwal.id]
-	}),
+	jadwal: one(jadwal, { fields: [pertemuan.jadwalId], references: [jadwal.id] }),
 	absensi_santri: many(absensi_santri),
 	absensi_guru: many(absensi_guru)
 }));
@@ -548,14 +505,8 @@ export const absensiSantriRelations = relations(absensi_santri, ({ one }) => ({
 		fields: [absensi_santri.pertemuanId],
 		references: [pertemuan.id]
 	}),
-	santri: one(santri, {
-		fields: [absensi_santri.santriId],
-		references: [santri.id]
-	}),
-	recordedBy: one(user, {
-		fields: [absensi_santri.recordedBy],
-		references: [user.id]
-	})
+	santri: one(santri, { fields: [absensi_santri.santriId], references: [santri.id] }),
+	recordedBy: one(user, { fields: [absensi_santri.recordedBy], references: [user.id] })
 }));
 
 export const absensiGuruRelations = relations(absensi_guru, ({ one }) => ({
@@ -563,20 +514,19 @@ export const absensiGuruRelations = relations(absensi_guru, ({ one }) => ({
 		fields: [absensi_guru.pertemuanId],
 		references: [pertemuan.id]
 	}),
+
 	guru: one(guru, {
 		relationName: 'absensiGuru_guru',
 		fields: [absensi_guru.guruId],
 		references: [guru.id]
 	}),
+
 	guruPengganti: one(guru, {
 		relationName: 'absensiGuru_guruPengganti',
 		fields: [absensi_guru.guruPenggantiId],
 		references: [guru.id]
 	}),
-	recordedBy: one(user, {
-		fields: [absensi_guru.recordedBy],
-		references: [user.id]
-	})
+	recordedBy: one(user, { fields: [absensi_guru.recordedBy], references: [user.id] })
 }));
 
 export const rekapSantriRelations = relations(rekap_absensi_santri, ({ one }) => ({
@@ -588,6 +538,7 @@ export const rekapSantriRelations = relations(rekap_absensi_santri, ({ one }) =>
 
 // Type Exports
 export type Session = typeof session.$inferSelect;
+
 export type User = typeof user.$inferSelect;
 export type Santri = typeof santri.$inferSelect;
 export type Guru = typeof guru.$inferSelect;
