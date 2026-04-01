@@ -1,12 +1,9 @@
-import { verify } from '@node-rs/argon2';
 import { fail, redirect } from '@sveltejs/kit';
-import { eq } from 'drizzle-orm';
-import * as auth from '$lib/server/auth';
-import { db } from '$lib/server/db';
-import * as table from '$lib/server/db/schema';
+import { auth } from '$lib/server/auth';
 import type { Actions, PageServerLoad } from './$types';
 import { LoginUserFormSchema } from '$lib/server/form-validation/user';
 import * as z from 'zod/v4';
+import { APIError } from 'better-auth/api';
 
 export const load: PageServerLoad = async (event) => {
 	if (event.locals.user && event.locals.user.role === 'admin') {
@@ -33,32 +30,25 @@ export const actions: Actions = {
 		}
 		const username = validationResult.data.username;
 		const password = validationResult.data.password;
-
-		const results = await db.select().from(table.users).where(eq(table.users.username, username));
-
-		const existingUser = results.at(0);
-		if (!existingUser) {
-			return fail(400, { message: 'Incorrect username or password' });
+		let role;
+		try {
+			const response = await auth.api.signInEmail({
+				body: {
+					email: username,
+					password: password
+				}
+			});
+			role = response.user.role;
+		} catch (error) {
+			if (error instanceof APIError) {
+				return fail(400, { message: error.message || 'Signin failed' });
+			}
+			console.error(error);
+			return fail(500, { message: 'Unexpected error' });
 		}
-
-		const validPassword = await verify(existingUser.passwordHash, password, {
-			memoryCost: 19456,
-			timeCost: 2,
-			outputLen: 32,
-			parallelism: 1
-		});
-		if (!validPassword) {
-			return fail(400, { message: 'Incorrect username or password' });
-		}
-
-		const sessionToken = auth.generateSessionToken();
-		const session = await auth.createSession(sessionToken, existingUser.id);
-		auth.setSessionTokenCookie(event, sessionToken, session.expiresAt);
-
-		if (existingUser.role === 'admin') {
+		if (role === 'admin') {
 			return redirect(302, '/dashboard');
-		}
-		if (existingUser.role === 'guru') {
+		} else if (role === 'guru') {
 			return redirect(302, '/dashboard-guru');
 		}
 	}

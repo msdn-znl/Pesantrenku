@@ -1,4 +1,4 @@
-import * as auth from '$lib/server/auth';
+import { auth } from '$lib/server/auth';
 import { fail, redirect } from '@sveltejs/kit';
 import type { Actions, RequestEvent } from './$types';
 
@@ -7,9 +7,9 @@ export const actions: Actions = {
 		if (!event.locals.session) {
 			return fail(401);
 		}
-		await auth.invalidateSession(event.locals.session.id);
-		auth.deleteSessionTokenCookie(event);
-
+		await auth.api.signOut({
+			headers: event.request.headers
+		});
 		return redirect(302, '/login');
 	}
 };
