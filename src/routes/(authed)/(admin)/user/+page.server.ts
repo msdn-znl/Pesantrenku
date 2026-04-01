@@ -1,9 +1,8 @@
 import { hash } from '@node-rs/argon2';
 // import { encodeBase32LowerCase } from '@oslojs/encoding';
-// import * as auth from '$lib/server/auth';
 import * as table from '$lib/server/db/schema';
 import { db } from '$lib/server/db';
-import { eq, inArray } from 'drizzle-orm';
+import { eq, inArray, isNull } from 'drizzle-orm';
 import type { Actions, PageServerLoad, RequestEvent } from './$types';
 import { fail, error } from '@sveltejs/kit';
 import {
@@ -18,12 +17,13 @@ export const load: PageServerLoad = async () => {
 	try {
 		const userList = await db
 			.select({
-				id: table.users.id,
-				nama: table.users.nama,
-				username: table.users.username,
-				role: table.users.role
+				id: table.user.id,
+				nama: table.user.name,
+				username: table.user.email,
+				role: table.user.role
 			})
-			.from(table.users);
+			.from(table.user)
+			.where(isNull(table.user.deletedAt));
 		return { userList };
 	} catch (err) {
 		console.error(err);
@@ -52,10 +52,18 @@ export const actions: Actions = {
 
 		if (validation.data.role === 'santri') {
 			const tahun = getTahunSekarang();
-			let urutan = await db.$count(table.santri, eq(table.santri.tahunMasuk, tahun));
+			const tahunAjaranSubQuery = db
+				.select({ id: table.tahun_ajaran.id })
+				.from(table.tahun_ajaran)
+				.where(eq(table.tahun_ajaran.isActive, true));
+			let urutan = await db.$count(
+				table.pendaftaran_santri,
+				eq(table.pendaftaran_santri.tahunAjaranId, tahunAjaranSubQuery)
+			);
 			console.log(urutan);
-			const userToInsert: (typeof table.users.$inferInsert)[] = [];
-			const santriToInsert: (typeof table.santri.$inferInsert)[] = [];
+			const userData: (typeof table.user.$inferInsert)[] = [];
+			const santriData: (typeof table.santri.$inferInsert)[] = [];
+			const accountData: (typeof table.account.$inferInsert)[] = [];
 			const listSantri = validation.data.nama
 				.split(/\r?\n/)
 				.map((nama) => nama.trim())
@@ -64,6 +72,7 @@ export const actions: Actions = {
 				urutan += 1;
 				const userId = generateId();
 				const santriId = generateId();
+				const accountId = generateId();
 				const NIS = generateNIS(validation.data.tipe, tahun, urutan.toString());
 
 				const password = await hash(NIS, {
@@ -72,30 +81,39 @@ export const actions: Actions = {
 					outputLen: 32,
 					parallelism: 1
 				});
-				userToInsert.push({
+				userData.push({
 					id: userId,
-					username: NIS,
-					passwordHash: password,
-					nama: santri,
+					email: NIS,
+					name: santri,
 					role: validation.data.role
 				});
-				santriToInsert.push({
+				santriData.push({
 					id: santriId,
 					userId: userId,
-					nomorIndukSantri: NIS,
-					tahunMasuk: tahun
+					nomorIndukSantri: NIS
+				});
+				accountData.push({
+					id: accountId,
+					accountId: userId,
+					userId: userId,
+					providerId: 'credential',
+					password: password
 				});
 			}
-			console.log(userToInsert);
-			console.log(santriToInsert);
+			console.log('UserData:', userData);
+			console.log('AccountData:', accountData);
+			console.log('SantriData:', santriData);
 			// Insert Data Santri ke Database
 
 			await db.transaction(async (tx) => {
-				if (userToInsert.length > 0) {
-					await tx.insert(table.users).values(userToInsert);
+				if (userData.length > 0) {
+					await tx.insert(table.user).values(userData);
 				}
-				if (santriToInsert.length > 0) {
-					await tx.insert(table.santri).values(santriToInsert);
+				if (santriData.length > 0) {
+					await tx.insert(table.santri).values(santriData);
+				}
+				if (accountData.length > 0) {
+					await tx.insert(table.account).values(accountData);
 				}
 			});
 		} else if (validation.data.role === 'guru') {
@@ -104,12 +122,14 @@ export const actions: Actions = {
 				.split(/\r?\n/)
 				.map((nama) => nama.trim())
 				.filter(Boolean);
-			const userToInsert: (typeof table.users.$inferInsert)[] = [];
-			const guruToInsert: (typeof table.guru.$inferInsert)[] = [];
+			const userData: (typeof table.user.$inferInsert)[] = [];
+			const guruData: (typeof table.guru.$inferInsert)[] = [];
+			const accountData: (typeof table.account.$inferInsert)[] = [];
 			for (const guru of listGuru) {
 				urutan += 1;
 				const userId = generateId();
 				const guruId = generateId();
+				const accountId = generateId();
 				const NIG = urutan.toString().padStart(3, '0');
 				const password = await hash(NIG, {
 					memoryCost: 19456,
@@ -117,130 +137,88 @@ export const actions: Actions = {
 					outputLen: 32,
 					parallelism: 1
 				});
-				userToInsert.push({
+				userData.push({
 					id: userId,
-					username: NIG,
-					passwordHash: password,
-					nama: guru,
+					email: NIG,
+					name: guru,
 					role: validation.data.role
 				});
-				guruToInsert.push({
+				guruData.push({
 					id: guruId,
 					userId: userId,
 					nomorIndukGuru: NIG
 				});
+				accountData.push({
+					id: accountId,
+					accountId: userId,
+					userId: userId,
+					providerId: 'credential',
+					password: password
+				});
 			}
-			console.log(userToInsert && guruToInsert);
+			console.log('UserData:', userData);
+			console.log('AccountData:', accountData);
+			console.log('GuruData:', guruData);
 			// Insert data Guru ke Database
 			await db.transaction(async (tx) => {
-				if (userToInsert.length > 0) {
-					await tx.insert(table.users).values(userToInsert);
+				if (userData.length > 0) {
+					await tx.insert(table.user).values(userData);
 				}
-				if (guruToInsert.length > 0) {
-					await tx.insert(table.guru).values(guruToInsert);
+				if (guruData.length > 0) {
+					await tx.insert(table.guru).values(guruData);
+				}
+				if (accountData.length > 0) {
+					await tx.insert(table.account).values(accountData);
 				}
 			});
 		} else {
 			const userId = generateId();
-			const hashedPassword = await hash(validation.data.password, {
+			const accountId = generateId();
+			const password = await hash(validation.data.password, {
 				memoryCost: 19456,
 				timeCost: 2,
 				outputLen: 32,
 				parallelism: 1
 			});
-			const data: typeof table.users.$inferInsert = {
+			const userData: typeof table.user.$inferInsert = {
 				id: userId,
 				role: validation.data.role,
-				username: validation.data.username,
-				passwordHash: hashedPassword,
-				nama: validation.data.nama
+				email: validation.data.username,
+				name: validation.data.nama
 			};
-			console.log(data);
-			await db.insert(table.users).values(data);
-		}
-	},
-	create: async (event: RequestEvent) => {
-		const formData = await event.request.formData();
-		const newUsername = formData.get('username');
-		if (!newUsername || typeof newUsername !== 'string') {
-			return fail(400, { message: 'no username provided' });
-		}
-		const result = await db.select().from(table.users).where(eq(table.users.username, newUsername));
-
-		const existingUser = result.at(0);
-		if (existingUser) {
-			return fail(422, { message: 'username sudah ada di database, gunakan username lain' });
-		}
-		const userFormData = Object.fromEntries(
-			Array.from(formData.keys()).map((key) => [
-				key,
-				formData.getAll(key).length > 1 ? formData.getAll(key) : formData.get(key)
-			])
-		);
-		const validationResult = CreateUserSchema.safeParse(userFormData);
-		if (!validationResult.success) {
-			console.log(validationResult.error);
-			return fail(422, {
-				message: 'Data yang anda masukkan salah',
-				error: z.prettifyError(validationResult.error),
-				data: userFormData
-			});
-		}
-
-		const { username, password, nama, role } = validationResult.data;
-		// Generate Id dan hash password
-		const userId = generateId();
-		const id = generateId();
-		const passwordHash = await hash(password, {
-			// recommended minimum parameters
-			memoryCost: 19456,
-			timeCost: 2,
-			outputLen: 32,
-			parallelism: 1
-		});
-
-		try {
+			const accountData: typeof table.account.$inferInsert = {
+				id: accountId,
+				accountId: userId,
+				userId: userId,
+				providerId: 'credential',
+				password: password
+			};
+			console.log('UserData:', userData);
+			console.log('AccountData:', accountData);
 			await db.transaction(async (tx) => {
-				await tx.insert(table.users).values({ id: userId, username, passwordHash, role, nama });
-				if (role === 'guru') {
-					await tx.insert(table.guru).values({ id: id, userId: userId });
-				} else if (role === 'santri') {
-					await tx.insert(table.santri).values({ id: id, userId: userId });
+				if (userData) {
+					await tx.insert(table.user).values(userData);
+				}
+				if (accountData) {
+					await tx.insert(table.account).values(accountData);
 				}
 			});
-			return { success: true, message: 'Berhasil Menambahkan Data' };
-		} catch (error) {
-			console.error(error);
-			return fail(500, { message: 'An error has occurred' });
 		}
 	},
 
-	delete: async (event: RequestEvent) => {
-		const formData = await event.request.formData();
-		const id = formData.get('id');
-		if (!id) {
-			return fail(400, { message: 'userId  tidak ada' });
-		}
-		if (typeof id !== 'string') {
-			return fail(400, { message: 'userId tidak valid' });
-		}
-		try {
-			await db.delete(table.users).where(eq(table.users.id, id));
-			return { success: true, message: 'Berhasil Dihapus' };
-		} catch (err) {
-			console.error(err);
-			return fail(500, { message: 'An error occured ' });
-		}
-	},
 	hapus: async (event: RequestEvent) => {
 		const formData = await event.request.formData();
 		const listId = formData.getAll('id');
+		const timestamp = new Date();
 		const validation = DeleteUserSchema.safeParse(listId);
 		if (!validation.success) {
 			return fail(400, { message: 'userId  tidak ada' });
 		}
 		try {
-			await db.delete(table.users).where(inArray(table.users.id, validation.data.id));
+			await db
+				.update(table.user)
+				.set({ deletedAt: timestamp })
+				.where(inArray(table.user.id, validation.data.id));
 		} catch (err) {
 			console.error(err);
 			return fail(500, { message: 'An error occured ' });
@@ -261,33 +239,6 @@ export const actions: Actions = {
 				error: z.prettifyError(result.error),
 				data: userData
 			});
-		}
-
-		const { username, password, nama, role, id } = result.data;
-		const updatedData: {
-			username: string;
-			nama: string;
-			role?: 'admin' | 'guru' | 'santri' | undefined;
-			passwordHash?: string;
-		} = { username, nama, role };
-		if (password) {
-			const passwordHash = await hash(password, {
-				// recommended minimum parameters
-				memoryCost: 19456,
-				timeCost: 2,
-				outputLen: 32,
-				parallelism: 1
-			});
-			updatedData.passwordHash = passwordHash;
-		}
-		console.log(updatedData);
-
-		try {
-			await db.update(table.users).set(updatedData).where(eq(table.users.id, id));
-			return { success: true, message: 'Berhasil di-edit' };
-		} catch (err) {
-			console.error(err);
-			error(500, 'An error occured');
 		}
 	}
 };
