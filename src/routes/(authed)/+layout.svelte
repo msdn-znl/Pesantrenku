@@ -7,7 +7,12 @@
 </script>
 
 <div class="drawer-content">
-	<nav class="navbar bg-base-100 shadow-sm sticky top-0 z-30">
+	<nav
+		class="navbar
+  bg-base-100/90 text-base-content sticky top-0 z-30 flex h-16 w-full [transform:translate3d(0,0,0)] justify-center backdrop-blur transition-shadow duration-100 print:hidden
+  shadow-xs
+  "
+	>
 		<label for="app-drawer" class="btn btn-square btn-ghost lg:hidden">
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
