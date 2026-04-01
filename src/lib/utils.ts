@@ -1,6 +1,8 @@
-import { customAlphabet } from 'nanoid';
-const alphabet = '0123456789abcdefghijklmnopqrstuvwxyz';
-export const generateId = customAlphabet(alphabet, 15);
+import { ulid } from 'ulid';
+export const generateId = () => {
+	const id = ulid();
+	return id;
+};
 
 import type { Jadwal } from './server/db/schema';
 
