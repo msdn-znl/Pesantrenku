@@ -4,7 +4,7 @@
 import type { Actions, PageServerLoad } from './$types';
 import * as table from '$lib/server/db/schema';
 import { db } from '$lib/server/db';
-import { eq } from 'drizzle-orm';
+import { eq, isNull } from 'drizzle-orm';
 import type { RequestEvent } from './$types';
 import { fail, error } from '@sveltejs/kit';
 
@@ -14,13 +14,11 @@ export const load: PageServerLoad = async () => {
 			.select({
 				id: table.santri.id,
 				userId: table.santri.userId,
-				nama: table.users.nama,
-				tahun_masuk: table.santri.tahunMasuk,
-				status: table.santri.status,
-				kamar: table.santri.kamarId
+				nama: table.user.name
 			})
 			.from(table.santri)
-			.innerJoin(table.users, eq(table.santri.userId, table.users.id));
+			.where(isNull(table.santri.deletedAt))
+			.innerJoin(table.user, eq(table.santri.userId, table.user.id));
 		return { santriList };
 	} catch (err) {
 		console.error(err);
@@ -31,6 +29,7 @@ export const load: PageServerLoad = async () => {
 export const actions: Actions = {
 	delete: async (event: RequestEvent) => {
 		const formData = await event.request.formData();
+		const timestamp = new Date();
 		const userId = formData.get('id');
 		if (!userId) {
 			return fail(400, { message: 'userId  tidak ada' });
@@ -39,7 +38,10 @@ export const actions: Actions = {
 			return fail(400, { message: 'userId tidak valid' });
 		}
 		try {
-			await db.delete(table.santri).where(eq(table.santri.userId, userId));
+			await db
+				.update(table.santri)
+				.set({ deletedAt: timestamp })
+				.where(eq(table.santri.userId, userId));
 			return { success: true, message: 'Success' };
 		} catch (error) {
 			console.error(error);
