@@ -1,3 +1,5 @@
+import type { User, Session } from 'better-auth/minimal';
+
 // for information about these interfaces
 declare global {
 	namespace App {

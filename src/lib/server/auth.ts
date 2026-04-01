@@ -1,97 +1,45 @@
-import type { RequestEvent } from '@sveltejs/kit';
-import { eq, sql } from 'drizzle-orm';
-import { sha256 } from '@oslojs/crypto/sha2';
-import { encodeBase64url, encodeHexLowerCase } from '@oslojs/encoding';
+import { betterAuth } from 'better-auth/minimal';
+import { admin } from 'better-auth/plugins';
+import { drizzleAdapter } from 'better-auth/adapters/drizzle';
+import { sveltekitCookies } from 'better-auth/svelte-kit';
+import { env } from '$env/dynamic/private';
+import { getRequestEvent } from '$app/server';
 import { db } from '$lib/server/db';
-import * as table from '$lib/server/db/schema';
+import { hash, verify, type Options } from '@node-rs/argon2';
+import { ulid } from 'ulid';
 
-const DAY_IN_MS = 1000 * 60 * 60 * 24;
+const opts: Options = {
+	memoryCost: 19456,
+	timeCost: 2,
+	outputLen: 32,
+	parallelism: 1
+};
 
-export const sessionCookieName = 'auth-session';
-
-export function generateSessionToken() {
-	const bytes = crypto.getRandomValues(new Uint8Array(18));
-	const token = encodeBase64url(bytes);
-	return token;
+export async function hashPassword(password: string) {
+	const result = await hash(password, opts);
+	return result;
+}
+export async function verifyPassword(data: { password: string; hash: string }) {
+	const { password, hash } = data;
+	const result = await verify(hash, password, opts);
+	return result;
 }
 
-export async function createSession(token: string, userId: string) {
-	const sessionId = encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
-	const session: table.Session = {
-		id: sessionId,
-		userId,
-		expiresAt: new Date(Date.now() + DAY_IN_MS * 30)
-	};
-	await db.insert(table.session).values(session);
-	return session;
-}
-
-export async function validateSessionToken(token: string) {
-	const sessionId = encodeHexLowerCase(sha256(new TextEncoder().encode(token)));
-	const [result] = await db
-		.select({
-			// Adjust user table here to tweak returned data
-			user: {
-				id: table.users.id,
-				username: table.users.username,
-				role: table.users.role,
-				nama: table.users.nama,
-				roleId: sql<string | null>`CASE
-				WHEN ${table.users.role} = 'guru' THEN ${table.guru.id}
-				WHEN ${table.users.role} = 'santri' THEN ${table.santri.id}
-				ELSE NULL
-				END
-			`.as('role_id')
-			},
-			session: table.session
-		})
-		.from(table.session)
-		.innerJoin(table.users, eq(table.session.userId, table.users.id))
-		.leftJoin(table.guru, eq(table.users.id, table.guru.userId))
-		.leftJoin(table.santri, eq(table.users.id, table.santri.userId))
-		.where(eq(table.session.id, sessionId));
-
-	if (!result) {
-		return { session: null, user: null };
-	}
-	const { session, user } = result;
-
-	const sessionExpired = Date.now() >= session.expiresAt.getTime();
-	if (sessionExpired) {
-		await db.delete(table.session).where(eq(table.session.id, session.id));
-		return { session: null, user: null };
-	}
-
-	const renewSession = Date.now() >= session.expiresAt.getTime() - DAY_IN_MS * 15;
-	if (renewSession) {
-		session.expiresAt = new Date(Date.now() + DAY_IN_MS * 30);
-		await db
-			.update(table.session)
-			.set({ expiresAt: session.expiresAt })
-			.where(eq(table.session.id, session.id));
-	}
-
-	return { session, user };
-}
-
-export type SessionValidationResult = Awaited<ReturnType<typeof validateSessionToken>>;
-
-export async function invalidateSession(sessionId: string) {
-	await db.delete(table.session).where(eq(table.session.id, sessionId));
-}
-
-export function setSessionTokenCookie(event: RequestEvent, token: string, expiresAt: Date) {
-	event.cookies.set(sessionCookieName, token, {
-		expires: expiresAt,
-		path: '/',
-		httpOnly: true,
-		sameSite: 'lax',
-		secure: false
-	});
-}
-
-export function deleteSessionTokenCookie(event: RequestEvent) {
-	event.cookies.delete(sessionCookieName, {
-		path: '/'
-	});
-}
+export const auth = betterAuth({
+	baseURL: env.ORIGIN,
+	secret: env.BETTER_AUTH_SECRET,
+	database: drizzleAdapter(db, { provider: 'pg' }),
+	advanced: {
+		database: {
+			generateId: () => ulid()
+		}
+	},
+	emailAndPassword: {
+		enabled: true,
+		password: {
+			hash: hashPassword,
+			verify: verifyPassword
+		}
+	},
+	plugins: [sveltekitCookies(getRequestEvent), admin()] // make sure this is the last plugin in the array
+});
