@@ -19,12 +19,12 @@
 					<fieldset class="fieldset">
 						<label for="nama">Nama</label>
 						<input type="text" name="nama" id="nama" placeholder="Nama" class="input" required />
-						<label class="label" for="username"> Username </label>
+						<label class="label" for="username"> Email </label>
 						<input
 							name="username"
 							id="username"
 							placeholder="Username"
-							type="text"
+							type="email"
 							class="input"
 							required
 						/>
