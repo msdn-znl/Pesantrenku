@@ -1,11 +1,11 @@
 <script lang="ts">
-	import type { PageServerData, PageProps } from './$types';
+	import type { PageServerData } from './$types';
 	import { enhance, applyAction } from '$app/forms';
 	import { invalidateAll } from '$app/navigation';
 	import { toast } from 'svelte-sonner';
 	type Guru = PageServerData['guruList'][number];
 
-	let { data }: { data: PageServerData; form: PageProps } = $props();
+	let { data }: { data: PageServerData } = $props();
 	let deleteGuruModal: HTMLDialogElement;
 	let editGuruModal: HTMLDialogElement;
 	let guruToDelete = $state<string | null>(null);
@@ -98,22 +98,6 @@
 						class="input w-full"
 						value={guruToEdit?.nomorTelepon}
 					/>
-					<label for="status"> Status </label>
-					<select name="status" id="status" class="select w-full">
-						{#if guruToEdit?.status === null}
-							<option value="" selected></option>
-							<option value="aktif">Aktif</option>
-							<option value="inaktif">Non Aktif</option>
-						{:else if guruToEdit?.status === 'aktif'}
-							<option value=""></option>
-							<option value="aktif" selected>Aktif</option>
-							<option value="inaktif">Non Aktif</option>
-						{:else if guruToEdit?.status === 'inaktif'}
-							<option value=""></option>
-							<option value="aktif">Aktif</option>
-							<option value="inaktif" selected>Non Aktif</option>
-						{/if}
-					</select>
 					<button type="submit" class="btn btn-success mt-4">Edit Data Guru</button>
 				</fieldset>
 			</form>
@@ -130,7 +114,6 @@
 				<th></th>
 				<th>Nama</th>
 				<th>Nomor Induk Guru</th>
-				<th>Status</th>
 				<th>Nomor Telepon</th>
 				<th>Action</th>
 			</tr>
@@ -141,7 +124,6 @@
 					<th>{i + 1}</th>
 					<td>{guru.nama}</td>
 					<td>{guru.nomorIndukGuru}</td>
-					<td>{guru.status}</td>
 					<td>{guru.nomorTelepon}</td>
 					<td>
 						<div>

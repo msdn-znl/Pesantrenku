@@ -4,7 +4,7 @@
 import type { Actions, PageServerLoad } from './$types';
 import * as table from '$lib/server/db/schema';
 import { db } from '$lib/server/db';
-import { eq } from 'drizzle-orm';
+import { eq, isNull } from 'drizzle-orm';
 import type { RequestEvent } from './$types';
 import { fail, error } from '@sveltejs/kit';
 import { GuruFormSchema } from '$lib/server/form-validation/guru';
@@ -15,13 +15,13 @@ export const load: PageServerLoad = async () => {
 		const guruList = await db
 			.select({
 				id: table.guru.userId,
-				nama: table.users.nama,
+				nama: table.user.name,
 				nomorIndukGuru: table.guru.nomorIndukGuru,
-				status: table.guru.status,
 				nomorTelepon: table.guru.nomorTelepon
 			})
 			.from(table.guru)
-			.innerJoin(table.users, eq(table.guru.userId, table.users.id));
+			.innerJoin(table.user, eq(table.guru.userId, table.user.id))
+			.where(isNull(table.guru.deletedAt));
 		return { guruList };
 	} catch (err) {
 		console.error(err);
@@ -66,8 +66,12 @@ export const actions: Actions = {
 		if (typeof userId !== 'string') {
 			return fail(400, { message: 'userId tidak valid' });
 		}
+		const timestamp = new Date();
 		try {
-			await db.delete(table.guru).where(eq(table.guru.userId, userId));
+			await db
+				.update(table.guru)
+				.set({ deletedAt: timestamp })
+				.where(eq(table.guru.userId, userId));
 			return { success: true, message: 'Berhasil dihapus' };
 		} catch (error) {
 			console.error(error);
