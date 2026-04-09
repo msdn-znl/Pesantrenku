@@ -12,9 +12,9 @@ export const load: PageServerLoad = async ({ params }) => {
 		const streamedPromises = {
 			kelasList: db.select().from(table.kelas),
 			guruList: db
-				.select({ id: table.guru.id, nama: table.users.nama })
+				.select({ id: table.guru.id, nama: table.user.name })
 				.from(table.guru)
-				.innerJoin(table.users, eq(table.guru.userId, table.users.id)), //harusnya tabel join antara guru dan user
+				.innerJoin(table.user, eq(table.guru.userId, table.user.id)), //harusnya tabel join antara guru dan user
 			kitabList: db.select().from(table.kitab)
 		};
 		const jadwal = db.query.jadwal.findFirst({
@@ -55,9 +55,10 @@ export const actions: Actions = {
 				data: jadwalData
 			});
 		}
+		const dataToUpdated: typeof table.jadwal.$inferInsert = validationResult.data;
 		// const { guruId, kelasId, kitabId, hari, jamMulai, jamSelesai } = validationResult.data;
 		try {
-			await db.update(table.jadwal).set(validationResult.data).where(eq(table.jadwal.id, jadwalId));
+			await db.update(table.jadwal).set(dataToUpdated).where(eq(table.jadwal.id, jadwalId));
 		} catch (err) {
 			console.error(err);
 			error(500, 'An error occured');

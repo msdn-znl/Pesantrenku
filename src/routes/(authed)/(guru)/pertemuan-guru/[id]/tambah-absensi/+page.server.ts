@@ -14,7 +14,7 @@ export const load: PageServerLoad = async ({ params }) => {
 			where: eq(table.absensi_santri.pertemuanId, id)
 		});
 		if (isDataExist) {
-			redirect(303, `/pertemuan-guru/${id}`);
+			redirect(303, `/(guru)/pertemuan-guru/${id}`);
 		}
 		const subqueryKelasId = db
 			.select({ kelasId: table.jadwal.kelasId })
@@ -27,7 +27,7 @@ export const load: PageServerLoad = async ({ params }) => {
 				santri: {
 					columns: { id: true },
 					with: {
-						user: { columns: { nama: true } }
+						user: { columns: { name: true } }
 					}
 				}
 			}
@@ -69,6 +69,6 @@ export const actions: Actions = {
 			console.error(err);
 			return fail(500, { message: 'Error saat menambahkan data ke database' });
 		}
-		return redirect(303, `/pertemuan-guru/${id}`);
+		return redirect(303, `/(guru)/pertemuan-guru/${id}`);
 	}
 };

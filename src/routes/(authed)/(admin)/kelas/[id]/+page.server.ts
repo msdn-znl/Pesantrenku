@@ -10,13 +10,13 @@ export const load: PageServerLoad = async ({ params }) => {
 	try {
 		const listSantri = await db.query.kelas_santri.findMany({
 			where: eq(table.kelas_santri.kelasId, id),
-			with: { santri: { with: { user: { columns: { nama: true } } }, columns: { userId: true } } }
+			with: { santri: { with: { user: { columns: { name: true } } }, columns: { userId: true } } }
 		});
 		const infoKelas = await db.query.kelas.findFirst({
 			where: eq(table.kelas.id, id),
 			with: {
-				guru: { with: { user: { columns: { nama: true } } }, columns: { userId: true } },
-				tahun_ajaran: { columns: { tahunAjaran: true } }
+				guru: { with: { user: { columns: { name: true } } }, columns: { userId: true } },
+				tahun_ajaran: true
 			}
 		});
 		return { listSantri, infoKelas };

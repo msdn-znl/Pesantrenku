@@ -15,7 +15,7 @@ export const load: PageServerLoad = async ({ params }) => {
 			with: {
 				santri: {
 					columns: { id: true },
-					with: { user: { columns: { nama: true } } }
+					with: { user: { columns: { name: true } } }
 				}
 			}
 		});

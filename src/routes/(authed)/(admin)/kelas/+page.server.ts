@@ -13,10 +13,13 @@ export const load: PageServerLoad = async () => {
 		const kelasList = await db.query.kelas.findMany({
 			with: {
 				tahun_ajaran: true,
-				guru: { with: { user: { columns: { nama: true } } } }
+				guru: { with: { user: { columns: { name: true } } } }
 			}
 		});
-		const tahunAjaranList = await db.select().from(table.tahun_ajaran);
+		const tahunAjaranList = await db
+			.select()
+			.from(table.tahun_ajaran)
+			.where(eq(table.tahun_ajaran.isActive, true));
 		return { kelasList, tahunAjaranList };
 	} catch (err) {
 		console.error(err);

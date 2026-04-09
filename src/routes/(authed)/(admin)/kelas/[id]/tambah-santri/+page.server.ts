@@ -1,6 +1,6 @@
 import * as table from '$lib/server/db/schema';
 import { db } from '$lib/server/db';
-import { eq, and, count, lt, sql, notInArray } from 'drizzle-orm';
+import { eq, and, sql, isNull, notExists } from 'drizzle-orm';
 import type { PageServerLoad, Actions, RequestEvent } from './$types';
 import { error, fail } from '@sveltejs/kit';
 import { generateId } from '$lib/utils';
@@ -12,63 +12,67 @@ export const load: PageServerLoad = async ({ params }) => {
 		error(404, 'Data not found');
 	}
 	try {
+		const kelas = await db.select().from(table.kelas).where(eq(table.kelas.id, id));
+		const sq = db
+			.select({ id: table.tahun_ajaran.id })
+			.from(table.tahun_ajaran)
+			.where(eq(table.tahun_ajaran.isActive, true));
 		// const santriWithoutClass = await db
 		// 	.select({
 		// 		id: table.santri.id,
-		// 		nama: table.users.nama,
-		// 		jumlahKelas: count(table.kelas_santri.kelasId),
-		// 		daftarKelas: sql<string[]>`array_agg(${table.kelas.namaKelas})`
+		// 		nama: table.user.name,
+		// 		nis: table.santri.nomorIndukSantri
 		// 	})
-		// 	.from(table.santri)
-		// 	.leftJoin(table.users, eq(table.santri.userId, table.users.id))
-		// 	.leftJoin(table.kelas_santri, eq(table.santri.id, table.kelas_santri.santriId))
-		// 	.leftJoin(table.kelas, eq(table.kelas_santri.kelasId, table.kelas.id))
-		// 	.groupBy(table.santri.id, table.users.id)
-		// 	.having(lt(count(table.kelas_santri.kelasId), 2));
-		// const santriWithClass = await db.query.kelas_santri.findMany({
-		// 	where: eq(table.kelas_santri.kelasId, id),
-		// 	with: {
-		// 		santri: {
-		// 			columns: {
-		// 				id: true
-		// 			},
-		// 			with: {
-		// 				user: {
-		// 					columns: {
-		// 						id: true,
-		// 						nama: true,
-		// 						username: true
-		// 					}
-		// 				}
-		// 			}
-		// 		}
-		// 	}
-		// });
-		//Logikanya adalah mencari dulu data yang ada di dalam tabel kelas_santri yang di join dengan tabel kelas(Subquery)
-		// baru kemudian data Santri dicari dengan negasi: Dimana id tidak ada di array kembalian subquery tadi
-		const kelas = await db.query.kelas.findFirst({
-			where: eq(table.kelas.id, id),
-			columns: { namaKelas: true, tipeKelas: true }
+		// 	.from(table.pendaftaran_santri) // ← start di sini
+		// 	.innerJoin(table.santri, eq(table.santri.id, table.pendaftaran_santri.santriId))
+		// 	.innerJoin(table.user, eq(table.user.id, table.santri.userId))
+		// 	.where(
+		// 		and(
+		// 			// filter 1: santri aktif di tahun ajaran ini
+		// 			eq(table.pendaftaran_santri.tahunAjaranId, sq),
+		// 			eq(table.pendaftaran_santri.status, 'aktif'),
+		// 			isNull(table.pendaftaran_santri.tanggalKeluar),
+
+		// 			// filter 2: belum terdaftar di kelas tertentu
+		// 			notExists(
+		// 				db
+		// 					.select({ one: sql`1` })
+		// 					.from(table.kelas_santri)
+		// 					.where(
+		// 						and(
+		// 							eq(table.kelas_santri.santriId, table.santri.id),
+		// 							eq(table.kelas_santri.kelasId, id) // ← filter ke kelas spesifik
+		// 						)
+		// 					)
+		// 			)
+		// 		)
+		// 	);
+		const santriTanpaKelas = await db.query.pendaftaran_santri.findMany({
+			columns: {},
+			with: {
+				santri: {
+					columns: { id: true, userId: true, nomorIndukSantri: true },
+					with: { user: { columns: { name: true } } }
+				}
+			},
+			where: (pendaftaran_santri) =>
+				and(
+					eq(pendaftaran_santri.tahunAjaranId, sq),
+					eq(pendaftaran_santri.status, 'aktif'),
+					isNull(pendaftaran_santri.tanggalKeluar),
+					notExists(
+						db
+							.select({ one: sql`1` })
+							.from(table.kelas_santri)
+							.where(
+								and(
+									eq(table.kelas_santri.santriId, table.pendaftaran_santri.santriId),
+									eq(table.kelas_santri.kelasId, id)
+								)
+							)
+					)
+				)
 		});
-		if (!kelas) {
-			error(404, { message: 'Kelas tidak ditemukan' });
-		}
-
-		const subqueryKelasSantri = db
-			.select({ id: table.kelas_santri.santriId })
-			.from(table.kelas_santri)
-			.innerJoin(table.kelas, eq(table.kelas_santri.kelasId, table.kelas.id))
-			.where(eq(table.kelas.tipeKelas, kelas?.tipeKelas));
-
-		const santriTanpaKelas = await db.query.santri.findMany({
-			where: and(
-				eq(table.santri.status, 'aktif'),
-				notInArray(table.santri.id, subqueryKelasSantri)
-			),
-			with: { user: { columns: { nama: true } } },
-			columns: { id: true }
-		});
-
 		return { santriTanpaKelas, kelas };
 	} catch (err) {
 		console.error(`Error saat mengambil data. Error:` + err);

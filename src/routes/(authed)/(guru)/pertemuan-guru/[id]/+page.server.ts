@@ -9,7 +9,7 @@ export const load: PageServerLoad = async ({ params }) => {
 	try {
 		const dataAbsensi = await db.query.absensi_santri.findMany({
 			where: eq(table.absensi_santri.pertemuanId, id),
-			with: { santri: { columns: {}, with: { user: { columns: { nama: true } } } } }
+			with: { santri: { columns: {}, with: { user: { columns: { name: true } } } } }
 		});
 		const dataPertemuan = await db.query.pertemuan.findFirst({
 			where: eq(table.pertemuan.id, id),

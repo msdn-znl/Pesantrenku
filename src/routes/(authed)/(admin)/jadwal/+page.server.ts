@@ -4,22 +4,22 @@ import { fail, error } from '@sveltejs/kit';
 import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
 import { eq } from 'drizzle-orm';
-
-import { generateId, groupJadwal } from '$lib/utils';
+import * as z from 'zod/v4';
+import { generateId, groupJadwal, getTanggalSekarang } from '$lib/utils';
 
 export const load: PageServerLoad = async () => {
 	try {
 		const streamedPromises = {
 			kelasList: db.select().from(table.kelas),
 			guruList: db
-				.select({ id: table.guru.id, nama: table.users.nama })
+				.select({ id: table.guru.id, nama: table.user.name })
 				.from(table.guru)
-				.innerJoin(table.users, eq(table.guru.userId, table.users.id)), //harusnya tabel join antara guru dan user
+				.innerJoin(table.user, eq(table.guru.userId, table.user.id)), //harusnya tabel join antara guru dan user
 			kitabList: db.select().from(table.kitab)
 		};
 		const jadwalListPromise = db.query.jadwal.findMany({
 			with: {
-				guru: { with: { user: { columns: { nama: true } } }, columns: {} },
+				guru: { with: { user: { columns: { name: true } } }, columns: {} },
 				kelas: { columns: { namaKelas: true } },
 				kitab: { columns: { namaKitab: true } }
 			}
@@ -47,14 +47,18 @@ export const actions: Actions = {
 		const validationResult = JadwalFormSchema.safeParse(jadwalFormData);
 
 		if (!validationResult.success) {
-			return fail(422, { message: 'Data yang anda masukkan salah' });
+			return fail(422, {
+				message: 'Data yang anda masukkan salah',
+				error: z.prettifyError(validationResult.error)
+			});
 		}
 
 		const { hari, ...dataLain } = validationResult.data;
-		const dataToInsert = hari.map((namaHari) => ({
+		const dataToInsert: (typeof table.jadwal.$inferInsert)[] = hari.map((namaHari) => ({
 			...dataLain,
 			hari: namaHari,
-			id: generateId()
+			id: generateId(),
+			berlakuMulai: getTanggalSekarang()
 		}));
 		try {
 			await db.insert(table.jadwal).values(dataToInsert);

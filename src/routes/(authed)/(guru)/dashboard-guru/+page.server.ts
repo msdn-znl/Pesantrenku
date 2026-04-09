@@ -13,7 +13,7 @@ export const load: PageServerLoad = async ({ parent }) => {
 	const guruProfile = await db.query.guru.findFirst({
 		where: eq(table.guru.userId, user.id),
 		columns: { id: true },
-		with: { user: { columns: { nama: true } } }
+		with: { user: { columns: { name: true } } }
 	});
 	let jadwalHariIni = undefined;
 	if (guruProfile) {
@@ -69,6 +69,6 @@ export const actions: Actions = {
 			}
 			redirect(303, `/pertemuan-guru/${data.id}/tambah-absensi`);
 		}
-		redirect(303, `/pertemuan/${pertemuan.id}`);
+		redirect(303, `/pertemuan-guru/${pertemuan.id}`);
 	}
 };

@@ -50,7 +50,7 @@ export const load: PageServerLoad = async () => {
 					with: {
 						user: {
 							columns: {
-								nama: true
+								name: true
 							}
 						}
 					}
