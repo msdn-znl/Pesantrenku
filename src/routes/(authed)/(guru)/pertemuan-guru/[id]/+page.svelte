@@ -21,8 +21,8 @@
 			</h2>
 			<p>Jurnal Mengajar: {data.dataPertemuan?.jurnalMengajar}</p>
 			<p>Status: {data.dataPertemuan?.status}</p>
-			<div class="card-action">
-				<button>Edit Jurnal</button>
+			<div class="card-actions justify-end">
+				<button class="btn btn-accent">Edit Jurnal</button>
 			</div>
 		</div>
 	</div>
@@ -51,4 +51,30 @@
 			</div>
 		</div>
 	</div>
+	<table class="table">
+		<thead
+			><tr>
+				<th></th>
+				<th>Nama</th>
+				<th>Status Kehadiran</th>
+			</tr></thead
+		>
+		<tbody>
+			{#each data.dataAbsensi as absensi, i (absensi.id)}
+				<tr>
+					<th>{i + 1}</th>
+					<td>{absensi.santri.user.name}</td>
+					{#if absensi.status_kehadiran === 'hadir'}
+						<td><p class="badge badge-accent">{absensi.status_kehadiran}</p></td>
+					{:else if absensi.status_kehadiran === 'alfa'}
+						<td><p class="badge badge-error">{absensi.status_kehadiran}</p></td>
+					{:else if absensi.status_kehadiran === 'sakit'}
+						<td><p class="badge badge-warning">{absensi.status_kehadiran}</p></td>
+					{:else}
+						<td><p class="badge badge-info">{absensi.status_kehadiran}</p></td>
+					{/if}
+				</tr>
+			{/each}
+		</tbody>
+	</table>
 </div>

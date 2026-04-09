@@ -75,15 +75,15 @@
 	</table>
 </div> -->
 <div class="card">
-	<h2 class="card-title">Tambah Santri untuk Kelas {data.kelas.namaKelas}</h2>
+	<h2 class="card-title">Tambah Santri untuk Kelas {data.kelas[0].namaKelas}</h2>
 	<div class="card-body">
-		<form action="?/create" method="post">
+		<form action="?/create" method="post" use:enhance>
 			<fieldset class="fieldset flex flex-col md:flex-row md:flex-wrap">
 				<legend class="fieldset-legend"> List Santri </legend>
-				{#each data.santriTanpaKelas as santri, i (santri.id)}
+				{#each data.santriTanpaKelas as santri, i (santri.santri.id)}
 					<label class="">
-						<input type="checkbox" name="idSantri" value={santri.id} class="checkbox" />
-						{santri.user.nama}
+						<input type="checkbox" name="idSantri" value={santri.santri.id} class="checkbox" />
+						{santri.santri.user.name}
 					</label>
 				{/each}
 			</fieldset>

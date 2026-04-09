@@ -60,7 +60,7 @@
 							/></th
 						>
 						<th>{i + 1}</th>
-						<td>{absensi.santri.user.nama}</td>
+						<td>{absensi.santri.user.name}</td>
 						<td>
 							<div>
 								<input type="text" name="id" id="" value={absensi.id} hidden />
@@ -74,7 +74,7 @@
 									class="radio"
 									checked={absensi.status_kehadiran === 'hadir'}
 								/>
-								<label for="hadir">Hadir</label>
+								<label for="hadir" class="badge badge-soft badge-accent">Hadir</label>
 								<input
 									type="radio"
 									name="status_{absensi.id}"
@@ -83,7 +83,7 @@
 									class="radio"
 									checked={absensi.status_kehadiran === 'alfa'}
 								/>
-								<label for="alfa">Alfa</label>
+								<label for="alfa" class="badge badge-soft badge-error">Alfa</label>
 								<input
 									type="radio"
 									name="status_{absensi.id}"
@@ -92,7 +92,7 @@
 									class="radio"
 									checked={absensi.status_kehadiran === 'sakit'}
 								/>
-								<label for="sakit">Sakit</label>
+								<label for="sakit" class="badge badge-soft badge-warning">Sakit</label>
 								<input
 									type="radio"
 									name="status_{absensi.id}"
@@ -101,21 +101,37 @@
 									class="radio"
 									checked={absensi.status_kehadiran === 'izin'}
 								/>
-								<label for="izin">Izin</label>
+								<label for="izin" class="badge badge-soft badge-info">Izin</label>
 							</div>
 						</td>
 					</tr>
 				{/each}
 			</tbody>
 		</table>
-		<div>
-			<button type="submit" class="btn btn-success">Submit data Absensi</button>
+		<div class="flex justify-between mt-5">
+			<button
+				type="button"
+				class="btn btn-accent btn-circle btn-outline flex-1"
+				onclick={() => changeStatusSantri('hadir')}>Hadir</button
+			>
+			<button
+				type="button"
+				class="btn btn-error btn-circle btn-outline flex-1"
+				onclick={() => changeStatusSantri('alfa')}>Alfa</button
+			>
+			<button
+				type="button"
+				class="btn btn-warning btn-circle btn-outline flex-1"
+				onclick={() => changeStatusSantri('sakit')}>Sakit</button
+			>
+			<button
+				type="button"
+				class="btn btn-info btn-circle btn-outline flex-1"
+				onclick={() => changeStatusSantri('izin')}>Izin</button
+			>
 		</div>
-		<div class="flex flex-row">
-			<button type="button" class="btn" onclick={() => changeStatusSantri('hadir')}>Hadir</button>
-			<button type="button" class="btn" onclick={() => changeStatusSantri('alfa')}>Alfa</button>
-			<button type="button" class="btn" onclick={() => changeStatusSantri('sakit')}>Sakit</button>
-			<button type="button" class="btn" onclick={() => changeStatusSantri('izin')}>Izin</button>
-		</div>
+		<fieldset class="fieldset">
+			<button type="submit" class="btn btn-success mt-4">Submit data Absensi</button>
+		</fieldset>
 	</form>
 </div>

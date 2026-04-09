@@ -48,7 +48,7 @@
 						<option value=""></option>
 						{#each data.jadwalList as jadwal (jadwal.id)}
 							<option value={jadwal.id}
-								>Guru: {jadwal.guru.user.nama}, Kelas: {jadwal.kelas.namaKelas}, Hari: {jadwal.hari},
+								>Guru: {jadwal.guru.user.name}, Kelas: {jadwal.kelas.namaKelas}, Hari: {jadwal.hari},
 								Mulai: {jadwal.jamMulai}, Kitab: {jadwal.kitab.namaKitab}
 							</option>
 						{/each}
@@ -147,7 +147,7 @@
 						<option value=""></option>
 						{#each data.jadwalList as jadwal (jadwal.id)}
 							<option value={jadwal.id} selected={jadwal.id === pertemuanToEdit?.jadwalId}
-								>Guru: {jadwal.guru.user.nama}, Kelas: {jadwal.kelas.namaKelas}, Hari: {jadwal.hari},
+								>Guru: {jadwal.guru.user.name}, Kelas: {jadwal.kelas.namaKelas}, Hari: {jadwal.hari},
 								Mulai: {jadwal.jamMulai}, Kitab: {jadwal.kitab.namaKitab}
 							</option>
 						{/each}
@@ -203,7 +203,7 @@
 					<th>Jurnal Mengajar</th>
 					<th>Hari</th>
 					<th>Tanggal Pertemuan</th>
-					<th>status</th>
+					<th>Status</th>
 				</tr>
 			</thead>
 			<tbody>

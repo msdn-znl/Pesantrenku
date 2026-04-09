@@ -65,7 +65,7 @@
 								/></th
 							>
 							<th>{i + 1}</th>
-							<td>{santrikelas.santri.user.nama}</td>
+							<td>{santrikelas.santri.user.name}</td>
 							<td>
 								<div>
 									<input type="text" name="santriId" id="" value={santrikelas.santriId} hidden />
@@ -77,8 +77,9 @@
 										id="hadir_{santrikelas.santriId}"
 										value="hadir"
 										class="radio"
+										checked
 									/>
-									<label for="hadir_{santrikelas.santriId}">Hadir</label>
+									<label for="hadir_{santrikelas.santriId}" class="badge badge-accent">Hadir</label>
 									<input
 										type="radio"
 										name="status_{santrikelas.santriId}"
@@ -86,7 +87,7 @@
 										value="alfa"
 										class="radio"
 									/>
-									<label for="alfa_{santrikelas.santriId}">Alfa</label>
+									<label for="alfa_{santrikelas.santriId}" class="badge badge-error">Alfa</label>
 									<input
 										type="radio"
 										name="status_{santrikelas.santriId}"
@@ -94,7 +95,8 @@
 										value="sakit"
 										class="radio"
 									/>
-									<label for="sakit_{santrikelas.santriId}">Sakit</label>
+									<label for="sakit_{santrikelas.santriId}" class="badge badge-warning">Sakit</label
+									>
 									<input
 										type="radio"
 										name="status_{santrikelas.santriId}"
@@ -102,7 +104,7 @@
 										value="izin"
 										class="radio"
 									/>
-									<label for="izin_{santrikelas.santriId}">Izin</label>
+									<label for="izin_{santrikelas.santriId}" class="badge badge-info">Izin</label>
 								</div>
 							</td>
 						</tr>
