@@ -24,7 +24,7 @@ export const CreateUserSchema = z.discriminatedUnion('role', [
 
 export const LoginUserFormSchema = z.object({
 	username: z.string().nonempty(),
-	password: z.string().min(6).max(255)
+	password: z.string().min(3).max(255)
 });
 
 export const EditUserFormSchema = z.object({
