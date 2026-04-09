@@ -27,7 +27,7 @@
 							id="password"
 							placeholder="Password"
 							class="input validator"
-							min="6"
+							min="3"
 						/>
 						<button class="btn btn-success hover:btn-accent mt-4">Login</button>
 					</fieldset>
