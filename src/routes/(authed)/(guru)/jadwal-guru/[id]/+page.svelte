@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { enhance } from '$app/forms';
 	import { toast } from 'svelte-sonner';
+	import { resolve } from '$app/paths';
 
 	import type { PageServerData } from './$types';
 	let { data }: { data: PageServerData } = $props();
@@ -63,7 +64,7 @@
 </dialog>
 
 <div class="flex flex-col flex-wrap gap-4 w-full md:flex-row">
-	{#each data.jurnalList as jurnal, i (jurnal.id)}
+	{#each data.jurnalList as jurnal (jurnal.id)}
 		<div class="card card-md bg-base-100 shadow-sm">
 			<div class="card-body">
 				<h2 class="card-title">{jurnal.tanggalPertemuan}</h2>
@@ -78,13 +79,16 @@
 							editPertemuanModal.showModal();
 						}}>Edit Jurnal</button
 					>
-					<a href={'pertemuan-guru' + jurnal.id}>Detail Absensi</a>
+					<a
+						href={resolve('/(authed)/(guru)/pertemuan-guru/[id]', { id: jurnal.id })}
+						class="btn btn-accent">Detail Absensi</a
+					>
 				</div>
 			</div>
 		</div>
 	{/each}
 	<!--Hapus Preview ini kalau sudah selesai-->
-	<div class="card bg-base-100 shadow-sm">
+	<!-- <div class="card bg-base-100 shadow-sm">
 		<div class="card-body">
 			<h2 class="card-title">10-10-2025</h2>
 			<p>Preview Jurnal Mengajar, sudah bisa dilihat</p>
@@ -120,5 +124,5 @@
 				<a href="/pertemuan-guru/abc" class="btn btn-accent">Detail Absensi</a>
 			</div>
 		</div>
-	</div>
+	</div> -->
 </div>

@@ -3,6 +3,7 @@
 	import type { PageServerData, ActionData } from './$types';
 	import { invalidateAll } from '$app/navigation';
 	import { toast } from 'svelte-sonner';
+	import { resolve } from '$app/paths';
 
 	type Kelas = PageServerData['kelasList'][number];
 
@@ -66,8 +67,14 @@
 					<label for="tahunAjaranId" class="label">Tahun Ajaran</label>
 					<select name="tahunAjaranId" id="tahunAjaranId" class="select w-full">
 						<option value=""></option>
-						{#each data.tahunAjaranList as item}
-							<option value={item.id}>{item.tahunAjaran}</option>
+						{#each data.tahunAjaranList as item (item.id)}
+							<option value={item.id}
+								>{item.tahunMulai +
+									'/' +
+									item.tahunSelesai +
+									' ' +
+									item.tipeSemester?.toUpperCase()}</option
+							>
 						{/each}
 					</select>
 					<button type="submit" class="btn btn-success mt-4">Tambah Kelas</button>
@@ -150,14 +157,6 @@
 						value={kelasToEdit?.namaKelas}
 						required
 					/>
-					<label for="tahunAjaran" class="label">Tahun Ajaran</label>
-					<select name="tahunAjaran" id="tahunAjaran" class="select w-full">
-						{#each data.tahunAjaranList as item}
-							<option value={item.id} selected={item.id == kelasToEdit?.tahun_ajaran?.id}
-								>{item.tahunAjaran}</option
-							>
-						{/each}
-					</select>
 					<button type="submit" class="btn btn-accent mt-4">Edit Data</button>
 				</fieldset>
 			</form>
@@ -187,10 +186,16 @@
 					<tr class="hover:bg-base-300">
 						<th>{i + 1}</th>
 						<td>{kelas.namaKelas}</td>
-						<td>{kelas.tahun_ajaran?.tahunAjaran}</td>
-						<td>{kelas.guru?.user.nama}</td>
+						<td
+							>{kelas.tahun_ajaran?.tahunMulai +
+								'/' +
+								kelas.tahun_ajaran?.tahunSelesai +
+								' ' +
+								kelas.tahun_ajaran?.tipeSemester?.toUpperCase()}</td
+						>
+						<td>{kelas.guru?.user.name}</td>
 						<td class="flex flex-col">
-							<a href={`/kelas/${kelas.id}`} class="btn btn-accent w-full">Detail</a>
+							<a href={resolve(`/kelas/${kelas.id}`)} class="btn btn-accent w-full">Detail</a>
 
 							<button
 								class="btn btn-warning w-full"

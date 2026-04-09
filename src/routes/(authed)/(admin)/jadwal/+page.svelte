@@ -2,6 +2,7 @@
 	import type { PageServerData, ActionData } from './$types';
 	import { enhance, applyAction } from '$app/forms';
 	import { invalidateAll } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import { toast } from 'svelte-sonner';
 	type Jadwal = PageServerData['jadwalList'][number];
 
@@ -222,17 +223,17 @@
 					{#each data.jadwalList as jadwal, i (jadwal.id)}
 						<tr class="hover:bg-base-300">
 							<th>{i + 1}</th>
-							<td>{jadwal.guru.user.nama}</td>
+							<td>{jadwal.guru.user.name}</td>
 							<td>{jadwal.kelas.namaKelas}</td>
 							<td>{jadwal.kitab.namaKitab}</td>
 							<td>{jadwal.hari}</td>
 							<td>{jadwal.jamMulai}</td>
 							<td>{jadwal.jamSelesai}</td>
 							<td>
-								<a href={'/jadwal/' + jadwal.id + '/pertemuan'}
+								<a href={resolve('/jadwal/[id]/pertemuan', { id: jadwal.id })}
 									><button class="btn btn-success">Data Pertemuan</button></a
 								>
-								<a href={'/jadwal/' + jadwal.id + '/edit'}
+								<a href={resolve('/jadwal/[id]/edit', { id: jadwal.id })}
 									><button class="btn btn-accent">Edit</button></a
 								>
 

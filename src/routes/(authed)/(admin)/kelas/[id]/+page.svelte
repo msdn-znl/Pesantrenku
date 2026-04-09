@@ -1,6 +1,7 @@
 <script lang="ts">
 	import type { PageServerData } from './$types';
 	import { enhance } from '$app/forms';
+	import { resolve } from '$app/paths';
 
 	let { data }: { data: PageServerData } = $props();
 	let selectedSantri: string[] = $state([]);
@@ -14,7 +15,6 @@
 			selectedSantri = [];
 		}
 	};
-	$inspect(selectedSantri);
 </script>
 
 <svelte:head><title>Detail Kelas</title></svelte:head>
@@ -58,18 +58,24 @@
 						</tr>
 						<tr>
 							<th>Tahun Ajaran</th>
-							<td>{data.infoKelas.tahun_ajaran?.tahunAjaran}</td>
+							<td
+								>{data.infoKelas.tahun_ajaran?.tahunMulai +
+									'/' +
+									data.infoKelas.tahun_ajaran?.tahunSelesai +
+									' ' +
+									data.infoKelas.tahun_ajaran?.tipeSemester?.toUpperCase()}</td
+							>
 						</tr>
 						<tr>
 							<th>Wali Kelas</th>
-							<td>{data.infoKelas.guru?.user.nama}</td>
+							<td>{data.infoKelas.guru?.user.name}</td>
 						</tr>
 					</tbody>
 				{/if}
 			</table>
 			{#if data.infoKelas != undefined}
 				<div class="card-actions justify-end mt-4">
-					<a href={`/kelas/${data.infoKelas.id}/tambah-santri`} class="btn btn-accent"
+					<a href={resolve(`/kelas/${data.infoKelas.id}/tambah-santri`)} class="btn btn-accent"
 						>Tambah Santri</a
 					>
 					{#if selectedSantri.length > 0}
@@ -121,7 +127,7 @@
 						></th
 					>
 					<th>{i + 1}</th>
-					<td>{santri_kelas.santri.user.nama}</td>
+					<td>{santri_kelas.santri.user.name}</td>
 				</tr>
 			{/each}
 		</tbody>
