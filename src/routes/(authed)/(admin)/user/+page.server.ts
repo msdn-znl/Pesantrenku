@@ -12,6 +12,7 @@ import {
 } from '$lib/server/form-validation/user';
 import * as z from 'zod/v4';
 import { generateId, getTahunSekarang, generateNIS } from '$lib/utils';
+import { env } from '$env/dynamic/private';
 
 export const load: PageServerLoad = async () => {
 	try {
@@ -83,7 +84,7 @@ export const actions: Actions = {
 				});
 				userData.push({
 					id: userId,
-					email: NIS,
+					email: NIS + env.TEMP_HOSTNAME_POSTFIX,
 					name: santri,
 					role: validation.data.role
 				});
@@ -139,7 +140,7 @@ export const actions: Actions = {
 				});
 				userData.push({
 					id: userId,
-					email: NIG,
+					email: NIG + env.TEMP_HOSTNAME_POSTFIX,
 					name: guru,
 					role: validation.data.role
 				});
