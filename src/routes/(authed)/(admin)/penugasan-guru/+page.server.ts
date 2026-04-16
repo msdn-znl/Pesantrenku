@@ -64,8 +64,22 @@ export const actions: Actions = {
 				data: guruId
 			});
 		}
+		const tahunAjaranId = formData.get('tahunAjaranId')?.toString();
+		if (!tahunAjaranId) {
+			return fail(422, {
+				message: 'tidak ada Id yang dikirimkan',
+				data: guruId
+			});
+		}
 		try {
-			await db.delete(table.penugasan_guru).where(eq(table.penugasan_guru.guruId, guruId));
+			await db
+				.delete(table.penugasan_guru)
+				.where(
+					and(
+						eq(table.penugasan_guru.guruId, guruId),
+						eq(table.penugasan_guru.tahunAjaranId, tahunAjaranId)
+					)
+				);
 		} catch (err) {
 			console.error(err);
 			return fail(500, { message: ' terjadi kesalahan di Server saat input data' });
