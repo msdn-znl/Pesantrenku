@@ -230,10 +230,10 @@
 							<td>{jadwal.jamMulai}</td>
 							<td>{jadwal.jamSelesai}</td>
 							<td>
-								<a href={resolve('/jadwal/[id]/pertemuan', { id: jadwal.id })}
+								<a href={resolve('/(authed)/(admin)/jadwal/[id]/pertemuan', { id: jadwal.id })}
 									><button class="btn btn-success">Data Pertemuan</button></a
 								>
-								<a href={resolve('/jadwal/[id]/edit', { id: jadwal.id })}
+								<a href={resolve('/(authed)/(admin)/jadwal/[id]/edit', { id: jadwal.id })}
 									><button class="btn btn-accent">Edit</button></a
 								>
 
