@@ -8,21 +8,21 @@
 		return currentPath.startsWith(menuHref);
 	};
 	let userManagementMenu = [
-		{ href: '/user', nama: 'User' },
-		{ href: '/guru', nama: 'Guru' },
-		{ href: '/santri', nama: 'Santri' }
+		{ href: '/(authed)/(admin)/user', nama: 'User' },
+		{ href: '/(authed)/(admin)/guru', nama: 'Guru' },
+		{ href: '/(authed)/(admin)/santri', nama: 'Santri' }
 	];
 	let setupMenu = [
-		{ href: '/periode', nama: 'Tahun Ajaran' },
-		{ href: '/kelas', nama: 'Kelas' },
-		{ href: '/kamar', nama: 'Kamar' },
-		{ href: '/penetapan-santri', nama: 'Penetapan Santri' },
-		{ href: '/penugasan-guru', nama: 'Penugasan Guru' }
+		{ href: '/(authed)/(admin)/periode', nama: 'Tahun Ajaran' },
+		{ href: '/(authed)/(admin)/kelas', nama: 'Kelas' },
+		{ href: '/(authed)/(admin)/penetapan-santri', nama: 'Penetapan Santri' },
+		{ href: '/(authed)/(admin)/penugasan-guru', nama: 'Penugasan Guru' },
+		{ href: '/(authed)/(admin)/kamar', nama: 'Kamar' }
 	];
 	let akademikMenu = [
-		{ href: '/kitab', nama: 'Kitab' },
-		{ href: '/jadwal', nama: 'Jadwal' },
-		{ href: '/pertemuan', nama: 'Pertemuan' }
+		{ href: '/(authed)/(admin)/kitab', nama: 'Kitab' },
+		{ href: '/(authed)/(admin)/jadwal', nama: 'Jadwal' },
+		{ href: '/(authed)/(admin)/pertemuan', nama: 'Pertemuan' }
 	];
 	// let listMenu = [
 	// 	{ href: '/dashboard', nama: 'Dashboard' },
