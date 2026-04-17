@@ -9,7 +9,8 @@ export const UserAdminFormSchema = z.object({
 export const UserSantriFormSchema = z.object({
 	role: z.literal('santri'),
 	nama: z.string(),
-	tipe: z.enum(['putra', 'putri'])
+	tipe: z.enum(['putra', 'putri']),
+	tahun: z.number()
 });
 
 export const UserGuruFormSchema = z.object({
@@ -41,9 +42,7 @@ export const RegisterFormSchema = z.object({
 	nama: z.string()
 });
 
-export const DeleteUserSchema = z.object({
-	id: z.array(z.string())
-});
+export const DeleteUserSchema = z.array(z.string());
 
 export type CreateUserForm = z.infer<typeof CreateUserSchema>;
 export type RoleUser = CreateUserForm['role'];

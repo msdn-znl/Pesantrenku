@@ -40,7 +40,7 @@
 				<button class="btn btn-success" onclick={() => (userToDelete = null)}>Batal</button>
 			</form>
 			<form
-				action="?/delete"
+				action="?/hapus"
 				method="post"
 				use:enhance={() => {
 					return async ({ result }) => {
@@ -160,6 +160,8 @@ Ahmad Umar"
 						<option value="putra">Putra</option>
 						<option value="putri">Putri</option>
 					</select>
+					<label for="tahun" class="label">Tahun Masuk</label>
+					<input type="number" name="tahun" id="" class="input w-full" placeholder="contoh: 2025" />
 				</fieldset>
 				<button type="submit" class="btn btn-success">Kirim</button>
 			{:else if role === 'guru'}
@@ -206,7 +208,7 @@ Amirul Hasan"
 <div class="collapse border-base-300 border">
 	<input type="checkbox" />
 	<p class="collapse-title font-semibold">Admin</p>
-	<div class="collapse-content">
+	<div class="collapse-content overflow-auto">
 		<table class="table">
 			<thead>
 				<tr>
@@ -229,7 +231,7 @@ Amirul Hasan"
 <div class="collapse border-base-300 border">
 	<input type="checkbox" />
 	<p class="collapse-title font-semibold">Guru</p>
-	<div class="collapse-content">
+	<div class="collapse-content overflow-auto">
 		<table class="table">
 			<thead>
 				<tr>
@@ -251,6 +253,15 @@ Amirul Hasan"
 						<th>{i + 1}</th>
 						<td>{user.nama}</td>
 						<td>{user.username}</td>
+						<td
+							><button
+								class="btn btn-error"
+								onclick={() => {
+									userToDelete = user.id;
+									deleteUserModal.showModal();
+								}}>Hapus</button
+							></td
+						>
 					</tr>
 				{/each}
 			</tbody>
@@ -260,7 +271,7 @@ Amirul Hasan"
 <div class="collapse border border-base-300">
 	<input type="checkbox" />
 	<p class="collapse-title font-semibold">Santri</p>
-	<div class="collapse-content">
+	<div class="collapse-content overflow-auto">
 		<table class="table">
 			<thead>
 				<tr>
@@ -282,6 +293,15 @@ Amirul Hasan"
 						<th>{i + 1}</th>
 						<td>{user.nama}</td>
 						<td>{user.username}</td>
+						<td
+							><button
+								class="btn btn-error"
+								onclick={() => {
+									userToDelete = user.id;
+									deleteUserModal.showModal();
+								}}>Hapus</button
+							></td
+						>
 					</tr>
 				{/each}
 			</tbody>

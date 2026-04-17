@@ -11,7 +11,7 @@ import {
 	EditUserFormSchema
 } from '$lib/server/form-validation/user';
 import * as z from 'zod/v4';
-import { generateId, getTahunSekarang, generateNIS } from '$lib/utils';
+import { generateId, generateNIS } from '$lib/utils';
 import { env } from '$env/dynamic/private';
 
 export const load: PageServerLoad = async () => {
@@ -52,7 +52,7 @@ export const actions: Actions = {
 		}
 
 		if (validation.data.role === 'santri') {
-			const tahun = getTahunSekarang();
+			const tahun = validation.data.tahun;
 			const tahunAjaranSubQuery = db
 				.select({ id: table.tahun_ajaran.id })
 				.from(table.tahun_ajaran)
@@ -210,16 +210,19 @@ export const actions: Actions = {
 	hapus: async (event: RequestEvent) => {
 		const formData = await event.request.formData();
 		const listId = formData.getAll('id');
+
 		const timestamp = new Date();
 		const validation = DeleteUserSchema.safeParse(listId);
 		if (!validation.success) {
+			console.log(validation.error);
 			return fail(400, { message: 'userId  tidak ada' });
 		}
 		try {
 			await db
 				.update(table.user)
 				.set({ deletedAt: timestamp })
-				.where(inArray(table.user.id, validation.data.id));
+				.where(inArray(table.user.id, validation.data));
+			return { success: true, message: 'Berhasil Menghapus Data' };
 		} catch (err) {
 			console.error(err);
 			return fail(500, { message: 'An error occured ' });
