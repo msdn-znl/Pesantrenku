@@ -84,7 +84,7 @@
 							placeholder="Contoh: 2025"
 							required
 						/>
-						<label for="tahunSelesai" class="label">Tahun Mulai</label>
+						<label for="tahunSelesai" class="label">Tahun Selesai</label>
 						<input
 							type="number"
 							name="tahunSelesai"
