@@ -10,7 +10,7 @@ export const UserSantriFormSchema = z.object({
 	role: z.literal('santri'),
 	nama: z.string(),
 	tipe: z.enum(['putra', 'putri']),
-	tahun: z.number()
+	tahun: z.coerce.number()
 });
 
 export const UserGuruFormSchema = z.object({
