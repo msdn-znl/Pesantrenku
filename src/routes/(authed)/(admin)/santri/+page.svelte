@@ -1,6 +1,8 @@
 <script lang="ts">
 	import type { ActionData, PageServerData } from './$types';
 	import { enhance } from '$app/forms';
+	import { resolve } from '$app/paths';
+	import { toast } from 'svelte-sonner';
 
 	let { data, form }: { data: PageServerData; form: ActionData } = $props();
 </script>
@@ -8,18 +10,13 @@
 <svelte:head>
 	<title>Menu Santri</title>
 </svelte:head>
-<div>
-	<h2 class="card-title">List Santri</h2>
-</div>
+
 <div class="overflow-auto">
 	<table class="table">
 		<thead>
 			<tr>
 				<th></th>
 				<th>Nama</th>
-				<th>Tahun Masuk</th>
-				<th>Status</th>
-				<th>Kamar</th>
 				<th>Action</th>
 			</tr>
 		</thead>
@@ -29,16 +26,32 @@
 					<tr class="hover:bg-base-300">
 						<th>{i + 1}</th>
 						<td>{santri.nama}</td>
-						<td>{santri.tahun_masuk}</td>
-						<td>{santri.status}</td>
-						<td>{santri.kamar}</td>
 						<td>
 							<div>
-								<a href={'/santri/' + santri.userId + '/edit'} class="btn btn-accent">Edit</a>
+								<a
+									href={resolve('/(authed)/(admin)/santri/[id]/edit', { id: santri.userId })}
+									class="btn btn-accent">Edit</a
+								>
 							</div>
 							<div>
 								<!-- Todo: Update list setelah tombol di delete tanpa reload halaman -->
-								<form action="?/delete" method="post" use:enhance>
+								<form
+									action="?/delete"
+									method="post"
+									id={'santri_' + santri.id}
+									use:enhance={() => {
+										return async ({ result, update }) => {
+											if (result.type === 'success') {
+												toast.success(result.data?.message ?? 'Berhasil');
+											} else if (result.type === 'failure') {
+												toast.error(result.data?.message ?? 'Gagal memproses data');
+											} else if (result.type === 'error') {
+												toast.error('Terjadi kesalahan server');
+											}
+											await update();
+										};
+									}}
+								>
 									<input type="hidden" name="id" value={santri.userId} />
 									<button type="submit" class="btn btn-error">Delete</button>
 								</form>
@@ -53,5 +66,4 @@
 			{/if}
 		</tbody>
 	</table>
-	<p>{form?.message ?? ''}</p>
 </div>

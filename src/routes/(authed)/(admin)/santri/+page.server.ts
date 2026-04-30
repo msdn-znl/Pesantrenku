@@ -19,6 +19,7 @@ export const load: PageServerLoad = async () => {
 			.from(table.santri)
 			.where(isNull(table.santri.deletedAt))
 			.innerJoin(table.user, eq(table.santri.userId, table.user.id));
+		console.log(santriList);
 		return { santriList };
 	} catch (err) {
 		console.error(err);
@@ -42,7 +43,7 @@ export const actions: Actions = {
 				.update(table.santri)
 				.set({ deletedAt: timestamp })
 				.where(eq(table.santri.userId, userId));
-			return { success: true, message: 'Success' };
+			return { success: true, message: 'berhasil menghapus data' };
 		} catch (error) {
 			console.error(error);
 			return fail(500, { message: 'An error has occured.' });
