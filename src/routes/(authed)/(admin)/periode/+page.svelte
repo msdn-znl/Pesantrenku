@@ -114,7 +114,7 @@
 	<dialog class="modal" id="delete_periode_modal" bind:this={deletePeriodeModal}>
 		<div class="modal-box">
 			<p>Apakah Anda yakin ingin menghapus data periode ini?</p>
-			<div class="flex flex-row">
+			<div class="modal-action justify-end">
 				<form method="dialog">
 					<button class="btn btn-success" onclick={() => (periodeToDelete = null)}>Batal</button>
 				</form>
