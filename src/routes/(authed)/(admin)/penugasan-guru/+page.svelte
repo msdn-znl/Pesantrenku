@@ -13,7 +13,6 @@
 	let guruId = $state<string | undefined>();
 	let PenugasanModal: HTMLDialogElement;
 	let PenghapusanModal: HTMLDialogElement;
-	$inspect(tahunAjaranId, guruId);
 </script>
 
 <div class="card">
