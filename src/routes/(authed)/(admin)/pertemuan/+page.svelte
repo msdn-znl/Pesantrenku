@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { enhance, applyAction } from '$app/forms';
 	import { invalidateAll } from '$app/navigation';
+	import { resolve } from '$app/paths';
 	import type { PageServerData, ActionData } from './$types';
 	import { toast } from 'svelte-sonner';
 	type Pertemuan = PageServerData['pertemuanList'][number];
@@ -217,11 +218,15 @@
 						<td>{pertemuan.tanggalPertemuan}</td>
 						<td>{pertemuan.status}</td>
 						<td class="flex flex-col">
-							<a href={'/pertemuan/' + pertemuan.id + '/absensi-santri'}
-								><button class="btn btn-success w-full">Absensi Santri</button></a
+							<a
+								href={resolve('/(authed)/(admin)/pertemuan/[id]/absensi-santri', {
+									id: pertemuan.id
+								})}><button class="btn btn-success w-full">Absensi Santri</button></a
 							>
-							<a href={'/pertemuan/' + pertemuan.id + '/data-absensi'}
-								><button class="btn btn-accent w-full">Data Absensi</button></a
+							<a
+								href={resolve('/(authed)/(admin)/pertemuan/[id]/data-absensi', {
+									id: pertemuan.id
+								})}><button class="btn btn-accent w-full">Data Absensi</button></a
 							>
 							<button
 								class="btn btn-warning w-full"
