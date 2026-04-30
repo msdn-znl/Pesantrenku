@@ -51,7 +51,9 @@ export const load: PageServerLoad = async () => {
 				or(
 					isNull(pendaftaranTerakhir.id),
 					and(eq(pendaftaranTerakhir.status, 'aktif'), isNull(pendaftaranTerakhir.tanggalKeluar))
-				)
+				),
+				// Kolom Deleted At di tabel user kosong
+				isNull(table.user.deletedAt)
 			)
 		);
 	const [tahunAjaranId] = await db
