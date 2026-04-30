@@ -218,10 +218,16 @@ export const actions: Actions = {
 			return fail(400, { message: 'userId  tidak ada' });
 		}
 		try {
-			await db
-				.update(table.user)
-				.set({ deletedAt: timestamp })
-				.where(inArray(table.user.id, validation.data));
+			await db.transaction(async (tx) => {
+				await tx
+					.update(table.user)
+					.set({ deletedAt: timestamp })
+					.where(inArray(table.user.id, validation.data));
+				await tx
+					.update(table.santri)
+					.set({ deletedAt: timestamp })
+					.where(inArray(table.santri.userId, validation.data));
+			});
 			return { success: true, message: 'Berhasil Menghapus Data' };
 		} catch (err) {
 			console.error(err);
