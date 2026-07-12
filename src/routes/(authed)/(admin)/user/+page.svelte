@@ -1,4 +1,4 @@
-<script lang="ts">
+<!-- <script lang="ts">
 	import { enhance, applyAction } from '$app/forms';
 	import { invalidateAll } from '$app/navigation';
 	import type { PageServerData } from './$types';
@@ -22,12 +22,10 @@
 	let listUserToDelete = $state<string[]>([]);
 </script>
 
-<svelte:head>
-	<title>Menu User</title>
-</svelte:head>
+ -->
 
 <!--Modal Hapus Data masih belum benar-->
-<dialog
+<!-- <dialog
 	class="modal"
 	id="delete_user_modal"
 	bind:this={deleteUserModal}
@@ -306,5 +304,158 @@ Amirul Hasan"
 				{/each}
 			</tbody>
 		</table>
+	</div>
+</div> -->
+
+<!--Rancangan halaman-->
+
+<script lang="ts">
+	let { data } = $props();
+
+	// State untuk search, filter, dan pagination
+	let searchQuery = $state('');
+	let selectedRole = $state('all');
+	let currentPage = $state(1);
+	const itemsPerPage = 10;
+
+	// $derived akan otomatis menghitung ulang data pengguna yang difilter jika searchQuery atau selectedRole berubah
+	let filteredUsers = $derived(
+		data.userList.filter((u) => {
+			const matchSearch =
+				u.nama.toLowerCase().includes(searchQuery.toLowerCase()) ||
+				u.username.toLowerCase().includes(searchQuery.toLowerCase());
+
+			// Role bisa null dari database, jadi kita tangani dengan fallback string kosong
+			const role = u.role || '';
+			const matchRole = selectedRole === 'all' || role === selectedRole;
+
+			return matchSearch && matchRole;
+		})
+	);
+
+	// $derived untuk total halaman dan memotong array untuk pagination
+	let totalPages = $derived(Math.ceil(filteredUsers.length / itemsPerPage) || 1);
+	let paginatedUsers = $derived(
+		filteredUsers.slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+	);
+
+	// Fungsi kontrol pagination
+	function nextPage() {
+		if (currentPage < totalPages) currentPage++;
+	}
+	function prevPage() {
+		if (currentPage > 1) currentPage--;
+	}
+
+	// Helper untuk mereset halaman ke 1 setiap kali filter atau pencarian digunakan
+	function resetPagination() {
+		currentPage = 1;
+	}
+</script>
+
+<svelte:head>
+	<title>Menu User</title>
+</svelte:head>
+
+<div class="p-6 min-h-screen">
+	<div class="mb-8">
+		<h1 class="text-3xl font-bold text-base-content">Daftar Pengguna</h1>
+		<p class="text-base-content/70 mt-1">Kelola data admin, guru, dan santri di sistem.</p>
+	</div>
+
+	<div class="card bg-base-100 shadow-xl card-border">
+		<div class="card-body">
+			<!-- Top Controls: Search & Filter -->
+			<div class="flex flex-col md:flex-row gap-4 mb-4 justify-between">
+				<!-- Search Bar menggunakan input dari daisyUI -->
+				<input
+					type="text"
+					placeholder="Cari nama atau username..."
+					class="input input-bordered w-full md:max-w-xs"
+					bind:value={searchQuery}
+					oninput={resetPagination}
+				/>
+
+				<!-- Role Filter menggunakan select dari daisyUI -->
+				<select
+					class="select select-bordered w-full md:max-w-xs"
+					bind:value={selectedRole}
+					onchange={resetPagination}
+				>
+					<option value="all">Semua Role</option>
+					<option value="admin">Admin</option>
+					<option value="guru">Guru</option>
+					<option value="santri">Santri</option>
+				</select>
+			</div>
+
+			<!-- Tabel Pengguna -->
+			<div class="overflow-x-auto">
+				<table class="table table-zebra w-full">
+					<thead>
+						<tr>
+							<th>Nama Lengkap</th>
+							<th>Username (Email)</th>
+							<th>Role</th>
+						</tr>
+					</thead>
+					<tbody>
+						{#each paginatedUsers as u (u.id)}
+							<tr>
+								<td class="font-medium">{u.nama}</td>
+								<td>{u.username}</td>
+								<td>
+									<!-- Penggunaan Badge daisyUI 5 dengan modifikator gaya (badge-soft) -->
+									{#if u.role === 'admin'}
+										<div class="badge badge-error badge-soft capitalize">{u.role}</div>
+									{:else if u.role === 'guru'}
+										<div class="badge badge-info badge-soft capitalize">{u.role}</div>
+									{:else if u.role === 'santri'}
+										<div class="badge badge-success badge-soft capitalize">{u.role}</div>
+									{:else}
+										<div class="badge badge-neutral badge-soft capitalize">
+											{u.role || 'Unassigned'}
+										</div>
+									{/if}
+								</td>
+							</tr>
+						{:else}
+							<tr>
+								<td colspan="3" class="text-center italic text-base-content/50 py-8">
+									Tidak ada data pengguna yang sesuai dengan filter.
+								</td>
+							</tr>
+						{/each}
+					</tbody>
+				</table>
+			</div>
+
+			<!-- Pagination Control -->
+			<div class="flex flex-col sm:flex-row justify-between items-center mt-6 gap-4">
+				<span class="text-sm text-base-content/70">
+					Menampilkan {filteredUsers.length === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1}
+					sampai {Math.min(currentPage * itemsPerPage, filteredUsers.length)}
+					dari {filteredUsers.length} data
+				</span>
+
+				<!-- Komponen Join daisyUI untuk grup tombol -->
+				<div class="join">
+					<!-- Di Svelte 5, event click menggunakan "onclick" bukan "on:click" -->
+					<button class="join-item btn btn-sm" disabled={currentPage === 1} onclick={prevPage}>
+						« Prev
+					</button>
+					<button class="join-item btn btn-sm no-animation">
+						Hal {currentPage} / {totalPages}
+					</button>
+					<button
+						class="join-item btn btn-sm"
+						disabled={currentPage === totalPages}
+						onclick={nextPage}
+					>
+						Next »
+					</button>
+				</div>
+			</div>
+		</div>
 	</div>
 </div>
