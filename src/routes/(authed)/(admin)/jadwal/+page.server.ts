@@ -7,20 +7,19 @@ import { eq } from 'drizzle-orm';
 import * as z from 'zod/v4';
 import { generateId, groupJadwal, getTanggalSekarang } from '$lib/utils';
 
-export const load: PageServerLoad = async () => {
+export const load: PageServerLoad = async ({ parent }) => {
 	try {
-		const streamedPromises = {
-			kelasList: db.select().from(table.kelas),
-			guruList: db
-				.select({ id: table.guru.id, nama: table.user.name })
-				.from(table.guru)
-				.innerJoin(table.user, eq(table.guru.userId, table.user.id)), //harusnya tabel join antara guru dan user
-			kitabList: db.select().from(table.kitab)
-		};
+		const { kelasList, guruList, kitabList } = await parent();
+		const streamedPromises = { kelasList, guruList, kitabList };
 		const jadwalListPromise = db.query.jadwal.findMany({
 			with: {
 				guru: { with: { user: { columns: { name: true } } }, columns: {} },
-				kelas: { columns: { namaKelas: true } },
+				kelas: {
+					columns: { namaKelas: true },
+					with: {
+						tahun_ajaran: true
+					}
+				},
 				kitab: { columns: { namaKitab: true } }
 			}
 		});
