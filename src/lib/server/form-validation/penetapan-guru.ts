@@ -1,7 +1,8 @@
 import * as z from 'zod/v4';
 
 export const PenetapanGuruFormSchema = z.object({
-	guruId: z.string(),
+	guruIds: z.array(z.string()),
 	tahunAjaranId: z.string(),
-	jabatan: z.string().optional()
+	jabatan: z.string().optional(),
+	actionType: z.enum(['aktif', 'inaktif'])
 });
