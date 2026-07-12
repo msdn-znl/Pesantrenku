@@ -7,20 +7,20 @@
 		}
 		return currentPath.startsWith(menuHref);
 	};
-	let userManagementMenu = [
-		{ href: '/user', nama: 'User' },
-		{ href: '/guru', nama: 'Guru' },
-		{ href: '/santri', nama: 'Santri' }
+	let masterDataMenu = [
+		{ href: '/user', nama: 'Data User' },
+		{ href: '/guru', nama: 'Data Guru' },
+		{ href: '/santri', nama: 'Data Santri' },
+		{ href: '/kitab', nama: 'Data Kitab' },
+		{ href: '/kamar', nama: 'Data Kamar' }
 	];
 	let setupMenu = [
 		{ href: '/periode', nama: 'Tahun Ajaran' },
-		{ href: '/kelas', nama: 'Kelas' },
 		{ href: '/penetapan-santri', nama: 'Penetapan Santri' },
 		{ href: '/penugasan-guru', nama: 'Penugasan Guru' },
-		{ href: '/kamar', nama: 'Kamar' }
+		{ href: '/kelas', nama: 'Manajemen Kelas' }
 	];
 	let akademikMenu = [
-		{ href: '/kitab', nama: 'Kitab' },
 		{ href: '/jadwal', nama: 'Jadwal' },
 		{ href: '/pertemuan', nama: 'Pertemuan' },
 		{ href: '/rekap', nama: 'Rekap' }
@@ -58,9 +58,9 @@
 		>
 	</li>
 	<li>
-		<h2 class="menu-title">User</h2>
+		<h2 class="menu-title">Master Data</h2>
 		<ul>
-			{#each userManagementMenu as menu (menu.nama)}
+			{#each masterDataMenu as menu (menu.nama)}
 				<li>
 					<a
 						href={resolve(menu.href)}
@@ -71,7 +71,7 @@
 		</ul>
 	</li>
 	<li>
-		<h2 class="menu-title">Tahun Ajaran</h2>
+		<h2 class="menu-title">Administrasi Akademik</h2>
 		<ul>
 			{#each setupMenu as menu (menu.nama)}
 				<li>
@@ -84,7 +84,7 @@
 		</ul>
 	</li>
 	<li>
-		<h2 class="menu-title">Akademik</h2>
+		<h2 class="menu-title">Kegiatan Belajar Mengajar (KBM)</h2>
 		<ul>
 			{#each akademikMenu as menu (menu.nama)}
 				<li>
