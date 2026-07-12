@@ -76,6 +76,7 @@ export const actions: Actions = {
 		const validation = pendaftaranSantriFormSchema.safeParse(data);
 		if (!validation.success) {
 			return fail(422, {
+				error: true,
 				message: 'Data yang anda masukkan salah',
 				data: validation.data
 			});
@@ -98,7 +99,7 @@ export const actions: Actions = {
 			await db.insert(table.pendaftaran_santri).values(dataToInsert);
 		} catch (err) {
 			console.error(`Terjadi Error:`, err);
-			return fail(500, { message: ' terjadi kesalahan di Server saat input data' });
+			return fail(500, { error: true, message: ' terjadi kesalahan di Server saat input data' });
 		}
 	}
 };
