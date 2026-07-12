@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { page } from '$app/state';
+	import { resolve } from '$app/paths';
 
 	const breadcrumbsMap: Record<string, string> = {
 		'[id]': 'Detail',
@@ -33,14 +34,14 @@
 	);
 </script>
 
-<nav class="breadcrumbs text-sm">
-	<ul>
-		{#each breadcrumbs as item, i}
+<nav class="breadcrumbs text-sm bg-base-200 rounded-2xl">
+	<ul class="ml-6">
+		{#each breadcrumbs as item, i (item.label)}
 			<li>
 				{#if i === breadcrumbs.length - 1}
 					<span class="font-semibold">{item.label}</span>
 				{:else}
-					<a href={item.href}>{item.label}</a>
+					<a href={resolve(item.href)}>{item.label}</a>
 				{/if}
 			</li>
 		{/each}
