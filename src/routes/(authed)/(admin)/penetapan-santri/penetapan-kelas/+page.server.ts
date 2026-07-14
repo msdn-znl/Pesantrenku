@@ -1,18 +1,35 @@
 import type { PageServerLoad, Actions, RequestEvent } from './$types';
 import { db } from '$lib/server/db';
 import * as table from '$lib/server/db/schema';
-import { sql } from 'drizzle-orm';
+import { sql, isNull } from 'drizzle-orm';
 import { fail } from '@sveltejs/kit';
 import { KelasSantriFormSchema } from '$lib/server/form-validation/kelas_santri';
 import { generateId } from '$lib/utils';
 
 export const load: PageServerLoad = async () => {
 	try {
+		//Mengambil data santri yang mana santri tersebut terdaftar dalam tabel pendaftaran santri
+		//dengan tahun ajaran yang aktif, memiliki status aktif, dan tanggal keluar masih null
+		//dan data kelas_santri dimana kelas tersebut termasuk di dalam tahun ajaran aktif
 		const daftarSantri = await db.query.santri.findMany({
 			columns: { id: true, userId: true, nomorIndukSantri: true },
 			with: {
 				user: { columns: { name: true } },
-				kelas_santri: { with: { kelas: { columns: { namaKelas: true } } } }
+				kelas_santri: {
+					where: (ks, { exists, eq, and }) =>
+						exists(
+							db
+								.select({ one: sql`1` })
+								.from(table.kelas)
+								.innerJoin(table.tahun_ajaran, eq(table.kelas.tahunAjaranId, table.tahun_ajaran.id))
+								.where(and(eq(table.kelas.id, ks.kelasId), eq(table.tahun_ajaran.isActive, true)))
+						),
+					with: {
+						kelas: {
+							columns: { namaKelas: true }
+						}
+					}
+				}
 			},
 			where: (santriTable, { exists, and, eq }) =>
 				exists(
@@ -26,7 +43,9 @@ export const load: PageServerLoad = async () => {
 						.where(
 							and(
 								eq(table.pendaftaran_santri.santriId, santriTable.id),
-								eq(table.tahun_ajaran.isActive, true)
+								eq(table.tahun_ajaran.isActive, true),
+								eq(table.pendaftaran_santri.status, 'aktif'),
+								isNull(table.pendaftaran_santri.tanggalKeluar)
 							)
 						)
 				)
