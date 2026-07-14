@@ -1,6 +1,6 @@
 import type { PageServerLoad, Actions, RequestEvent } from './$types';
 import { db } from '$lib/server/db';
-import { eq, and, inArray } from 'drizzle-orm';
+import { eq, inArray } from 'drizzle-orm';
 import * as table from '$lib/server/db/schema';
 import { error, fail } from '@sveltejs/kit';
 import { DeleteKelasSantriFormScheme } from '$lib/server/form-validation/kelas_santri';
@@ -39,20 +39,18 @@ export const actions: Actions = {
 				formData.getAll(key).length > 1 ? formData.getAll(key) : formData.get(key)
 			])
 		);
+		console.log(inputData);
 		const validation = DeleteKelasSantriFormScheme.safeParse(inputData);
 		if (!validation.success) {
+			console.log(validation.error);
 			return fail(422, { message: 'data yang dimasukkan salah' });
 		}
 
 		try {
-			await db
+			const query = await db
 				.delete(table.kelas_santri)
-				.where(
-					and(
-						eq(table.kelas_santri.kelasId, id),
-						inArray(table.kelas_santri.santriId, validation.data.idSantri)
-					)
-				);
+				.where(inArray(table.kelas_santri.id, validation.data.kelasSantriId));
+			console.log(query);
 			return { success: true, message: 'Berhasil Dihapus' };
 		} catch (err) {
 			console.error(`Terjadi Error:`, err);
