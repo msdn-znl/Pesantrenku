@@ -339,7 +339,7 @@
 										<!-- Form untuk Set Aktif/Inaktif -->
 										<form
 											method="POST"
-											action="?/setAktif"
+											action="?/activate"
 											use:enhance={() => {
 												isSettingActive = true;
 												return async ({ update }) => {
@@ -349,7 +349,7 @@
 												};
 											}}
 										>
-											<input type="hidden" name="id" value={ta.id} />
+											<input type="hidden" name="tahunAjaranId" value={ta.id} />
 											<!-- Mengirim target status kebalikannya untuk proses di server -->
 											<input
 												type="hidden"
