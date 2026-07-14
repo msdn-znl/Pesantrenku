@@ -1,10 +1,13 @@
 import * as table from '$lib/server/db/schema';
 import { db } from '$lib/server/db';
-import { eq, and, sql, isNull, notExists } from 'drizzle-orm';
+import { eq, and, sql, isNull, notExists, exists, inArray } from 'drizzle-orm';
 import type { PageServerLoad, Actions, RequestEvent } from './$types';
 import { error, fail } from '@sveltejs/kit';
 import { generateId } from '$lib/utils';
-import { KelasSantriFormSchema } from '$lib/server/form-validation/kelas_santri';
+import {
+	KelasSantriFormSchema,
+	DeleteKelasSantriFormScheme
+} from '$lib/server/form-validation/kelas_santri';
 
 export const load: PageServerLoad = async ({ params }) => {
 	const id = params.id;
@@ -12,7 +15,9 @@ export const load: PageServerLoad = async ({ params }) => {
 		error(404, 'Data not found');
 	}
 	try {
-		const kelas = await db.select().from(table.kelas).where(eq(table.kelas.id, id));
+		const kelas = await db.query.kelas.findFirst({
+			where: eq(table.kelas.id, id)
+		});
 		const sq = db
 			.select({ id: table.tahun_ajaran.id })
 			.from(table.tahun_ajaran)
@@ -60,6 +65,17 @@ export const load: PageServerLoad = async ({ params }) => {
 					eq(pendaftaran_santri.tahunAjaranId, sq),
 					eq(pendaftaran_santri.status, 'aktif'),
 					isNull(pendaftaran_santri.tanggalKeluar),
+					exists(
+						db
+							.select({ one: sql`1` })
+							.from(table.santri)
+							.where(
+								and(
+									eq(table.santri.id, table.pendaftaran_santri.santriId),
+									isNull(table.santri.deletedAt)
+								)
+							)
+					),
 					notExists(
 						db
 							.select({ one: sql`1` })
@@ -73,7 +89,16 @@ export const load: PageServerLoad = async ({ params }) => {
 					)
 				)
 		});
-		return { santriTanpaKelas, kelas };
+		const santriTerdaftarKelasAktif = await db.query.kelas_santri.findMany({
+			where: eq(table.kelas_santri.kelasId, id),
+			with: {
+				santri: {
+					with: { user: { columns: { name: true } } },
+					columns: { userId: true, nomorIndukSantri: true }
+				}
+			}
+		});
+		return { santriTanpaKelas, kelas, santriTerdaftarKelasAktif };
 	} catch (err) {
 		console.error(`Error saat mengambil data. Error:` + err);
 		error(500, 'Error saat memuat data halaman');
@@ -107,6 +132,7 @@ export const actions: Actions = {
 
 		const validation = KelasSantriFormSchema.safeParse(inputData);
 		if (!validation.success) {
+			console.log(validation.error);
 			return fail(422, {
 				message: 'Data yang anda masukkan salah',
 				data: validation.data
@@ -121,6 +147,37 @@ export const actions: Actions = {
 		try {
 			await db.insert(table.kelas_santri).values(insertData);
 			return { success: true };
+		} catch (err) {
+			console.error(`Terjadi Error:`, err);
+			return fail(500, { message: ' terjadi kesalahan di Server saat input data' });
+		}
+	},
+	delete: async (event: RequestEvent) => {
+		const id = event.params.id;
+		if (!id || typeof id !== 'string') {
+			error(404, 'Id tidak ditemukan');
+		}
+		const formData = await event.request.formData();
+		const inputData = Object.fromEntries(
+			Array.from(formData.keys()).map((key) => [
+				key,
+				formData.getAll(key).length > 1 ? formData.getAll(key) : formData.get(key)
+			])
+		);
+		const validation = DeleteKelasSantriFormScheme.safeParse(inputData);
+		if (!validation.success) {
+			console.log(validation.error);
+			return fail(422, {
+				message: 'Data yang anda masukkan salah',
+				data: validation.data
+			});
+		}
+		try {
+			const query = await db
+				.delete(table.kelas_santri)
+				.where(inArray(table.kelas_santri.id, validation.data.kelasSantriId));
+
+			console.log(query);
 		} catch (err) {
 			console.error(`Terjadi Error:`, err);
 			return fail(500, { message: ' terjadi kesalahan di Server saat input data' });
