@@ -10,17 +10,20 @@ import { generateId } from '$lib/utils';
 
 export const load: PageServerLoad = async () => {
 	try {
-		const kelasList = await db.query.kelas.findMany({
+		const tAjaranDanKelasList = await db.query.tahun_ajaran.findMany({
 			with: {
-				tahun_ajaran: true,
-				guru: { with: { user: { columns: { name: true } } } }
+				kelas: true
+			},
+			columns: {
+				id: true,
+				tipeSemester: true,
+				tahunMulai: true,
+				tahunSelesai: true,
+				isActive: true
 			}
 		});
-		const tahunAjaranList = await db
-			.select()
-			.from(table.tahun_ajaran)
-			.where(eq(table.tahun_ajaran.isActive, true));
-		return { kelasList, tahunAjaranList };
+
+		return { tAjaranDanKelasList };
 	} catch (err) {
 		console.error(err);
 		return error(500, { message: 'An error occured' });

@@ -5,7 +5,7 @@
 	import { toast } from 'svelte-sonner';
 	import { resolve } from '$app/paths';
 
-	type Kelas = PageServerData['kelasList'][number];
+	type Kelas = PageServerData['tAjaranDanKelasList'][number]['kelas'][number];
 
 	let { data, form }: { data: PageServerData; form: ActionData } = $props();
 
@@ -14,6 +14,43 @@
 	let editKelasModal: HTMLDialogElement;
 	let kelasToDelete = $state<string | null>(null);
 	let kelasToEdit = $state<Kelas | null>(null);
+	const tahunAjaranAktif = $derived(
+		data.tAjaranDanKelasList.filter((i) => {
+			return i.isActive !== null && i.isActive === true;
+		})
+	);
+	const opsiTa = $derived(
+		data.tAjaranDanKelasList.map((i) => {
+			return {
+				id: i.id,
+				tahunMulai: i.tahunMulai,
+				tahunSelesai: i.tahunSelesai,
+				tipeSemester: i.tipeSemester,
+				isActive: i.isActive
+			};
+		})
+	);
+	let selectedTa = $state('');
+	let selectedTipe = $state('');
+	const filteredTaKelas = $derived(
+		data.tAjaranDanKelasList
+			.filter((baris) => {
+				const tAId = baris.id;
+				return selectedTa === '' || tAId === selectedTa;
+			})
+			.map((ta) => {
+				return {
+					...ta,
+					kelas: ta.kelas.filter((k) => {
+						return selectedTipe === '' || k.tipeKelas === selectedTipe;
+					})
+				};
+			})
+			.filter((ta) => ta.kelas.length > 0)
+	);
+
+	let isSubmitting = $state(false);
+	let isFormOpen = $state(false); // Untuk toggle form pembuatan kelas
 </script>
 
 <svelte:head>
@@ -67,7 +104,7 @@
 					<label for="tahunAjaranId" class="label">Tahun Ajaran</label>
 					<select name="tahunAjaranId" id="tahunAjaranId" class="select w-full">
 						<option value=""></option>
-						{#each data.tahunAjaranList as item (item.id)}
+						{#each tahunAjaranAktif as item (item.id)}
 							<option value={item.id}
 								>{item.tahunMulai +
 									'/' +
@@ -162,14 +199,35 @@
 			</form>
 		</div>
 	</dialog>
-	<div class="flex flex-row-reverse">
+	<div>
+		<label for="" class="select">
+			<span class="label">Tahun Ajaran</span>
+			<select name="" id="" bind:value={selectedTa}>
+				<option value="" disabled selected></option>
+				{#each opsiTa as ta (ta.id)}
+					<option value={ta.id}
+						>{ta.tahunMulai + '/' + ta.tahunSelesai + ' ' + ta.tipeSemester?.toUpperCase()}</option
+					>
+				{/each}
+			</select>
+		</label>
+		<label for="" class="select">
+			<span class="label">Tipe</span>
+			<select name="" id="" bind:value={selectedTipe}>
+				<option></option>
+				<option value="diniyah">Diniyah</option>
+				<option value="quran">Quran</option>
+			</select>
+		</label>
+	</div>
+	<!-- <div class="flex flex-row-reverse">
 		<button class="btn btn-success" onclick={() => createKelasModal.showModal()}>
 			Tambah Kelas</button
 		>
-	</div>
+	</div> -->
 </div>
 
-<div class="card overflow-auto">
+<!-- <div class="card overflow-auto">
 	<h1 class="card-title">List Kelas</h1>
 	<div class="card-body">
 		<table class="table">
@@ -178,43 +236,202 @@
 					<th></th>
 					<th>Nama Kelas</th>
 					<th>Tahun Ajaran</th>
-					<th>Ketua Kelas</th>
 				</tr>
 			</thead>
 			<tbody>
-				{#each data.kelasList as kelas, i (kelas.id)}
-					<tr class="hover:bg-base-300">
-						<th>{i + 1}</th>
-						<td>{kelas.namaKelas}</td>
-						<td
-							>{kelas.tahun_ajaran?.tahunMulai +
-								'/' +
-								kelas.tahun_ajaran?.tahunSelesai +
-								' ' +
-								kelas.tahun_ajaran?.tipeSemester?.toUpperCase()}</td
-						>
-						<td>{kelas.guru?.user.name}</td>
-						<td class="flex flex-col">
-							<a href={resolve(`/kelas/${kelas.id}`)} class="btn btn-accent w-full">Detail</a>
+				{#each filteredTaKelas as item (item.id)}
+					{#each item.kelas as k, i (k.id)}
+						<tr class="hover:bg-base-300">
+							<th>{i + 1}</th>
+							<td>{k.namaKelas}</td>
+							<td
+								>{item.tahunMulai +
+									'/' +
+									item.tahunSelesai +
+									' ' +
+									item.tipeSemester?.toUpperCase()}</td
+							>
+							<td class="flex flex-col">
+								<a href={resolve(`/kelas/${k.id}`)} class="btn btn-accent w-full">Detail</a>
 
-							<button
-								class="btn btn-warning w-full"
-								onclick={() => {
-									kelasToEdit = { ...kelas };
-									editKelasModal.showModal();
-								}}>Edit Kelas</button
-							>
-							<button
-								class="btn btn-error w-full"
-								onclick={() => {
-									kelasToDelete = kelas.id;
-									deleteKelasModal.showModal();
-								}}>Delete Kelas</button
-							>
-						</td>
+								<button
+									class="btn btn-warning w-full"
+									onclick={() => {
+										kelasToEdit = { ...k };
+										editKelasModal.showModal();
+									}}>Edit Kelas</button
+								>
+								<button
+									class="btn btn-error w-full"
+									onclick={() => {
+										kelasToDelete = k.id;
+										deleteKelasModal.showModal();
+									}}>Delete Kelas</button
+								>
+							</td>
+						</tr>
+					{/each}
+				{:else}
+					<tr class="hover:bg-base-300">
+						<td colspan="4"
+							>Tidak ada data kelas pada Tahun Ajaran Terpilih, Tambahkan terlebih dahulu</td
+						>
 					</tr>
 				{/each}
 			</tbody>
 		</table>
 	</div>
+</div> -->
+
+<div class="p-6 bg-base-200 min-h-screen">
+	<div class="flex justify-between items-center mb-8">
+		<div>
+			<h1 class="text-3xl font-bold text-base-content">Manajemen Kelas</h1>
+			<p class="text-base-content/70 mt-1">
+				Kelola data kelas dan lihat detail pendaftaran santri.
+			</p>
+		</div>
+		<!-- <button class="btn btn-primary" onclick={() => (isFormOpen = !isFormOpen)}>
+			{isFormOpen ? 'Tutup Form' : '+ Buat Kelas Baru'}
+		</button> -->
+		<button class="btn btn-primary" onclick={() => createKelasModal.showModal()}>
+			+ Buat Kelas Baru</button
+		>
+	</div>
+
+	<!-- Form Pembuatan Kelas (Ditampilkan kondisional) -->
+	<!-- {#if isFormOpen} -->
+	<!-- <div class="card bg-base-100 shadow-xl card-border mb-8">
+			<div class="card-body">
+				<h2 class="card-title mb-4">Buat Kelas Baru</h2>
+				<form
+					method="POST"
+					action="?/buatKelas"
+					class="grid grid-cols-1 md:grid-cols-2 gap-4"
+					use:enhance={() => {
+						isSubmitting = true;
+						return async ({ update }) => {
+							await update();
+							isSubmitting = false;
+							if (!form?.error) isFormOpen = false; // Tutup form jika sukses
+						};
+					}}
+				>
+					Input Nama Kelas -->
+	<!-- <div class="form-control">
+						<label class="label" for="inputKelas"><span class="label-text">Nama Kelas</span></label>
+						<input
+							type="text"
+							id="inputKelas"
+							name="namaKelas"
+							placeholder="Misal: 1A Diniyah"
+							class="input input-bordered"
+							required
+						/> -->
+	<!-- </div> -->
+
+	<!-- Input Tipe Kelas -->
+	<!-- <div class="form-control">
+						<label class="label" for="inputTipe"><span class="label-text">Tipe Kelas</span></label>
+						<select name="tipeKelas" id="inputTipe" class="select select-bordered" required>
+							<option value="diniyah">Diniyah</option>
+							<option value="quran">Al-Quran</option>
+						</select>
+					</div> -->
+
+	<!-- Input Tahun Ajaran -->
+	<!-- <div class="form-control">
+						<label class="label" for="tahunAjaran"
+							><span class="label-text">Tahun Ajaran</span></label
+						>
+						<select name="tahunAjaranId" id="tahunAjaran" class="select select-bordered" required>
+							<option value="" disabled selected>Pilih Tahun Ajaran...</option>
+							{#each data.daftarTahunAjaran as ta}
+								<option value={ta.id}>
+									{ta.tahunMulai}/{ta.tahunSelesai} - Semester {ta.tipeSemester}
+									{#if ta.isActive}(Aktif){/if}
+								</option>
+							{/each}
+						</select>
+					</div> -->
+
+	<!-- Input Wali Kelas -->
+	<!-- <div class="form-control">
+						<label class="label"><span class="label-text">Wali Kelas (Opsional)</span></label>
+						<select name="waliKelasId" class="select select-bordered">
+							<option value="">Pilih Wali Kelas...</option>
+							{#each data.daftarGuru as guru}
+								<option value={guru.id}>{guru.nama}</option>
+							{/each}
+						</select>
+					</div> -->
+
+	<!-- <div class="col-span-1 md:col-span-2 flex justify-end mt-4">
+						<button type="submit" class="btn btn-primary" disabled={isSubmitting}>
+							{#if isSubmitting}<span class="loading loading-spinner loading-sm"></span>{/if}
+							Simpan Kelas
+						</button>
+					</div>
+				</form>
+			</div>
+		</div> -->
+	<!-- {/if} -->
+
+	<!-- Tabel Daftar Kelas -->
+	<div class="card bg-base-100 shadow-xl card-border">
+		<div class="card-body">
+			<div class="overflow-x-auto">
+				<table class="table table-zebra w-full">
+					<thead>
+						<tr>
+							<th>Nama Kelas</th>
+							<th>Tipe</th>
+							<th>Tahun Ajaran</th>
+							<th>Wali Kelas</th>
+							<th class="text-right">Aksi</th>
+						</tr>
+					</thead>
+					<tbody>
+						{#each filteredTaKelas as item (item.id)}
+							{#each item.kelas as k (k.id)}
+								<tr>
+									<td class="font-bold">{k.namaKelas}</td>
+									<td>
+										<div
+											class="badge {k.tipeKelas === 'diniyah'
+												? 'badge-info'
+												: 'badge-success'} badge-soft capitalize"
+										>
+											{k.tipeKelas}
+										</div>
+									</td>
+									<td>{item?.tahunMulai}/{item?.tahunSelesai}</td>
+									<td>{k.waliKelasId || 'Belum diatur'}</td>
+									<td class="text-right">
+										<!-- Tombol Detail yang mengarah ke routing dinamis SvelteKit -->
+										<a href="/kelas/{k.id}" class="btn btn-sm btn-outline"> Lihat Detail </a>
+									</td>
+								</tr>
+							{:else}
+								<tr>
+									<td colspan="5" class="text-center py-6 italic text-base-content/50"
+										>Belum ada data kelas.</td
+									>
+								</tr>
+							{/each}
+						{/each}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
+
+	<!-- Notifikasi Toast -->
+	{#if form}
+		<div class="toast toast-end toast-bottom z-50">
+			<div class={`alert ${form.error ? 'alert-error' : 'alert-success'}`}>
+				<span>{form.message}</span>
+			</div>
+		</div>
+	{/if}
 </div>
