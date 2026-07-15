@@ -67,7 +67,7 @@
 								/>
 							</th>
 							<th>{i + 1}</th>
-							<td>{item.santri.user.nama}</td>
+							<td>{item.santri.user.name}</td>
 							<td>
 								<input type="text" name="id" id="" value={item.id} hidden />
 								<div>
@@ -121,7 +121,7 @@
 								/>
 							</th>
 							<th>{i + 1}</th>
-							<td>{item.santri.user.nama}</td>
+							<td>{item.santri.user.name}</td>
 							<td>
 								<input type="text" name="id" id="" value={item.id} hidden />
 								<div>
@@ -175,7 +175,7 @@
 								/>
 							</th>
 							<th>{i + 1}</th>
-							<td>{item.santri.user.nama}</td>
+							<td>{item.santri.user.name}</td>
 							<td>
 								<input type="text" name="id" id="" value={item.id} hidden />
 								<div>
@@ -229,7 +229,7 @@
 								/>
 							</th>
 							<th>{i + 1}</th>
-							<td>{item.santri.user.nama}</td>
+							<td>{item.santri.user.name}</td>
 							<td>
 								<input type="text" name="id" id="" value={item.id} hidden />
 								<div>
