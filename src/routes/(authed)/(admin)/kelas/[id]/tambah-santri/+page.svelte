@@ -41,7 +41,7 @@
 	function toggleAll(e: Event) {
 		const target = e.target as HTMLInputElement;
 		if (target.checked) {
-			selectedSantri = filteredSantriTersedia.map((s: any) => s.santriId);
+			selectedSantri = filteredSantriTersedia.map((s: any) => s.santri.id);
 		} else {
 			selectedSantri = [];
 		}
