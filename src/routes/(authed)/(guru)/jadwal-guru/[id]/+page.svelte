@@ -70,7 +70,7 @@
 				<h2 class="card-title">{jurnal.tanggalPertemuan}</h2>
 				<p>{jurnal.jurnalMengajar}</p>
 				<div class="card-actions justify-end">
-					<button
+					<!-- <button
 						class="btn btn-primary"
 						onclick={() => {
 							pertemuanId = jurnal.id;
@@ -78,7 +78,7 @@
 							defaultStatus = jurnal.status;
 							editPertemuanModal.showModal();
 						}}>Edit Jurnal</button
-					>
+					> -->
 					<a
 						href={resolve('/(authed)/(guru)/pertemuan-guru/[id]', { id: jurnal.id })}
 						class="btn btn-accent">Detail Absensi</a
