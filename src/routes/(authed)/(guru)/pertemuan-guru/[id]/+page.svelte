@@ -1,5 +1,6 @@
 <script lang="ts">
 	import type { PageServerData } from './$types';
+	import { resolve } from '$app/paths';
 	let { data }: { data: PageServerData } = $props();
 	const stats = $derived({
 		hadir: data.dataAbsensi.filter((h) => h.status_kehadiran === 'hadir'),
@@ -22,7 +23,13 @@
 			<p>Jurnal Mengajar: {data.dataPertemuan?.jurnalMengajar}</p>
 			<p>Status: {data.dataPertemuan?.status}</p>
 			<div class="card-actions justify-end">
-				<button class="btn btn-accent">Edit Jurnal</button>
+				<button class="btn btn-accent"
+					><a
+						href={resolve('/(authed)/(guru)/pertemuan-guru/[id]/edit-absensi', {
+							id: data.dataPertemuan?.id
+						})}>Edit Kehadiran</a
+					></button
+				>
 			</div>
 		</div>
 	</div>
