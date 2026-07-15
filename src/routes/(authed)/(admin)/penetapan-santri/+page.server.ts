@@ -75,6 +75,7 @@ export const actions: Actions = {
 		console.log(data);
 		const validation = pendaftaranSantriFormSchema.safeParse(data);
 		if (!validation.success) {
+			console.log(validation.error);
 			return fail(422, {
 				error: true,
 				message: 'Data yang anda masukkan salah',

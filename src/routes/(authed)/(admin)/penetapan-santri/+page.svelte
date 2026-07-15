@@ -86,7 +86,6 @@
 		)
 	);
 
-	// Improvisasi 3: Logika "Pilih Semua"
 	let allSelected = $derived(
 		filteredSantri.length > 0 && selectedSantri.length === filteredSantri.length
 	);
@@ -118,7 +117,6 @@
 		<div class="card bg-base-100 shadow-xl card-border">
 			<div class="card-body">
 				<div class="flex flex-col md:flex-row justify-between items-center mb-4 gap-4">
-					<!-- Improvisasi 4: Pencarian -->
 					<input
 						type="text"
 						placeholder="Cari nama atau NIS..."
@@ -131,27 +129,25 @@
 					</div>
 				</div>
 
-				<!-- Form Action untuk Bulk Insert -->
 				<form
 					method="POST"
 					action="?/daftar"
 					use:enhance={() => {
 						isSubmitting = true;
 						return async ({ update }) => {
-							await update({ reset: false }); // Cegah reset total UI form
+							await update({ reset: false });
 							isSubmitting = false;
-							selectedSantri = []; // Kosongkan pilihan jika sukses
+							selectedSantri = [];
 						};
 					}}
 				>
-					<input type="hidden" name="tahunAjaranId" value={data.tahunAjaranId} />
+					<input type="hidden" name="tahunAjaranId" value={data.tahunAjaranId.id} />
 
 					<div class="overflow-x-auto border rounded-box max-h-[60vh]">
 						<table class="table table-zebra table-pin-rows w-full">
 							<thead>
 								<tr>
 									<th class="w-12 text-center">
-										<!-- Checkbox Pilih Semua -->
 										<input
 											type="checkbox"
 											class="checkbox checkbox-sm checkbox-primary"
@@ -167,10 +163,9 @@
 								{#each filteredSantri as santri (santri.id)}
 									<tr>
 										<td class="text-center">
-											<!-- Bind group agar Svelte otomatis memasukkan value ke array selectedSantri -->
 											<input
 												type="checkbox"
-												name="santriIds"
+												name="santriId"
 												value={santri.id}
 												bind:group={selectedSantri}
 												class="checkbox checkbox-sm"
@@ -190,7 +185,6 @@
 						</table>
 					</div>
 
-					<!-- Area Eksekusi -->
 					<div class="mt-6 flex justify-end">
 						<button
 							type="submit"
