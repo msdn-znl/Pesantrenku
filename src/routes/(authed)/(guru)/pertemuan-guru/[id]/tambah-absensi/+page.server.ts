@@ -9,13 +9,13 @@ import { generateId } from '$lib/utils';
 
 export const load: PageServerLoad = async ({ params }) => {
 	const id = params.id;
+	const isDataExist = await db.query.absensi_santri.findFirst({
+		where: eq(table.absensi_santri.pertemuanId, id)
+	});
+	if (isDataExist) {
+		redirect(303, `/pertemuan-guru/${id}`);
+	}
 	try {
-		const isDataExist = await db.query.absensi_santri.findFirst({
-			where: eq(table.absensi_santri.pertemuanId, id)
-		});
-		if (isDataExist) {
-			redirect(303, `/(guru)/pertemuan-guru/${id}`);
-		}
 		const subqueryKelasId = db
 			.select({ kelasId: table.jadwal.kelasId })
 			.from(table.pertemuan)
@@ -69,6 +69,6 @@ export const actions: Actions = {
 			console.error(err);
 			return fail(500, { message: 'Error saat menambahkan data ke database' });
 		}
-		return redirect(303, `/(guru)/pertemuan-guru/${id}`);
+		return redirect(303, `/pertemuan-guru/${id}`);
 	}
 };
