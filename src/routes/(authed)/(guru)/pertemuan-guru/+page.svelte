@@ -36,9 +36,10 @@
 						{:else}
 							<td><p class="badge badge-accent">{pertemuan.status}</p></td>
 						{/if}
-						<td
-							><button class="btn btn-accent"
-								><a href={resolve('/pertemuan-guru/[id]/', { id: pertemuan.id })}>Detail</a></button
+						<td>
+							<a
+								class="btn btn-accent"
+								href={resolve('/pertemuan-guru/[id]/', { id: pertemuan.id })}>Detail</a
 							></td
 						>
 					</tr>

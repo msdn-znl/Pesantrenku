@@ -18,17 +18,16 @@
 		<div class="card-body">
 			<h2 class="card-title">
 				Detail Pertemuan: {data.dataPertemuan?.jadwal.kitab.namaKitab} - {data.dataPertemuan?.jadwal
-					.kelas.namaKelas}
+					.kelas.namaKelas} - {data.dataPertemuan?.jadwal.hari}
 			</h2>
 			<p>Jurnal Mengajar: {data.dataPertemuan?.jurnalMengajar}</p>
 			<p>Status: {data.dataPertemuan?.status}</p>
 			<div class="card-actions justify-end">
-				<button class="btn btn-accent"
-					><a
-						href={resolve('/(authed)/(guru)/pertemuan-guru/[id]/edit-absensi', {
-							id: data.dataPertemuan?.id
-						})}>Edit Kehadiran</a
-					></button
+				<a
+					class="btn btn-accent"
+					href={resolve('/(authed)/(guru)/pertemuan-guru/[id]/edit-absensi', {
+						id: data.dataPertemuan?.id
+					})}>Edit Kehadiran</a
 				>
 			</div>
 		</div>
