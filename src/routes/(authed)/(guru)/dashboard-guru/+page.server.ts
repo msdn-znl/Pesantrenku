@@ -1,7 +1,7 @@
 import type { PageServerLoad, Actions, RequestEvent } from './$types';
 import { error, fail, redirect } from '@sveltejs/kit';
 import { db } from '$lib/server/db';
-import { eq, and } from 'drizzle-orm';
+import { eq, and, getTableColumns } from 'drizzle-orm';
 import * as table from '$lib/server/db/schema';
 
 import { SinglePertemuanFormSchema } from '$lib/server/form-validation/pertemuan';
@@ -26,8 +26,23 @@ export const load: PageServerLoad = async ({ parent }) => {
 			with: { kelas: true, kitab: true }
 		});
 	}
-	console.log(jadwalHariIni);
-	return { user, isGuru: !!guruProfile, jadwalHariIni };
+	const tanggalSekarang = getTanggalSekarang();
+	const hariIni = getHariIni();
+	const jadwalSekarang = await db
+		.select()
+		.from(table.jadwal)
+		.leftJoin(table.kitab, eq(table.kitab.id, table.jadwal.kitabId))
+		.leftJoin(table.kelas, eq(table.kelas.id, table.jadwal.kelasId))
+		.leftJoin(
+			table.pertemuan,
+			and(
+				eq(table.pertemuan.jadwalId, table.jadwal.id),
+				eq(table.pertemuan.tanggalPertemuan, tanggalSekarang)
+			)
+		)
+		.where(and(eq(table.jadwal.guruId, guruProfile.id), eq(table.jadwal.hari, hariIni)));
+	console.log(jadwalSekarang);
+	return { user, isGuru: !!guruProfile, jadwalHariIni, jadwalSekarang };
 };
 
 export const actions: Actions = {
