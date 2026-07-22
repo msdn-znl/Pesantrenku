@@ -12,7 +12,7 @@
 </script>
 
 <svelte:head>
-	<title>Menu Pertemuan : Detail</title>
+	<title>Riwayat Jurnal</title>
 </svelte:head>
 <dialog class="modal" id="edit_perteman_modal" bind:this={editPertemuanModal}>
 	<div class="modal-box">
@@ -63,14 +63,14 @@
 	</div>
 </dialog>
 
-<div class="flex flex-col flex-wrap gap-4 w-full md:flex-row">
+<!-- <div class="flex flex-col flex-wrap gap-4 w-full md:flex-row">
 	{#each data.jurnalList as jurnal (jurnal.id)}
 		<div class="card card-md bg-base-100 shadow-sm">
 			<div class="card-body">
 				<h2 class="card-title">{jurnal.tanggalPertemuan}</h2>
 				<p>{jurnal.jurnalMengajar}</p>
 				<div class="card-actions justify-end">
-					<!-- <button
+					 <button
 						class="btn btn-primary"
 						onclick={() => {
 							pertemuanId = jurnal.id;
@@ -78,7 +78,7 @@
 							defaultStatus = jurnal.status;
 							editPertemuanModal.showModal();
 						}}>Edit Jurnal</button
-					> -->
+					> 
 					<a
 						href={resolve('/(authed)/(guru)/pertemuan-guru/[id]', { id: jurnal.id })}
 						class="btn btn-accent">Detail Absensi</a
@@ -87,42 +87,72 @@
 			</div>
 		</div>
 	{/each}
-	<!--Hapus Preview ini kalau sudah selesai-->
-	<!-- <div class="card bg-base-100 shadow-sm">
-		<div class="card-body">
-			<h2 class="card-title">10-10-2025</h2>
-			<p>Preview Jurnal Mengajar, sudah bisa dilihat</p>
-			<p>Status: Selesai</p>
-			<div class="card-actions justify-end">
-				<button
-					class="btn btn-primary"
-					onclick={() => {
-						pertemuanId = 'abc';
-						defaultJurnal = 'ini default value di awal';
-						defaultStatus = 'tugas mandiri';
-						editPertemuanModal.showModal();
-					}}>Edit Jurnal</button
-				>
-			</div>
-		</div>
+</div> -->
+<div class="p-6 bg-base-200 min-h-screen">
+	<!-- Header Halaman -->
+	<div class="mb-8">
+		<h1 class="text-3xl font-bold text-base-content">Riwayat Jurnal & Absensi</h1>
+		<p class="text-base-content/70 mt-1">
+			Daftar pertemuan kelas dan catatan materi yang telah diajarkan.
+		</p>
 	</div>
-	<div class="card bg-base-100 shadow-sm">
-		<div class="card-body">
-			<h2 class="card-title">10-10-2025</h2>
-			<p>Preview Jurnal Mengajar, sdah bisa dilihat</p>
-			<p>Status: Selesai</p>
-			<div class="card-actions justify-end">
-				<button
-					class="btn btn-primary"
-					onclick={() => {
-						pertemuanId = 'xyz';
-						defaultJurnal = 'Default value lain';
-						defaultStatus = 'selesai';
-						editPertemuanModal.showModal();
-					}}>Edit Jurnal</button
-				>
-				<a href="/pertemuan-guru/abc" class="btn btn-accent">Detail Absensi</a>
+
+	<!-- Layout Grid untuk Card Jurnal -->
+	<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+		{#each data.jurnalList as jurnal (jurnal.id)}
+			<div class="card bg-base-100 shadow-xl card-border">
+				<div class="card-body">
+					<!-- Top Info: Tanggal & Status -->
+					<div class="flex flex-wrap justify-between items-start gap-2 mb-4">
+						<div class="badge badge-primary badge-soft font-medium">
+							<!-- Format tanggal menjadi lebih ramah dibaca (contoh: 18 Juli 2026) -->
+							{new Date(jurnal.tanggalPertemuan).toLocaleDateString('id-ID', {
+								weekday: 'long',
+								year: 'numeric',
+								month: 'long',
+								day: 'numeric'
+							})}
+						</div>
+
+						<!-- Badge status berdasarkan enum di skema -->
+						{#if jurnal.status === 'selesai'}
+							<div class="badge badge-success badge-soft capitalize">Selesai</div>
+						{:else if jurnal.status === 'tugas mandiri'}
+							<div class="badge badge-info badge-soft capitalize">Tugas Mandiri</div>
+						{:else if jurnal.status === 'batal'}
+							<div class="badge badge-error badge-soft capitalize">Batal</div>
+						{/if}
+					</div>
+
+					<!-- Konten Jurnal -->
+					<h2 class="card-title text-base-content text-lg">Catatan Mengajar:</h2>
+					<!-- line-clamp-3 menjaga agar text panjang tidak merusak tinggi card secara berlebihan -->
+					<p class="text-base-content/70 text-sm line-clamp-3 mt-1">
+						{jurnal.jurnalMengajar || 'Tidak ada catatan yang diisi pada pertemuan ini.'}
+					</p>
+
+					<!-- Tombol Aksi -->
+					<div class="card-actions justify-end mt-6">
+						<a
+							href={resolve('/(authed)/(guru)/pertemuan-guru/[id]', { id: jurnal.id })}
+							class="btn btn-accent w-full sm:w-auto"
+						>
+							Detail Absensi
+						</a>
+					</div>
+				</div>
 			</div>
-		</div>
-	</div> -->
+		{:else}
+			<!-- Fallback Tampilan Kosong -->
+			<div class="col-span-full">
+				<div class="card bg-base-100 shadow-sm border border-base-200">
+					<div class="card-body text-center py-12">
+						<p class="text-lg font-medium text-base-content/70">
+							Belum ada riwayat jurnal mengajar untuk jadwal ini.
+						</p>
+					</div>
+				</div>
+			</div>
+		{/each}
+	</div>
 </div>
