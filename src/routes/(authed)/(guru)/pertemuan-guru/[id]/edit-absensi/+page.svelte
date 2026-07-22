@@ -2,20 +2,13 @@
 	import type { PageServerData, ActionData } from './$types';
 	let { data, form }: { data: PageServerData; form: ActionData } = $props();
 
-	const absensi = $derived({
-		hadir: data.dataAbsensiSantri.filter((item) => item.status_kehadiran === 'hadir'),
-		izin: data.dataAbsensiSantri.filter((item) => item.status_kehadiran === 'izin'),
-		alfa: data.dataAbsensiSantri.filter((item) => item.status_kehadiran === 'alfa'),
-		sakit: data.dataAbsensiSantri.filter((item) => item.status_kehadiran === 'sakit')
-	});
-
 	let tableBody = $state<HTMLElement>();
 	let selectedSantri: string[] = $state([]);
 
 	const toggleSelectAll = (event: Event) => {
 		const target = event.target as HTMLInputElement;
 		if (target.checked) {
-			selectedSantri = data.dataAbsensiSantri.map((s) => s.santriId);
+			selectedSantri = data.dataAbsensiSantri.map((s) => s.id);
 		} else {
 			selectedSantri = [];
 		}
@@ -55,217 +48,62 @@
 						<th>Status</th>
 					</tr>
 				</thead>
-				<tbody id="table-body-hadir" bind:this={tableBody}>
-					{#each absensi.hadir as item, i (item.id)}
+				<tbody id="table-body" bind:this={tableBody}>
+					{#each data.dataAbsensiSantri as absensi, i (absensi.id)}
 						<tr>
-							<th>
-								<input
+							<th
+								><input
 									type="checkbox"
+									name=""
+									id=""
 									class="checkbox checkbox-md"
-									value={item.id}
+									value={absensi.id}
 									bind:group={selectedSantri}
-								/>
-							</th>
+								/></th
+							>
 							<th>{i + 1}</th>
-							<td>{item.santri.user.name}</td>
+							<td>{absensi.santri.user.name}</td>
 							<td>
-								<input type="text" name="id" id="" value={item.id} hidden />
 								<div>
-									<input
-										type="radio"
-										name="status_{item.id}"
-										id="hadir"
-										value="hadir"
-										class="radio"
-										checked
-									/>
-									<label for="hadir_{item.id}">Hadir</label>
-									<input
-										type="radio"
-										name="status_{item.id}"
-										id="alfa"
-										value="alfa"
-										class="radio"
-									/>
-									<label for="alfa_{item.id}">Alfa</label>
-									<input
-										type="radio"
-										name="status_{item.id}"
-										id="izin"
-										value="izin"
-										class="radio"
-									/>
-									<label for="izin_{item.id}">Izin</label>
-									<input
-										type="radio"
-										name="status_{item.id}"
-										id="sakit"
-										value="sakit"
-										class="radio"
-									/>
-									<label for="sakit_{item.id}">Sakit</label>
+									<input type="text" name="id" id="" value={absensi.id} hidden />
 								</div>
-							</td>
-						</tr>
-					{/each}
-				</tbody>
-				<tbody id="table-body-alfa" bind:this={tableBody}>
-					{#each absensi.alfa as item, i (item.id)}
-						<tr>
-							<th>
-								<input
-									type="checkbox"
-									class="checkbox checkbox-md"
-									value={item.id}
-									bind:group={selectedSantri}
-								/>
-							</th>
-							<th>{i + 1}</th>
-							<td>{item.santri.user.name}</td>
-							<td>
-								<input type="text" name="id" id="" value={item.id} hidden />
-								<div>
+								<div class="">
 									<input
 										type="radio"
-										name="status_{item.id}"
+										name="status_{absensi.id}"
 										id="hadir"
 										value="hadir"
 										class="radio"
+										checked={absensi.status_kehadiran === 'hadir'}
 									/>
-									<label for="hadir_{item.id}">Hadir</label>
+									<label for="hadir" class="badge badge-soft badge-accent">Hadir</label>
 									<input
 										type="radio"
-										name="status_{item.id}"
+										name="status_{absensi.id}"
 										id="alfa"
 										value="alfa"
 										class="radio"
-										checked
+										checked={absensi.status_kehadiran === 'alfa'}
 									/>
-									<label for="alfa_{item.id}">Alfa</label>
+									<label for="alfa" class="badge badge-soft badge-error">Alfa</label>
 									<input
 										type="radio"
-										name="status_{item.id}"
-										id="izin"
-										value="izin"
-										class="radio"
-									/>
-									<label for="izin_{item.id}">Izin</label>
-									<input
-										type="radio"
-										name="status_{item.id}"
+										name="status_{absensi.id}"
 										id="sakit"
 										value="sakit"
 										class="radio"
+										checked={absensi.status_kehadiran === 'sakit'}
 									/>
-									<label for="sakit_{item.id}">Sakit</label>
-								</div>
-							</td>
-						</tr>
-					{/each}
-				</tbody>
-				<tbody id="table-body-izin" bind:this={tableBody}>
-					{#each absensi.izin as item, i (item.id)}
-						<tr>
-							<th>
-								<input
-									type="checkbox"
-									class="checkbox checkbox-md"
-									value={item.id}
-									bind:group={selectedSantri}
-								/>
-							</th>
-							<th>{i + 1}</th>
-							<td>{item.santri.user.name}</td>
-							<td>
-								<input type="text" name="id" id="" value={item.id} hidden />
-								<div>
+									<label for="sakit" class="badge badge-soft badge-warning">Sakit</label>
 									<input
 										type="radio"
-										name="status_{item.id}"
-										id="hadir"
-										value="hadir"
-										class="radio"
-									/>
-									<label for="hadir_{item.id}">Hadir</label>
-									<input
-										type="radio"
-										name="status_{item.id}"
-										id="alfa"
-										value="alfa"
-										class="radio"
-									/>
-									<label for="alfa_{item.id}">Alfa</label>
-									<input
-										type="radio"
-										name="status_{item.id}"
+										name="status_{absensi.id}"
 										id="izin"
 										value="izin"
 										class="radio"
-										checked
+										checked={absensi.status_kehadiran === 'izin'}
 									/>
-									<label for="izin_{item.id}">Izin</label>
-									<input
-										type="radio"
-										name="status_{item.id}"
-										id="sakit"
-										value="sakit"
-										class="radio"
-									/>
-									<label for="sakit_{item.id}">Sakit</label>
-								</div>
-							</td>
-						</tr>
-					{/each}
-				</tbody>
-				<tbody id="table-body-sakit" bind:this={tableBody}>
-					{#each absensi.sakit as item, i (item.id)}
-						<tr>
-							<th>
-								<input
-									type="checkbox"
-									class="checkbox checkbox-md"
-									value={item.id}
-									bind:group={selectedSantri}
-								/>
-							</th>
-							<th>{i + 1}</th>
-							<td>{item.santri.user.name}</td>
-							<td>
-								<input type="text" name="id" id="" value={item.id} hidden />
-								<div>
-									<input
-										type="radio"
-										name="status_{item.id}"
-										id="hadir"
-										value="hadir"
-										class="radio"
-									/>
-									<label for="hadir_{item.id}">Hadir</label>
-									<input
-										type="radio"
-										name="status_{item.id}"
-										id="alfa"
-										value="alfa"
-										class="radio"
-									/>
-									<label for="alfa_{item.id}">Alfa</label>
-									<input
-										type="radio"
-										name="status_{item.id}"
-										id="izin"
-										value="izin"
-										class="radio"
-									/>
-									<label for="izin_{item.id}">Izin</label>
-									<input
-										type="radio"
-										name="status_{item.id}"
-										id="sakit"
-										value="sakit"
-										class="radio"
-										checked
-									/>
-									<label for="sakit_{item.id}">Sakit</label>
+									<label for="izin" class="badge badge-soft badge-info">Izin</label>
 								</div>
 							</td>
 						</tr>
